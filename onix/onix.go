@@ -19,10 +19,9 @@ func CreateService(args common.Command) {
         console.Fail("Must supply an application name")
     }
 
-    createServiceUrl := onixUrl("/applications")
     createBody := Service{args.Application}
 
-    response, err := common.PostJson(createServiceUrl, createBody)
+    response, err := common.PostJson(onixUrl("/applications"), createBody)
 
     if err != nil {
         fmt.Println(err)
@@ -37,6 +36,7 @@ func ListServices() {
     response, err := common.GetString(onixUrl("/applications"))
     if err != nil {
         fmt.Println(err)
+        console.Fail("Error listing services")
     }
     fmt.Println(response)
 }

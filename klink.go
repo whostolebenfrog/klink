@@ -8,8 +8,10 @@ import (
 	ditto "nokia.com/klink/ditto"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
+    tyr "nokia.com/klink/tyranitar"
 )
 
+// TODO: positional args!
 func loadFlags() common.Command {
 	command := common.Command{}
 	flag.StringVar(&command.Action, "action", "", "Action for klink to perform: [deploy, build, rollback]")
@@ -29,16 +31,25 @@ func loadFlags() common.Command {
 	return command
 }
 
+// TODO: figure out some names here
+// TODO: --json output mode
 func handleAction(args common.Command) {
 	switch args.Action {
 	case "deploy":
 		exploud.Exploud(args)
 	case "bake":
 		ditto.Bake(args)
-	case "create-service":
+	case "create-service-onix":
 		onix.CreateService(args)
-    case "list-services":
+    case "list-services-onix":
         onix.ListServices()
+    case "create-service-tyr":
+        tyr.CreateService(args)
+    case "list-services-tyr":
+        tyr.ListServices()
+    case "create-service":
+        onix.CreateService(args)
+        tyr.CreateService(args)
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}
