@@ -1,0 +1,29 @@
+#!/bin/bash
+# Build klink for all environments. Note you must have built go from source and cross-compiled for all platforms before running this script.
+# See http://dave.cheney.net/2012/09/08/an-introduction-to-cross-compilation-with-go for instructions
+
+PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
+
+function go-alias {
+	GOOS=${1%/*}
+	GOARCH=${1#*/}
+	eval "function go-${GOOS}-${GOARCH} { ( GOOS=${GOOS} GOARCH=${GOARCH} go \$@ ) }"
+}
+
+for PLATFORM in $PLATFORMS; do
+    go-alias $PLATFORM
+done
+
+FAILURES=""
+for PLATFORM in $PLATFORMS; do
+    GOOS=${PLATFORM%/*}
+    GOARCH=${PLATFORM#*/}
+    OUTPUT=`echo $@ | sed 's/\.go//'` 
+    CMD="go-${GOOS}-${GOARCH} build -o builds/klink-${GOOS}-${GOARCH} $@"
+    echo "$CMD"
+    $CMD || FAILURES="$FAILURES $PLATFORM"
+done
+if [ "$FAILURES" != "" ]; then
+    echo "*** go-build-all FAILED on $FAILURES ***"
+    return 1
+fi
