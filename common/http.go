@@ -55,3 +55,12 @@ func GetJson(url string, v interface{}) error {
 	}
 	return json.Unmarshal([]byte(body), &v)
 }
+
+func Head(url string) (bool, error) {
+	resp, err := http.Head(url)
+	if err != nil {
+		return false, errors.New(fmt.Sprintf("Error calling head on URL: %s", url))
+	}
+
+	return resp.StatusCode == 200, nil
+}

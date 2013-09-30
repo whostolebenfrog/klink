@@ -3,12 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+    "os"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
     tyr "nokia.com/klink/tyranitar"
+    update "nokia.com/klink/update"
 )
 
 // TODO: positional args!
@@ -33,8 +35,11 @@ func loadFlags() common.Command {
 
 // TODO: figure out some names here
 // TODO: --json output mode
+// TODO: DOCTOR! 
 func handleAction(args common.Command) {
 	switch args.Action {
+    case "update":
+        update.Update(os.Args[0])
 	case "deploy":
 		exploud.Exploud(args)
 	case "bake":
