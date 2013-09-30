@@ -1,4 +1,4 @@
-package args
+package common
 
 type Command struct {
 	Action      string

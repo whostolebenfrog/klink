@@ -3,15 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	args "nokia.com/klink/args"
+	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
 )
 
-func loadFlags() args.Command {
-	command := args.Command{}
+func loadFlags() common.Command {
+	command := common.Command{}
 	flag.StringVar(&command.Action, "action", "", "Action for klink to perform: [deploy, build, rollback]")
 	flag.StringVar(&command.Application, "app", "", "Application to do stuff with")
 	flag.StringVar(&command.Ami, "ami", "deploy", "Set the ami to deploy")
@@ -29,7 +29,7 @@ func loadFlags() args.Command {
 	return command
 }
 
-func handleAction(args args.Command) {
+func handleAction(args common.Command) {
 	switch args.Action {
 	case "deploy":
 		exploud.Exploud(args)

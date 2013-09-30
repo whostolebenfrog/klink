@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	args "nokia.com/klink/args"
+	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 )
 
-func Bake(command args.Command) {
+func Bake(command common.Command) {
 	if command.Version == "" {
 		console.Fail("Args version must be supplied")
 	}

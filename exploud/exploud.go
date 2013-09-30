@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	args "nokia.com/klink/args"
+	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 )
 
@@ -15,7 +15,7 @@ type DeployRequest struct {
 	Environment string `json:"environment"`
 }
 
-func Exploud(args args.Command) {
+func Exploud(args common.Command) {
 	deployUrl := fmt.Sprintf("http://10.216.138.6:8080/1.x/applications/%s/deploy", args.Application)
 
 	deployRequest := DeployRequest{args.Ami, "dev"}
