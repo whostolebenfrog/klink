@@ -24,12 +24,12 @@ func loadFlags() common.Command {
 	flag.StringVar(&command.Version, "v", "", "Version to deploy, rollback etc [e.g. 0.153]")
 	flag.Parse()
 
-	fmt.Println("\tAction:      ", command.Action)
-	fmt.Println("\tAmi:         ", command.Ami)
-	fmt.Println("\tApplication: ", command.Application)
-	fmt.Println("\tEnvironment: ", command.Environment)
-	fmt.Println("\tMessage:     ", command.Message)
-	fmt.Println("\tVersion:     ", command.Version, "\n")
+	fmt.Println("\t\t\tAction:      ", command.Action)
+	fmt.Println("\t\t\tAmi:         ", command.Ami)
+	fmt.Println("\t\t\tApplication: ", command.Application)
+	fmt.Println("\t\t\tEnvironment: ", command.Environment)
+	fmt.Println("\t\t\tMessage:     ", command.Message)
+	fmt.Println("\t\t\tVersion:     ", command.Version, "\n")
 	return command
 }
 
