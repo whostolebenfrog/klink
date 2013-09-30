@@ -3,7 +3,7 @@
 # See http://dave.cheney.net/2012/09/08/an-introduction-to-cross-compilation-with-go for instructions
 
 PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
-VERSION=0.2
+VERSION="0.3"
 
 function go-alias {
 	GOOS=${1%/*}

@@ -38,6 +38,8 @@ func loadFlags() common.Command {
 // TODO: DOCTOR! 
 func handleAction(args common.Command) {
 	switch args.Action {
+    case "version":
+        update.Version()
     case "update":
         update.Update(os.Args[0])
 	case "deploy":

@@ -9,9 +9,18 @@ import (
     console "nokia.com/klink/console"
 )
 
-// TODO: move the version out from this file
+// TODO: version in a property?
+// TODO: version bumped on build
+// TODO: support non 0.x versions
+
+const version = 3
+
+func Version() {
+    fmt.Println(fmt.Sprintf("klink-0.%d-%s-%s", version, runtime.GOOS, runtime.GOARCH))
+}
+
 func Update(path string) {
-    currentVersion := 1 + 1
+    currentVersion := version + 1
 
     nextVersion := fmt.Sprintf("klink-0.%d-%s-%s", currentVersion, runtime.GOOS, runtime.GOARCH)
 
