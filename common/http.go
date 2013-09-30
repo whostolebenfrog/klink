@@ -27,10 +27,8 @@ func PostJson(url string, body interface{}) (string, error) {
 			return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
 		}
 		return string(body), nil
-	} else {
-		return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
 	}
-	return "", errors.New("I didn't think this was reachable :-(")
+	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
 }
 
 func GetString(url string) (string, error) {
@@ -45,16 +43,15 @@ func GetString(url string) (string, error) {
 		if err != nil {
 			return "", errors.New(fmt.Sprintf("Failed to read body response from: %s", url))
 		}
-        return string(body), nil
-	} else {
-        return "", errors.New(fmt.Sprintf("Non 200 response from: %s", url))
-    }
+		return string(body), nil
+	}
+	return "", errors.New(fmt.Sprintf("Non 200 response from: %s", url))
 }
 
 func GetJson(url string, v interface{}) error {
-    body, err := GetString(url)
-    if err != nil {
-        return err
-    }
-    return json.Unmarshal([]byte(body), &v)
+	body, err := GetString(url)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal([]byte(body), &v)
 }
