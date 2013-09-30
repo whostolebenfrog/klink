@@ -13,7 +13,7 @@ import (
 // TODO: version bumped on build
 // TODO: support non 0.x versions
 
-const version = 4
+const version = 5
 
 func Version() {
     fmt.Println(fmt.Sprintf("klink-0.%d-%s-%s", version, runtime.GOOS, runtime.GOARCH))
