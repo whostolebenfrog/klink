@@ -15,11 +15,11 @@ func onixUrl(end string) string {
 }
 
 func CreateService(args common.Command) {
-    if args.Application == "" {
-        console.Fail("Must supply an application name")
+    if args.SecondPos == "" {
+        console.Fail("Must supply an application name as second positional argument")
     }
 
-    createBody := Service{args.Application}
+    createBody := Service{args.SecondPos}
 
     response, err := common.PostJson(onixUrl("/applications"), createBody)
 
