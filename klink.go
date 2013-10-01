@@ -16,6 +16,7 @@ import (
 func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
+    fmt.Println("\n")
 	fmt.Println(optarg.UsageString())
 	os.Exit(0)
 }
