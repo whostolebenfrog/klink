@@ -40,3 +40,8 @@ func ListServices() {
     }
     fmt.Println(response)
 }
+
+func ServiceExists(serviceName string) bool {
+    resp, _ := common.Head(onixUrl("/applications" + serviceName))
+    return resp
+}
