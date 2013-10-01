@@ -15,56 +15,53 @@ import (
 
 func printHelpAndExit() {
 	console.Klink()
-    update.PrintVersion()
-    fmt.Println(optarg.UsageString())
-    os.Exit(0)
+	update.PrintVersion()
+	fmt.Println(optarg.UsageString())
+	os.Exit(0)
 }
 
 // TODO: general - doc string on functions?
+// TODO: general - json output mode? jq mode?
 func loadFlags() common.Command {
 	command := common.Command{}
 
-    // flags
-    optarg.Header("General Options")
-    optarg.Add("h", "help", "Displays this help message", false)
-    optarg.Header("Deployment based flags")
-    optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
-    optarg.Add("e", "environment", "Sets the environment", "ent-dev")
-    optarg.Add("m", "message", "Sets the environment", "")
-    optarg.Add("v", "version", "Sets the version", "")
+	// flags
+	optarg.Header("General Options")
+	optarg.Add("h", "help", "Displays this help message", false)
+	optarg.Header("Deployment based flags")
+	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
+	optarg.Add("e", "environment", "Sets the environment", "ent-dev")
+	optarg.Add("m", "message", "Sets the environment", "")
+	optarg.Add("v", "version", "Sets the version", "")
 
-    for opt := range optarg.Parse() {
-        switch opt.ShortName {
-        case "h":
-            printHelpAndExit()
-        case "a":
-            command.Ami = opt.String()
-        case "e":
-            command.Environment = opt.String()
-        case "m":
-            command.Message = opt.String()
-        case "v":
-            command.Version = opt.String()
-        }
-    }
+	for opt := range optarg.Parse() {
+		switch opt.ShortName {
+		case "h":
+			printHelpAndExit()
+		case "a":
+			command.Ami = opt.String()
+		case "e":
+			command.Environment = opt.String()
+		case "m":
+			command.Message = opt.String()
+		case "v":
+			command.Version = opt.String()
+		}
+	}
 
-    // positional arguments
-    if len(os.Args) < 2 {
-        printHelpAndExit()
-    }
-    command.Action = os.Args[1]
-    // some commands need a second positional argument
-    if len(os.Args) > 2 {
-        command.SecondPos = os.Args[2]
-    }
-
+	// positional arguments
+	if len(os.Args) < 2 {
+		printHelpAndExit()
+	}
+	command.Action = os.Args[1]
+	// some commands need a second positional argument
+	if len(os.Args) > 2 {
+		command.SecondPos = os.Args[2]
+	}
 
 	return command
 }
 
-// TODO: figure out some names here
-// TODO: --json output mode
-// TODO: DOCTOR!
 func handleAction(args common.Command) {
 	switch args.Action {
 	case "update":
@@ -84,14 +81,13 @@ func handleAction(args common.Command) {
 	case "create-service":
 		onix.CreateService(args)
 		tyr.CreateService(args)
-    case "doctor":
-        fmt.Println("The Doctor is in the house")
+	case "doctor":
+		fmt.Println("The Doctor is in the house")
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}
 }
 
 func main() {
-	command := loadFlags()
-	handleAction(command)
+	handleAction(loadFlags())
 }
