@@ -14,6 +14,7 @@ import (
 )
 
 func printHelpAndExit() {
+	console.Klink()
     fmt.Println(optarg.UsageString())
     os.Exit(0)
 }
@@ -85,7 +86,6 @@ func handleAction(args common.Command) {
 }
 
 func main() {
-	console.Klink()
 	command := loadFlags()
 	handleAction(command)
 }
