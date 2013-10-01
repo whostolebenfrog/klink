@@ -16,7 +16,7 @@ type DeployRequest struct {
 }
 
 func Exploud(args common.Command) {
-	deployUrl := fmt.Sprintf("http://10.216.138.6:8080/1.x/applications/%s/deploy", args.Application)
+	deployUrl := fmt.Sprintf("http://exploud.brislabs.com:8080/1.x/applications/%s/deploy", args.Application)
 
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	b, err := json.Marshal(deployRequest)
