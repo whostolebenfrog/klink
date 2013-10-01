@@ -3,7 +3,7 @@
 # See http://dave.cheney.net/2012/09/08/an-introduction-to-cross-compilation-with-go for instructions
 
 PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
-VERSION="0.5"
+VERSION=`cat version`
 
 function go-alias {
 	GOOS=${1%/*}
@@ -24,7 +24,7 @@ for PLATFORM in $PLATFORMS; do
     CMD="go-${GOOS}-${GOARCH} build -o builds/$NAME $@"
     echo "$CMD"
     $CMD || FAILURES="$FAILURES $PLATFORM"
-    scp -i ~/.ssh/dmt-key builds/$NAME root@benkins.brislabs.com:/opt/klink/
+    #scp -i ~/.ssh/dmt-key builds/$NAME root@benkins.brislabs.com:/opt/klink/
 done
 if [ "$FAILURES" != "" ]; then
     echo "*** go-build-all FAILED on $FAILURES ***"

@@ -13,6 +13,8 @@ import (
     update "nokia.com/klink/update"
 )
 
+// TODO: general - doc string on functions?
+
 // TODO: positional args!
 func loadFlags() common.Command {
 	command := common.Command{}
@@ -39,7 +41,7 @@ func loadFlags() common.Command {
 func handleAction(args common.Command) {
 	switch args.Action {
     case "version":
-        update.Version()
+        update.PrintVersion()
     case "update":
         update.Update(os.Args[0])
 	case "deploy":

@@ -1,69 +1,105 @@
 package update
 
 import (
-    "bytes"
-    "fmt"
-    "os/exec"
-    "runtime"
-    common "nokia.com/klink/common"
-    console "nokia.com/klink/console"
+	"bytes"
+	"fmt"
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	"os/exec"
+	"runtime"
+	"strconv"
+    "strings"
 )
 
-// TODO: version in a property?
-// TODO: version bumped on build
-// TODO: support non 0.x versions
+// TODO: git tag builds
 
-const version = 5
+func benkinsUrl(end string) string {
+	return "http://benkins.brislabs.com/klink/" + end
+}
 
-func Version() {
-    fmt.Println(fmt.Sprintf("klink-0.%d-%s-%s", version, runtime.GOOS, runtime.GOARCH))
+func PrintVersion() {
+	fmt.Println(fmt.Sprintf("klink-0.%d-%s-%s", Version, runtime.GOOS, runtime.GOARCH))
+}
+
+func LatestVersion() int {
+	latestFromServer, err := common.GetString(benkinsUrl("version"))
+	if err != nil {
+        fmt.Println(err)
+		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
+	}
+
+	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
+	if err != nil {
+        fmt.Println(err)
+		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
+	}
+	return i
+}
+
+func errorWithHelper(nextVersionUrl string) {
+	fmt.Println("\nThere appears to be a later version but an error has occured whilst updating")
+	fmt.Println("You should may be able to download it manually from: ", nextVersionUrl)
+	fmt.Println("\nYou could also try again or check benkins manually for updates")
+	console.Fail("http://benkins.brislabs.com/klink/")
 }
 
 func Update(path string) {
-    currentVersion := version + 1
+	if LatestVersion() == Version {
+		fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
+		PrintVersion()
+		return
+	}
 
-    nextVersion := fmt.Sprintf("klink-0.%d-%s-%s", currentVersion, runtime.GOOS, runtime.GOARCH)
+	nextVersion := fmt.Sprintf("klink-%d-%s-%s", LatestVersion(), runtime.GOOS, runtime.GOARCH)
 
-    nextVersionUrl := "http://benkins.brislabs.com/klink/" + nextVersion
+	nextVersionUrl := benkinsUrl(nextVersion)
 
-    exists, err := common.Head(nextVersionUrl)
-    if err != nil {
-        console.Fail("Failed to curl benkins for new version")
-    }
+	exists, err := common.Head(nextVersionUrl)
+	if err != nil {
+        fmt.Println(err)
+		errorWithHelper(nextVersionUrl)
+	}
 
-    if exists {
-        wget := exec.Command("wget", nextVersionUrl, "-O", path + ".tmp")
-        var wgetStderr bytes.Buffer
-        wget.Stderr = &wgetStderr
-        wgetErr := wget.Run()
+	if exists {
+        // get the latest version, save to a tmp file
+		wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
+		var wgetStderr bytes.Buffer
+		wget.Stderr = &wgetStderr
+		wgetErr := wget.Run()
 
-        if wgetErr != nil {
-            fmt.Println(fmt.Sprint(wgetErr) + ":" + wgetStderr.String())
-            console.Fail("Failed to wget the latest version. Ensure it's installed!")
-        }
+		if wgetErr != nil {
+			fmt.Println(fmt.Sprint(wgetErr) + ":" + wgetStderr.String())
+			fmt.Println("Failed to wget the latest version. Ensure it's installed!")
+			errorWithHelper(nextVersionUrl)
+		}
 
-        mv := exec.Command("mv", "-f", path + ".tmp", path)
-        var mvStderr bytes.Buffer
-        mv.Stderr = &mvStderr
-        mvErr := mv.Run()
+        // overwrite the old version with the new one
+		mv := exec.Command("mv", "-f", path+".tmp", path)
+		var mvStderr bytes.Buffer
+		mv.Stderr = &mvStderr
+		mvErr := mv.Run()
 
-        if mvErr != nil {
-            fmt.Println(fmt.Sprint(mvErr) + ":" + mvStderr.String())
-            console.Fail("Can't overwrite the previous version. DIY.")
-        }
+		if mvErr != nil {
+			fmt.Println(fmt.Sprint(mvErr) + ":" + mvStderr.String())
+			fmt.Println("Can't overwrite the previous version. You might be able to do it yourself")
+			errorWithHelper(nextVersionUrl)
+		}
 
-        chmod := exec.Command("chmod", "+x", path)
-        var chmodStderr bytes.Buffer
-        chmod.Stderr = &chmodStderr
-        chmodErr := chmod.Run()
+        // make the new one executable
+		chmod := exec.Command("chmod", "+x", path)
+		var chmodStderr bytes.Buffer
+		chmod.Stderr = &chmodStderr
+		chmodErr := chmod.Run()
 
-        if chmodErr != nil {
-            fmt.Println(fmt.Sprint(chmodErr) + ":" + chmodStderr.String())
-            console.Fail("Failed to set executable on the newly updated klink")
-        }
+		if chmodErr != nil {
+			fmt.Println(fmt.Sprint(chmodErr) + ":" + chmodStderr.String())
+			fmt.Println("Failed to +x on klink. You might be able to do it yourself")
+			errorWithHelper(nextVersionUrl)
+		}
 
-        fmt.Println("Klink has been updated to the latest version!")
-    } else {
-        fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
-    }
+		fmt.Println("Klink has been updated to the latest version!")
+	} else {
+        fmt.Println(err)
+		errorWithHelper(nextVersionUrl)
+	}
 }

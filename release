@@ -1,0 +1,28 @@
+#!/bin/bash
+# Builds then releases latest version
+
+VERSION=`cat version`
+NEXT_VERSION=$(($VERSION + 1))
+
+echo Releasing next version: $NEXT_VERSION
+
+# Set the new version in the go source so that the code has access to it.
+# Ghetto properties files going on here! 
+
+sed -i "s/^const Version.*$/const Version = $NEXT_VERSION/" update/version.go
+echo $NEXT_VERSION > version
+
+# Clear the build output directory and build project for all environments
+rm builds/*
+./build-all
+
+BUILDS=builds/*
+
+for build in $BUILDS
+do
+    scp -i ~/.ssh/dmt-key $build root@benkins.brislabs.com:/opt/klink/
+done
+
+# Update the version file on the remote server to provide the latest version
+
+scp -i ~/.ssh/dmt-key version root@benkins.brislabs.com:/opt/klink/
