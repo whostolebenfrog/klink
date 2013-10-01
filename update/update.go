@@ -11,8 +11,6 @@ import (
     "strings"
 )
 
-// TODO: git tag builds
-
 func benkinsUrl(end string) string {
 	return "http://benkins.brislabs.com/klink/" + end
 }
