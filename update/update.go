@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
-    "strings"
+	"strings"
 )
 
 func benkinsUrl(end string) string {
@@ -22,13 +22,13 @@ func PrintVersion() {
 func LatestVersion() int {
 	latestFromServer, err := common.GetString(benkinsUrl("version"))
 	if err != nil {
-        fmt.Println(err)
+		fmt.Println(err)
 		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
 	}
 
 	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
 	if err != nil {
-        fmt.Println(err)
+		fmt.Println(err)
 		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
 	}
 	return i
@@ -41,7 +41,12 @@ func errorWithHelper(nextVersionUrl string) {
 	console.Fail("http://benkins.brislabs.com/klink/")
 }
 
-func Update(path string) {
+func Update(argsPath string) {
+	path, pathErr := exec.LookPath("klink")
+	if pathErr != nil {
+		path = argsPath
+	}
+
 	if LatestVersion() == Version {
 		fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
 		PrintVersion()
@@ -54,12 +59,12 @@ func Update(path string) {
 
 	exists, err := common.Head(nextVersionUrl)
 	if err != nil {
-        fmt.Println(err)
+		fmt.Println(err)
 		errorWithHelper(nextVersionUrl)
 	}
 
 	if exists {
-        // get the latest version, save to a tmp file
+		// get the latest version, save to a tmp file
 		wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
 		var wgetStderr bytes.Buffer
 		wget.Stderr = &wgetStderr
@@ -71,7 +76,7 @@ func Update(path string) {
 			errorWithHelper(nextVersionUrl)
 		}
 
-        // overwrite the old version with the new one
+		// overwrite the old version with the new one
 		mv := exec.Command("mv", "-f", path+".tmp", path)
 		var mvStderr bytes.Buffer
 		mv.Stderr = &mvStderr
@@ -83,7 +88,7 @@ func Update(path string) {
 			errorWithHelper(nextVersionUrl)
 		}
 
-        // make the new one executable
+		// make the new one executable
 		chmod := exec.Command("chmod", "+x", path)
 		var chmodStderr bytes.Buffer
 		chmod.Stderr = &chmodStderr
@@ -97,7 +102,7 @@ func Update(path string) {
 
 		fmt.Println("Klink has been updated to the latest version!")
 	} else {
-        fmt.Println(err)
+		fmt.Println(err)
 		errorWithHelper(nextVersionUrl)
 	}
 }
