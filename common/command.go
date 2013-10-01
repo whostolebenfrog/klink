@@ -6,5 +6,6 @@ type Command struct {
 	Application string
 	Environment string
 	Message     string
+    SecondPos   string
 	Version     string
 }

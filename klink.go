@@ -15,6 +15,7 @@ import (
 
 func printHelpAndExit() {
 	console.Klink()
+    update.PrintVersion()
     fmt.Println(optarg.UsageString())
     os.Exit(0)
 }
@@ -52,6 +53,11 @@ func loadFlags() common.Command {
         printHelpAndExit()
     }
     command.Action = os.Args[1]
+    // some commands need a second positional argument
+    if len(os.Args) > 2 {
+        command.SecondPost = os.Args[2]
+    }
+
 
 	return command
 }
@@ -61,8 +67,6 @@ func loadFlags() common.Command {
 // TODO: DOCTOR!
 func handleAction(args common.Command) {
 	switch args.Action {
-	case "version":
-		update.PrintVersion()
 	case "update":
 		update.Update(os.Args[0])
 	case "deploy":
@@ -71,7 +75,7 @@ func handleAction(args common.Command) {
 		ditto.Bake(args)
 	case "create-service-onix":
 		onix.CreateService(args)
-	case "list-services-onix":
+	case "list-services":
 		onix.ListServices()
 	case "create-service-tyr":
 		tyr.CreateService(args)
@@ -80,6 +84,8 @@ func handleAction(args common.Command) {
 	case "create-service":
 		onix.CreateService(args)
 		tyr.CreateService(args)
+    case "doctor":
+        fmt.Println("The Doctor is in the house")
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}
