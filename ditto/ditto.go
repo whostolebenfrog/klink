@@ -6,6 +6,7 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+    onix "nokia.com/klink/onix"
 )
 
 func dittoUrl(end string) string {
@@ -16,15 +17,19 @@ func bakeUrl(app string, version string) string {
 	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
 }
 
-func Bake(command common.Command) {
-	if command.SecondPos == "" {
+func Bake(args common.Command) {
+	if args.SecondPos == "" {
 		console.Fail("Application must be supplied as second positional argument")
 	}
-	if command.Version == "" {
+	if args.Version == "" {
 		console.Fail("Version must be supplied using --version")
 	}
+	if !onix.ServiceExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Service \"%s\" does not exist. It's your word aginst onix.",
+			args.SecondPos))
+	}
 
-	url := bakeUrl(command.SecondPos, command.Version)
+	url := bakeUrl(args.SecondPos, args.Version)
 
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
@@ -37,8 +42,8 @@ func Bake(command common.Command) {
 		if err != nil {
 			console.BigFail("Failed to read ditto response body, that's bad :-(")
 		}
-		fmt.Println("Sucessfully baked application:", command.SecondPos,
-			"with version:", command.Version)
+		fmt.Println("Sucessfully baked application:", args.SecondPos,
+			"with version:", args.Version)
 		fmt.Println(string(body))
 	}
 }

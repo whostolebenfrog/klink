@@ -8,6 +8,7 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+	onix "nokia.com/klink/onix"
 )
 
 type DeployRequest struct {
@@ -15,18 +16,22 @@ type DeployRequest struct {
 	Environment string `json:"environment"`
 }
 
+// TODO: use http lib and add polling here!
 // TODO: handle message when exploud supports it
 func Exploud(args common.Command) {
-    if args.SecondPos == "" {
-        console.Fail("Must supply an application name as the second positional argument")
-    }
-    if args.Ami == "" {
-        console.Fail("Must supply an ami to deploy using --ami")
-    }
+	if args.SecondPos == "" {
+		console.Fail("Must supply an application name as the second positional argument")
+	}
+	if args.Ami == "" {
+		console.Fail("Must supply an ami to deploy using --ami")
+	}
+	if !onix.ServiceExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Service \"%s\" does not exist. It's your word aginst onix.",
+			args.SecondPos))
+	}
 
 	deployUrl := fmt.Sprintf("http://exploud.brislabs.com:8080/1.x/applications/%s/deploy", args.SecondPos)
 
-    // TODO: use http lib and add polling here!
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	b, err := json.Marshal(deployRequest)
 	if err != nil {
