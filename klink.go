@@ -55,7 +55,7 @@ func loadFlags() common.Command {
     command.Action = os.Args[1]
     // some commands need a second positional argument
     if len(os.Args) > 2 {
-        command.SecondPost = os.Args[2]
+        command.SecondPos = os.Args[2]
     }
 
 
