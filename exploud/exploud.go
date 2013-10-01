@@ -15,9 +15,18 @@ type DeployRequest struct {
 	Environment string `json:"environment"`
 }
 
+// TODO: handle message when exploud supports it
 func Exploud(args common.Command) {
-	deployUrl := fmt.Sprintf("http://exploud.brislabs.com:8080/1.x/applications/%s/deploy", args.Application)
+    if args.SecondPos == "" {
+        console.Fail("Must supply an application name as the second positional argument")
+    }
+    if args.Ami == "" {
+        console.Fail("Must supply an ami to deploy using --ami")
+    }
 
+	deployUrl := fmt.Sprintf("http://exploud.brislabs.com:8080/1.x/applications/%s/deploy", args.SecondPos)
+
+    // TODO: use http lib and add polling here!
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	b, err := json.Marshal(deployRequest)
 	if err != nil {
