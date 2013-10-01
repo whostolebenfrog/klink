@@ -8,6 +8,14 @@ import (
 	console "nokia.com/klink/console"
 )
 
+func dittoUrl(end string) string {
+    return "http://localhost:8080/1.x" + end
+}
+
+func bakeUrl(app string, version string) {
+    return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
+}
+
 func Bake(command common.Command) {
 	if command.Version == "" {
 		console.Fail("Args version must be supplied")
@@ -15,8 +23,10 @@ func Bake(command common.Command) {
 	if command.Application == "" {
 		console.Fail("Application must be supplied")
 	}
-	bakeUrl := fmt.Sprintf("http://localhost:8080/1.x/bake/%s/%s", command.Application, command.Version)
-	resp, err := http.Post(bakeUrl, "application/json", nil)
+
+    url := bakeUrl(command.Application, command.Version)
+
+	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		console.BigFail("Failed to call ditto to bake service")
 	}
