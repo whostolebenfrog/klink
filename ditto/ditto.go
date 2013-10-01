@@ -9,22 +9,22 @@ import (
 )
 
 func dittoUrl(end string) string {
-    return "http://localhost:8080/1.x" + end
+	return "http://localhost:8080/1.x" + end
 }
 
-func bakeUrl(app string, version string) {
-    return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
+func bakeUrl(app string, version string) string {
+	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
 }
 
 func Bake(command common.Command) {
-	if command.Version == "" {
-		console.Fail("Args version must be supplied")
+	if command.SecondPos == "" {
+		console.Fail("Application must be supplied as second positional argument")
 	}
-	if command.Application == "" {
-		console.Fail("Application must be supplied")
+	if command.Version == "" {
+		console.Fail("Version must be supplied using --version")
 	}
 
-    url := bakeUrl(command.Application, command.Version)
+	url := bakeUrl(command.SecondPos, command.Version)
 
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
@@ -37,7 +37,8 @@ func Bake(command common.Command) {
 		if err != nil {
 			console.BigFail("Failed to read ditto response body, that's bad :-(")
 		}
-		fmt.Println("Sucessfully baked application:", command.Application, "with version:", command.Version)
+		fmt.Println("Sucessfully baked application:", command.SecondPos,
+			"with version:", command.Version)
 		fmt.Println(string(body))
 	}
 }
