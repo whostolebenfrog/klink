@@ -1,8 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	optarg "github.com/jteeuwen/go-pkg-optarg"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
@@ -13,25 +13,45 @@ import (
 	"os"
 )
 
-// TODO: general - doc string on functions?
+func printHelpAndExit() {
+    fmt.Println(optarg.UsageString())
+    os.Exit(0)
+}
 
-// TODO: positional args!
+// TODO: general - doc string on functions?
 func loadFlags() common.Command {
 	command := common.Command{}
-	flag.StringVar(&command.Action, "action", "", "Action for klink to perform: [deploy, build, rollback]")
-	flag.StringVar(&command.Application, "app", "", "Application to do stuff with")
-	flag.StringVar(&command.Ami, "ami", "deploy", "Set the ami to deploy")
-	flag.StringVar(&command.Environment, "env", "ent-dev", "Environment for this command [ent-dev, prod]")
-	flag.StringVar(&command.Message, "m", "", "Message for this action. For example why you are deploying")
-	flag.StringVar(&command.Version, "v", "", "Version to deploy, rollback etc [e.g. 0.153]")
-	flag.Parse()
 
-	fmt.Println("\t\t\tAction:      ", command.Action)
-	fmt.Println("\t\t\tAmi:         ", command.Ami)
-	fmt.Println("\t\t\tApplication: ", command.Application)
-	fmt.Println("\t\t\tEnvironment: ", command.Environment)
-	fmt.Println("\t\t\tMessage:     ", command.Message)
-	fmt.Println("\t\t\tVersion:     ", command.Version, "\n")
+    // flags
+    optarg.Header("General Options")
+    optarg.Add("h", "help", "Displays this help message", false)
+    optarg.Header("Deployment based flags")
+    optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
+    optarg.Add("e", "environment", "Sets the environment", "ent-dev")
+    optarg.Add("m", "message", "Sets the environment", "")
+    optarg.Add("v", "version", "Sets the version", "")
+
+    for opt := range optarg.Parse() {
+        switch opt.ShortName {
+        case "h":
+            printHelpAndExit()
+        case "a":
+            command.Ami = opt.String()
+        case "e":
+            command.Environment = opt.String()
+        case "m":
+            command.Message = opt.String()
+        case "v":
+            command.Version = opt.String()
+        }
+    }
+
+    // positional arguments
+    if len(os.Args) < 2 {
+        printHelpAndExit()
+    }
+    command.Action = os.Args[1]
+
 	return command
 }
 
