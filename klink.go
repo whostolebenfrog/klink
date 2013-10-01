@@ -3,14 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-    "os"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
-    tyr "nokia.com/klink/tyranitar"
-    update "nokia.com/klink/update"
+	tyr "nokia.com/klink/tyranitar"
+	update "nokia.com/klink/update"
+	"os"
 )
 
 // TODO: general - doc string on functions?
@@ -37,28 +37,28 @@ func loadFlags() common.Command {
 
 // TODO: figure out some names here
 // TODO: --json output mode
-// TODO: DOCTOR! 
+// TODO: DOCTOR!
 func handleAction(args common.Command) {
 	switch args.Action {
-    case "version":
-        update.PrintVersion()
-    case "update":
-        update.Update(os.Args[0])
+	case "version":
+		update.PrintVersion()
+	case "update":
+		update.Update(os.Args[0])
 	case "deploy":
 		exploud.Exploud(args)
 	case "bake":
 		ditto.Bake(args)
 	case "create-service-onix":
 		onix.CreateService(args)
-    case "list-services-onix":
-        onix.ListServices()
-    case "create-service-tyr":
-        tyr.CreateService(args)
-    case "list-services-tyr":
-        tyr.ListServices()
-    case "create-service":
-        onix.CreateService(args)
-        tyr.CreateService(args)
+	case "list-services-onix":
+		onix.ListServices()
+	case "create-service-tyr":
+		tyr.CreateService(args)
+	case "list-services-tyr":
+		tyr.ListServices()
+	case "create-service":
+		onix.CreateService(args)
+		tyr.CreateService(args)
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}
