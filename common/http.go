@@ -31,6 +31,33 @@ func PostJson(url string, body interface{}) (string, error) {
 	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
 }
 
+func PutJson(url string, body interface{}) (string, error) {
+	b, err := json.Marshal(body)
+	if err != nil {
+		return "", errors.New("Unable to Marshall json for http put")
+	}
+
+	req, _ := http.NewRequest("PUT", url, bytes.NewReader(b))
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error trying to call URL: %s", url))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 || resp.StatusCode == 201 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
+		}
+		return string(body), nil
+	}
+	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
+}
+
 func GetString(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {

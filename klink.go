@@ -34,6 +34,9 @@ func loadFlags() common.Command {
 	optarg.Add("e", "environment", "Sets the environment", "ent-dev")
 	optarg.Add("m", "message", "Sets the environment", "")
 	optarg.Add("v", "version", "Sets the version", "")
+	optarg.Add("d", "description", "Set the description for commands that require it", "")
+	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
+	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
@@ -47,6 +50,12 @@ func loadFlags() common.Command {
 			command.Message = opt.String()
 		case "v":
 			command.Version = opt.String()
+		case "d":
+			command.Description = opt.String()
+		case "E":
+			command.Email = opt.String()
+		case "o":
+			command.Owner = opt.String()
 		}
 	}
 
@@ -80,8 +89,9 @@ func handleAction(args common.Command) {
 	case "list-services-tyr":
 		tyr.ListServices()
 	case "create-service":
-		onix.CreateService(args)
-		tyr.CreateService(args)
+		exploud.CreateService(args)
+		// onix.CreateService(args)
+		//tyr.CreateService(args)
 	case "doctor":
 		fmt.Println("The Doctor is in the house")
 	default:

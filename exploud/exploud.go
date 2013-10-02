@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
@@ -14,6 +15,16 @@ import (
 type DeployRequest struct {
 	Ami         string `json:"ami"`
 	Environment string `json:"environment"`
+}
+
+type CreateServiceRequest struct {
+        Description string `json:"description"`
+	Email string `json:"email"`
+        Owner string `json:"owner"`
+}
+
+func exploudUrl(end string) string {
+    return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
 // TODO: use http lib and add polling here!
@@ -30,7 +41,7 @@ func Exploud(args common.Command) {
 			args.SecondPos))
 	}
 
-	deployUrl := fmt.Sprintf("http://exploud.brislabs.com:8080/1.x/applications/%s/deploy", args.SecondPos)
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	b, err := json.Marshal(deployRequest)
@@ -53,4 +64,29 @@ func Exploud(args common.Command) {
 		fmt.Println("200 response from exploud - that's good!")
 		fmt.Println(string(body))
 	}
+}
+
+func CreateService(args common.Command) {
+	if args.SecondPos == "" || strings.Index(args.SecondPos, "-") == 0 {
+		console.Fail("Must supply an application name as second positional argument")
+	}
+
+        if args.Description == "" || args.Email == "" || args.Owner == "" {
+		console.Fail("Don't be lazy! You must supply owner, email and description values")
+	}
+
+	fmt.Println(fmt.Sprintf("Calling exploud to create application %s with description: %s, email: %s, owner: %s",
+		args.SecondPos, args.Description, args.Email, args.Owner))
+
+	createBody := CreateServiceRequest{args.Description, args.Email, args.Owner}
+
+	response, err := common.PutJson(exploudUrl("/applications/" + args.SecondPos), createBody)
+
+	if err != nil {
+		fmt.Println(err)
+		console.BigFail("Unable to register new service with exploud")
+	}
+
+	fmt.Println("Exploud has created our service for us!")
+	fmt.Println(response)
 }

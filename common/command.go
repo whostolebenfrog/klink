@@ -6,6 +6,9 @@ type Command struct {
 	Application string
 	Environment string
 	Message     string
-    SecondPos   string
+	SecondPos   string
 	Version     string
+	Description string
+	Email       string
+	Owner       string
 }
