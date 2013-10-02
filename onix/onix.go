@@ -42,6 +42,6 @@ func ListServices() {
 }
 
 func ServiceExists(serviceName string) bool {
-    resp, _ := common.Head(onixUrl("/applications" + serviceName))
+    resp, _ := common.Head(onixUrl("/applications/" + serviceName))
     return resp
 }
