@@ -21,9 +21,9 @@ var (
 		"create-service      {application} -E {email} -o {owner} -d {description}\n" +
 		"                    Creates a new service via expload.\n" +
 		"create-service-onix {application}\n" +
-		"                    Creates a new service in onix only (deprecated).\n" +
+		"                    Creates a new service in onix only.\n" +
 		"create-service-tyr  {application}\n" +
-		"                    Creates a new service in tyranitar only (deprecated).\n" +
+		"                    Creates a new service in tyranitar only.\n" +
 		"deploy              {application} -a {ami}\n" +
 		"                    Deploy the AMI {ami} for {application}.\n" +
 		"doctor              Not yet implemented.\n" +
