@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+        "strings"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
@@ -13,11 +14,29 @@ import (
 	"os"
 )
 
+var (
+	cmd = "[Commands]\n" +
+		"bake                {application} -v {version}\n" +
+		"                    Bakes an AMI for {application} with version {version}.\n" +
+		"create-service      {application} -E {email} -o {owner} -d {description}\n" +
+		"                    Creates a new service via expload.\n" +
+		"create-service-onix {application}\n" +
+		"                    Creates a new service in onix only (deprecated).\n" +
+		"create-service-tyr  {application}\n" +
+		"                    Creates a new service in tyranitar only (deprecated).\n" +
+		"deploy              {application} -a {ami}\n" +
+		"                    Deploy the AMI {ami} for {application}.\n" +
+		"doctor              Not yet implemented.\n" +
+		"list-services       Lists the services that exist (in onix).\n" +
+		"list-services-tyr   Lists the services that exist (in tyranitar).\n" +
+		"update              Update to the current version of klink."
+)
+
 func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
-    fmt.Println("\n")
-	fmt.Println(optarg.UsageString())
+	fmt.Println("\n")
+	fmt.Println(strings.Replace(optarg.UsageString(), "[options]", "command [application] [options]\n\n" + cmd, 1))
 	os.Exit(0)
 }
 
@@ -32,7 +51,7 @@ func loadFlags() common.Command {
 	optarg.Header("Deployment based flags")
 	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
 	optarg.Add("e", "environment", "Sets the environment", "ent-dev")
-	optarg.Add("m", "message", "Sets the environment", "")
+	optarg.Add("m", "message", "Sets an informational message", "")
 	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
 	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
@@ -90,8 +109,6 @@ func handleAction(args common.Command) {
 		tyr.ListServices()
 	case "create-service":
 		exploud.CreateService(args)
-		// onix.CreateService(args)
-		//tyr.CreateService(args)
 	case "doctor":
 		fmt.Println("The Doctor is in the house")
 	default:
