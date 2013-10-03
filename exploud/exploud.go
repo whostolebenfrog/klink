@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
+	"strings"
 )
 
 type DeployRequest struct {
@@ -18,13 +18,13 @@ type DeployRequest struct {
 }
 
 type CreateServiceRequest struct {
-        Description string `json:"description"`
-	Email string `json:"email"`
-        Owner string `json:"owner"`
+	Description string `json:"description"`
+	Email       string `json:"email"`
+	Owner       string `json:"owner"`
 }
 
 func exploudUrl(end string) string {
-    return "http://exploud.brislabs.com:8080/1.x" + end
+	return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
 // TODO: use http lib and add polling here!
@@ -71,7 +71,7 @@ func CreateService(args common.Command) {
 		console.Fail("Must supply an application name as second positional argument")
 	}
 
-        if args.Description == "" || args.Email == "" || args.Owner == "" {
+	if args.Description == "" || args.Email == "" || args.Owner == "" {
 		console.Fail("Don't be lazy! You must supply owner, email and description values")
 	}
 
@@ -80,7 +80,7 @@ func CreateService(args common.Command) {
 
 	createBody := CreateServiceRequest{args.Description, args.Email, args.Owner}
 
-	response, err := common.PutJson(exploudUrl("/applications/" + args.SecondPos), createBody)
+	response, err := common.PutJson(exploudUrl("/applications/"+args.SecondPos), createBody)
 
 	if err != nil {
 		fmt.Println(err)

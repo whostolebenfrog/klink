@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-        "strings"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
@@ -12,6 +11,7 @@ import (
 	tyr "nokia.com/klink/tyranitar"
 	update "nokia.com/klink/update"
 	"os"
+	"strings"
 )
 
 var (
@@ -36,7 +36,7 @@ func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
 	fmt.Println("\n")
-	fmt.Println(strings.Replace(optarg.UsageString(), "[options]", "command [application] [options]\n\n" + cmd, 1))
+	fmt.Println(strings.Replace(optarg.UsageString(), "[options]", "command [application] [options]\n\n"+cmd, 1))
 	os.Exit(0)
 }
 

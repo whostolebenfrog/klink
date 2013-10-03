@@ -12,11 +12,13 @@ import (
 func PostJson(url string, body interface{}) (string, error) {
 	b, err := json.Marshal(body)
 	if err != nil {
+        fmt.Println("Can't marshall body")
 		return "", errors.New("Unable to Marshall json for http post")
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
+        fmt.Println("Error posting to url:", url)
 		return "", errors.New(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
@@ -28,6 +30,7 @@ func PostJson(url string, body interface{}) (string, error) {
 		}
 		return string(body), nil
 	}
+    fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
 	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
 }
 

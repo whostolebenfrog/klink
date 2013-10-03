@@ -6,7 +6,7 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    onix "nokia.com/klink/onix"
+	onix "nokia.com/klink/onix"
 )
 
 func dittoUrl(end string) string {
@@ -37,13 +37,17 @@ func Bake(args common.Command) {
 	}
 	defer resp.Body.Close()
 
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        console.Fail(fmt.Sprintf("Failed to read ditto response body, that's bad :-(", resp.StatusCode))
+    }
+
 	if resp.StatusCode == 200 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			console.BigFail("Failed to read ditto response body, that's bad :-(")
-		}
 		fmt.Println("Sucessfully baked application:", args.SecondPos,
 			"with version:", args.Version)
 		fmt.Println(string(body))
+	} else {
+		fmt.Println("Non 200 response from onix: ", resp.StatusCode)
+        console.Fail(fmt.Sprintf("Response body was: %s", body))
 	}
 }
