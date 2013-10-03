@@ -10,7 +10,7 @@ import (
 )
 
 func dittoUrl(end string) string {
-	return "http://localhost:8080/1.x" + end
+	return "http://ditto.brislabs.com:8080/1.x" + end
 }
 
 func bakeUrl(app string, version string) string {
