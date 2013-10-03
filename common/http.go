@@ -39,6 +39,8 @@ func PutJson(url string, body interface{}) (string, error) {
 
 	req, _ := http.NewRequest("PUT", url, bytes.NewReader(b))
 
+	req.Header.Add("Content-Type", "application/json")
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
