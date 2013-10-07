@@ -45,5 +45,7 @@ func Bake(args common.Command) {
 		fmt.Println("Sucessfully baked application:", args.SecondPos,
 			"with version:", args.Version)
 		fmt.Println(string(body))
+	} else if resp.StatusCode == 404 {
+		fmt.Println("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
 	}
 }
