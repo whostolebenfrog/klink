@@ -18,17 +18,17 @@ var (
 	cmd = "[Commands]\n" +
 		"bake                {application} -v {version}\n" +
 		"                    Bakes an AMI for {application} with version {version}.\n" +
-		"create-service      {application} -E {email} -o {owner} -d {description}\n" +
-		"                    Creates a new service via exploud.\n" +
-		"create-service-onix {application}\n" +
-		"                    Creates a new service in onix only.\n" +
-		"create-service-tyr  {application}\n" +
-		"                    Creates a new service in tyranitar only.\n" +
+		"create-app          {application} -E {email} -o {owner} -d {description}\n" +
+		"                    Creates a new application via exploud.\n" +
+		"create-app-onix     {application}\n" +
+		"                    Creates a new application in onix only.\n" +
+		"create-app-tyr      {application}\n" +
+		"                    Creates a new application in tyranitar only.\n" +
 		"deploy              {application} -a {ami}\n" +
 		"                    Deploy the AMI {ami} for {application}.\n" +
 		"doctor              Not yet implemented.\n" +
-		"list-services       Lists the services that exist (in onix).\n" +
-		"list-services-tyr   Lists the services that exist (in tyranitar).\n" +
+		"list-apps           Lists the applications that exist (in onix).\n" +
+		"list-apps-tyr       Lists the applications that exist (in tyranitar).\n" +
 		"update              Update to the current version of klink."
 )
 
@@ -36,11 +36,10 @@ func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
 	fmt.Println("\n")
-	fmt.Println(strings.Replace(optarg.UsageString(), "[options]", "command [application] [options]\n\n" + cmd, 1))
+	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", "command [application] [options]\n\n" + cmd, 1))
 	os.Exit(0)
 }
 
-// TODO: general - doc string on functions?
 // TODO: general - json output mode? jq mode?
 func loadFlags() common.Command {
 	command := common.Command{}
@@ -99,16 +98,16 @@ func handleAction(args common.Command) {
 		exploud.Exploud(args)
 	case "bake":
 		ditto.Bake(args)
-	case "create-service-onix":
-		onix.CreateService(args)
-	case "list-services":
-		onix.ListServices()
-	case "create-service-tyr":
-		tyr.CreateService(args)
-	case "list-services-tyr":
-		tyr.ListServices()
-	case "create-service":
-		exploud.CreateService(args)
+	case "create-app-onix":
+		onix.CreateApp(args)
+	case "list-apps":
+		onix.ListApps()
+	case "create-app-tyr":
+		tyr.CreateApp(args)
+	case "list-apps-tyr":
+		tyr.ListApps()
+	case "create-app":
+		exploud.CreateApp(args)
 	case "doctor":
 		fmt.Println("The Doctor is in the house")
 	default:

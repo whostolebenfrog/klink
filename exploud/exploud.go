@@ -17,7 +17,7 @@ type DeployRequest struct {
 	Environment string `json:"environment"`
 }
 
-type CreateServiceRequest struct {
+type CreateAppRequest struct {
         Description string `json:"description"`
 	Email string `json:"email"`
         Owner string `json:"owner"`
@@ -36,8 +36,8 @@ func Exploud(args common.Command) {
 	if args.Ami == "" {
 		console.Fail("Must supply an ami to deploy using --ami")
 	}
-	if !onix.ServiceExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Service \"%s\" does not exist. It's your word aginst onix.",
+	if !onix.AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst onix.",
 			args.SecondPos))
 	}
 
@@ -66,7 +66,7 @@ func Exploud(args common.Command) {
 	}
 }
 
-func CreateService(args common.Command) {
+func CreateApp(args common.Command) {
 	if args.SecondPos == "" || strings.Index(args.SecondPos, "-") == 0 {
 		console.Fail("Must supply an application name as second positional argument")
 	}
@@ -78,15 +78,15 @@ func CreateService(args common.Command) {
 	fmt.Println(fmt.Sprintf("Calling exploud to create application %s with description: %s, email: %s, owner: %s",
 		args.SecondPos, args.Description, args.Email, args.Owner))
 
-	createBody := CreateServiceRequest{args.Description, args.Email, args.Owner}
+	createBody := CreateAppRequest{args.Description, args.Email, args.Owner}
 
 	response, err := common.PutJson(exploudUrl("/applications/" + args.SecondPos), createBody)
 
 	if err != nil {
 		fmt.Println(err)
-		console.BigFail("Unable to register new service with exploud")
+		console.BigFail("Unable to register new application with exploud")
 	}
 
-	fmt.Println("Exploud has created our service for us!")
+	fmt.Println("Exploud has created our application for us!")
 	fmt.Println(response)
 }

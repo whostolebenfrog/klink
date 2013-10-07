@@ -24,8 +24,8 @@ func Bake(args common.Command) {
 	if args.Version == "" {
 		console.Fail("Version must be supplied using --version")
 	}
-	if !onix.ServiceExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Service \"%s\" does not exist. It's your word aginst onix.",
+	if !onix.AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word aginst onix.",
 			args.SecondPos))
 	}
 
@@ -33,7 +33,7 @@ func Bake(args common.Command) {
 
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
-		console.BigFail("Failed to call ditto to bake service")
+		console.BigFail("Failed to call ditto to bake application")
 	}
 	defer resp.Body.Close()
 
