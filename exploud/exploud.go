@@ -90,3 +90,12 @@ func CreateApp(args common.Command) {
 	fmt.Println("Exploud has created our application for us!")
 	fmt.Println(response)
 }
+
+func ListApps() {
+    response, err := common.GetString(exploudUrl("/applications"))
+    if err != nil {
+        fmt.Println(err)
+        console.Fail("Error listing applications")
+    }
+    fmt.Println(response)
+}

@@ -27,7 +27,8 @@ var (
 		"deploy              {application} -a {ami}\n" +
 		"                    Deploy the AMI {ami} for {application}.\n" +
 		"doctor              Not yet implemented.\n" +
-		"list-apps           Lists the applications that exist (in onix).\n" +
+		"list-apps           Lists the applications that exist (via exploud)\n" +
+		"list-apps-onix      Lists the applications that exist (in onix).\n" +
 		"list-apps-tyr       Lists the applications that exist (in tyranitar).\n" +
 		"update              Update to the current version of klink."
 )
@@ -100,12 +101,14 @@ func handleAction(args common.Command) {
 		ditto.Bake(args)
 	case "create-app-onix":
 		onix.CreateApp(args)
-	case "list-apps":
+	case "list-apps-onix":
 		onix.ListApps()
 	case "create-app-tyr":
 		tyr.CreateApp(args)
 	case "list-apps-tyr":
 		tyr.ListApps()
+	case "list-apps":
+		exploud.ListApps()
 	case "create-app":
 		exploud.CreateApp(args)
 	case "doctor":
