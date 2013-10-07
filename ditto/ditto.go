@@ -25,8 +25,8 @@ func Bake(args common.Command) {
 	if args.Version == "" {
 		console.Fail("Version must be supplied using --version")
 	}
-	if !onix.ServiceExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Service \"%s\" does not exist. It's your word aginst onix.",
+	if !onix.AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word aginst onix.",
 			args.SecondPos))
 	}
 
@@ -43,9 +43,13 @@ func Bake(args common.Command) {
     }
 	defer resp.Body.Close()
 
+	if resp.StatusCode == 404 {
+		console.Fail("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
+	}
 	if resp.StatusCode != 200 {
 		console.Fail(fmt.Sprintf("Non 200 response from ditto: ", resp.StatusCode))
 	}
+	defer resp.Body.Close()
 
 	io.Copy(os.Stdout, resp.Body)
 }
