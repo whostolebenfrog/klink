@@ -2,11 +2,12 @@ package ditto
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
+	"os"
 )
 
 func dittoUrl(end string) string {
@@ -31,23 +32,20 @@ func Bake(args common.Command) {
 
 	url := bakeUrl(args.SecondPos, args.Version)
 
-	resp, err := http.Post(url, "application/json", nil)
-	if err != nil {
-		console.BigFail("Failed to call ditto to bake service")
-	}
+    httpClient := common.NewTimeoutClient()
+    req, _ := http.NewRequest("POST", url, nil)
+    req.Header.Add("Content-Type", "application/json")
+
+    resp, err := httpClient.Do(req)
+    if err != nil {
+        fmt.Println(err)
+        console.Fail(fmt.Sprintf("Failed to make a request to: %s", url))
+    }
 	defer resp.Body.Close()
 
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        console.Fail(fmt.Sprintf("Failed to read ditto response body, that's bad :-(", resp.StatusCode))
-    }
-
-	if resp.StatusCode == 200 {
-		fmt.Println("Sucessfully baked application:", args.SecondPos,
-			"with version:", args.Version)
-		fmt.Println(string(body))
-	} else {
-		fmt.Println("Non 200 response from onix: ", resp.StatusCode)
-        console.Fail(fmt.Sprintf("Response body was: %s", body))
+	if resp.StatusCode != 200 {
+		console.Fail(fmt.Sprintf("Non 200 response from ditto: ", resp.StatusCode))
 	}
+
+	io.Copy(os.Stdout, resp.Body)
 }

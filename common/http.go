@@ -6,19 +6,22 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"time"
 )
 
 func PostJson(url string, body interface{}) (string, error) {
+
 	b, err := json.Marshal(body)
 	if err != nil {
-        fmt.Println("Can't marshall body")
+		fmt.Println("Can't marshall body")
 		return "", errors.New("Unable to Marshall json for http post")
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
-        fmt.Println("Error posting to url:", url)
+		fmt.Println("Error posting to url:", url)
 		return "", errors.New(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
@@ -30,7 +33,7 @@ func PostJson(url string, body interface{}) (string, error) {
 		}
 		return string(body), nil
 	}
-    fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
+	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
 	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
 }
 
@@ -95,4 +98,50 @@ func Head(url string) (bool, error) {
 	}
 
 	return resp.StatusCode == 200, nil
+}
+
+type Config struct {
+	ConnectTimeout   time.Duration
+	ReadWriteTimeout time.Duration
+}
+
+func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error) {
+	return func(netw, addr string) (net.Conn, error) {
+		conn, err := net.DialTimeout(netw, addr, config.ConnectTimeout)
+		if err != nil {
+			return nil, err
+		}
+
+		conn.SetDeadline(time.Time{})
+        conn.SetReadDeadline(time.Time{})
+        conn.SetWriteDeadline(time.Time{})
+		return conn, nil
+	}
+}
+
+func NewTimeoutClient(args ...interface{}) *http.Client {
+	// Default configuration, lots of time for a streaming response to return
+    // Needs as long as our longest bake
+	config := &Config{
+		ConnectTimeout:   5 * time.Second,
+		ReadWriteTimeout: 1200 * time.Second,
+	}
+
+	// merge the default with user input if there is one
+	if len(args) == 1 {
+		timeout := args[0].(time.Duration)
+		config.ConnectTimeout = timeout
+		config.ReadWriteTimeout = timeout
+	}
+
+	if len(args) == 2 {
+		config.ConnectTimeout = args[0].(time.Duration)
+		config.ReadWriteTimeout = args[1].(time.Duration)
+	}
+
+	return &http.Client{
+		Transport: &http.Transport{
+			Dial: TimeoutDialer(config),
+		},
+	}
 }
