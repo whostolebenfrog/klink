@@ -19,7 +19,7 @@ var (
 		"bake                {application} -v {version}\n" +
 		"                    Bakes an AMI for {application} with version {version}.\n" +
 		"create-service      {application} -E {email} -o {owner} -d {description}\n" +
-		"                    Creates a new service via expload.\n" +
+		"                    Creates a new service via exploud.\n" +
 		"create-service-onix {application}\n" +
 		"                    Creates a new service in onix only.\n" +
 		"create-service-tyr  {application}\n" +
