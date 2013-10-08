@@ -8,7 +8,6 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	onix "nokia.com/klink/onix"
 	"strings"
 )
 
@@ -36,8 +35,8 @@ func Exploud(args common.Command) {
 	if args.Ami == "" {
 		console.Fail("Must supply an ami to deploy using --ami")
 	}
-	if !onix.AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst onix.",
+	if !AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst exploud!",
 			args.SecondPos))
 	}
 
@@ -98,4 +97,9 @@ func ListApps() {
         console.Fail("Error listing applications")
     }
     fmt.Println(response)
+}
+
+func AppExists(appName string) bool {
+    resp, _ := common.Head(exploudUrl("/applications/" + appName))
+    return resp
 }

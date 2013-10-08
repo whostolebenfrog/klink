@@ -6,7 +6,7 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	onix "nokia.com/klink/onix"
+	exploud "nokia.com/klink/exploud"
 	"os"
 )
 
@@ -25,8 +25,8 @@ func Bake(args common.Command) {
 	if args.Version == "" {
 		console.Fail("Version must be supplied using --version")
 	}
-	if !onix.AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word aginst onix.",
+	if !exploud.AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word aginst exploud!",
 			args.SecondPos))
 	}
 
