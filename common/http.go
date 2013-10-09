@@ -109,6 +109,15 @@ func Head(url string) (bool, error) {
 	if err != nil {
 		return false, errors.New(fmt.Sprintf("Error calling head on URL: %s", url))
 	}
+	switch resp.StatusCode {
+	case 200:
+		return true, nil
+	case 404:
+		return false, nil
+	default:
+		panic(fmt.Sprintf("Unknwon response: %d from HEAD on URL: %s Is your proxy set correctly?",
+			resp.StatusCode, url))
+	}
 
 	return resp.StatusCode == 200, nil
 }
