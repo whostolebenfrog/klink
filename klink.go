@@ -14,8 +14,7 @@ import (
 	"strings"
 )
 
-var (
-	cmd = `
+var cmd = `
 [command] [application] [options]\n\n
 
 [Commands]
@@ -34,7 +33,6 @@ var (
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
     update              Update to the current version of klink.`
-)
 
 func printHelpAndExit() {
 	console.Klink()
