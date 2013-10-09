@@ -20,12 +20,12 @@ BUILDS=builds/*
 
 for build in $BUILDS
 do
-    scp -i ~/.ssh/dmt-key $build root@benkins.brislabs.com:/opt/klink/
+    scp $build benkins.brislabs.com:/opt/klink/
 done
 
 # Update the version file on the remote server to provide the latest version
 
-scp -i ~/.ssh/dmt-key version root@benkins.brislabs.com:/opt/klink/
+scp version benkins.brislabs.com:/opt/klink/
 
 # Update git
 
