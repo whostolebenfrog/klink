@@ -15,7 +15,7 @@ import (
 )
 
 var cmd = `
-[command] [application] [options]\n\n
+[command] [application] [options]
 
 [Commands]
     bake                {application} -v {version}
