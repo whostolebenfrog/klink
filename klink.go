@@ -15,29 +15,32 @@ import (
 )
 
 var (
-	cmd = "[Commands]\n" +
-		"bake                {application} -v {version}\n" +
-		"                    Bakes an AMI for {application} with version {version}.\n" +
-		"create-app          {application} -E {email} -o {owner} -d {description}\n" +
-		"                    Creates a new application via exploud.\n" +
-		"create-app-onix     {application}\n" +
-		"                    Creates a new application in onix only.\n" +
-		"create-app-tyr      {application}\n" +
-		"                    Creates a new application in tyranitar only.\n" +
-		"deploy              {application} -a {ami}\n" +
-		"                    Deploy the AMI {ami} for {application}.\n" +
-		"doctor              Not yet implemented.\n" +
-		"list-apps           Lists the applications that exist (via exploud)\n" +
-		"list-apps-onix      Lists the applications that exist (in onix).\n" +
-		"list-apps-tyr       Lists the applications that exist (in tyranitar).\n" +
-		"update              Update to the current version of klink."
+	cmd = `
+[command] [application] [options]\n\n
+
+[Commands]
+    bake                {application} -v {version}
+                        Bakes an AMI for {application} with version {version}.
+    create-app          {application} -E {email} -o {owner} -d {description}
+                        Creates a new application via exploud.
+    create-app-onix     {application}
+                        Creates a new application in onix only.
+    create-app-tyr      {application}
+                        Creates a new application in tyranitar only.
+    deploy              {application} -a {ami}
+                        Deploy the AMI {ami} for {application}.
+    doctor              Not yet implemented.
+    list-apps           Lists the applications that exist (via exploud)
+    list-apps-onix      Lists the applications that exist (in onix).
+    list-apps-tyr       Lists the applications that exist (in tyranitar).
+    update              Update to the current version of klink.`
 )
 
 func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
 	fmt.Println("\n")
-	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", "command [application] [options]\n\n"+cmd, 1))
+	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
 }
 

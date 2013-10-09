@@ -65,6 +65,9 @@ func Exploud(args common.Command) {
 	}
 }
 
+// Register a new application with exploud, should have the knock on effect
+// of registering with the other services that exploud depends upon e.g.
+// onix and tyranitar
 func CreateApp(args common.Command) {
 	if args.SecondPos == "" || strings.Index(args.SecondPos, "-") == 0 {
 		console.Fail("Must supply an application name as second positional argument")
@@ -74,7 +77,8 @@ func CreateApp(args common.Command) {
 		console.Fail("Don't be lazy! You must supply owner, email and description values")
 	}
 
-	fmt.Println(fmt.Sprintf("Calling exploud to create application %s with description: %s, email: %s, owner: %s",
+	fmt.Println(fmt.Sprintf(`Calling exploud to create application %s with description:
+        %s, email: %s, owner: %s`,
 		args.SecondPos, args.Description, args.Email, args.Owner))
 
 	createBody := CreateAppRequest{args.Description, args.Email, args.Owner}
@@ -92,16 +96,16 @@ func CreateApp(args common.Command) {
 
 // List the apps known by exploud
 func ListApps() {
-    response, err := common.GetString(exploudUrl("/applications"))
-    if err != nil {
-        fmt.Println(response, err)
-        console.Fail("Error listing applications")
-    }
-    fmt.Println(response)
+	response, err := common.GetString(exploudUrl("/applications"))
+	if err != nil {
+		fmt.Println(response, err)
+		console.Fail("Error listing applications")
+	}
+	fmt.Println(response)
 }
 
 // AppExists returns true if the application exists according to the exploud service
 func AppExists(appName string) bool {
-    resp, _ := common.Head(exploudUrl("/applications/" + appName))
-    return resp
+	resp, _ := common.Head(exploudUrl("/applications/" + appName))
+	return resp
 }
