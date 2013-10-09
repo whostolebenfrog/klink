@@ -90,11 +90,11 @@ func CreateApp(args common.Command) {
 	fmt.Println(response)
 }
 
-// List the apps 
+// List the apps known by exploud
 func ListApps() {
     response, err := common.GetString(exploudUrl("/applications"))
     if err != nil {
-        fmt.Println(err)
+        fmt.Println(response, err)
         console.Fail("Error listing applications")
     }
     fmt.Println(response)
