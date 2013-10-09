@@ -14,8 +14,7 @@ import (
 	"strings"
 )
 
-var cmd = `
-[command] [application] [options]
+var cmd = `[command] [application] [options]
 
 [Commands]
     bake                {application} -v {version}
