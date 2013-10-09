@@ -11,8 +11,9 @@ import (
 	"time"
 )
 
+// Perform an HHTP PUT on the supplied url withe the body of the supplied object reference
+// Returns a non nil error on non 200 series response or other error.
 func PostJson(url string, body interface{}) (string, error) {
-
 	b, err := json.Marshal(body)
 	if err != nil {
 		fmt.Println("Can't marshall body")
@@ -26,29 +27,31 @@ func PostJson(url string, body interface{}) (string, error) {
 	}
 	defer resp.Body.Close()
 
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
+	}
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
-		}
-		return string(body), nil
+		return string(responseBody), nil
 	}
 	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
-	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
+	return string(responseBody), errors.New(fmt.Sprintf("Got non 200 series response calling:",
+		url, "with body", b))
 }
 
+// Performs an HTTP PUT on the supplied url with the body of the supplied object reference
+// Returns a non nil error on non 200 series response or other error.
 func PutJson(url string, body interface{}) (string, error) {
 	b, err := json.Marshal(body)
 	if err != nil {
+		fmt.Println("Can't marshall body")
 		return "", errors.New("Unable to Marshall json for http put")
 	}
 
 	req, _ := http.NewRequest("PUT", url, bytes.NewReader(b))
-
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
-
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -56,16 +59,21 @@ func PutJson(url string, body interface{}) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 || resp.StatusCode == 201 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
-		}
-		return string(body), nil
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
 	}
-	return "", errors.New(fmt.Sprintf("Got non 200 series response calling:", url, "with body", b))
+
+	if resp.StatusCode == 200 || resp.StatusCode == 201 {
+		return string(responseBody), nil
+	}
+	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
+	return string(responseBody), errors.New(fmt.Sprintf("Got non 200 series response calling:",
+		url, "with body", b))
 }
 
+// Performs an HTTP GET request on the supplied url and returns the result
+// as a string. Returns non nil err on non 200 response.
 func GetString(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -73,16 +81,19 @@ func GetString(url string) (string, error) {
 	}
 	defer resp.Body.Close()
 
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Failed to read body response from: %s", url))
+	}
+
 	if resp.StatusCode == 200 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", errors.New(fmt.Sprintf("Failed to read body response from: %s", url))
-		}
 		return string(body), nil
 	}
-	return "", errors.New(fmt.Sprintf("Non 200 response from: %s", url))
+	return string(body), errors.New(fmt.Sprintf("Non 200 response from: %s", url))
 }
 
+// Performs an HTTP GET request on the supplied url and unmarshals the response
+// into the supplied object. Returns non nil error on failure
 func GetJson(url string, v interface{}) error {
 	body, err := GetString(url)
 	if err != nil {
@@ -91,6 +102,8 @@ func GetJson(url string, v interface{}) error {
 	return json.Unmarshal([]byte(body), &v)
 }
 
+// Performs an HTTP HEAD call on the supplied URL. Returns true if
+// the response code is 200.
 func Head(url string) (bool, error) {
 	resp, err := http.Head(url)
 	if err != nil {
@@ -100,11 +113,13 @@ func Head(url string) (bool, error) {
 	return resp.StatusCode == 200, nil
 }
 
+// Config defines the configuration for a TimeoutDialer or TimeoutClient
 type Config struct {
 	ConnectTimeout   time.Duration
 	ReadWriteTimeout time.Duration
 }
 
+// Creates a new TimeoutDialer with supplied config object
 func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error) {
 	return func(netw, addr string) (net.Conn, error) {
 		conn, err := net.DialTimeout(netw, addr, config.ConnectTimeout)
@@ -112,16 +127,17 @@ func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error
 			return nil, err
 		}
 
-		conn.SetDeadline(time.Time{})
-        conn.SetReadDeadline(time.Time{})
-        conn.SetWriteDeadline(time.Time{})
+		conn.SetDeadline(time.Now().Add(config.ReadWriteTimeout))
+		conn.SetReadDeadline(time.Now().Add(config.ReadWriteTimeout))
+		conn.SetWriteDeadline(time.Now().Add(config.ReadWriteTimeout))
 		return conn, nil
 	}
 }
 
+// Creates a new http.Client with a longer timeout, optionally accepts a Config object
 func NewTimeoutClient(args ...interface{}) *http.Client {
 	// Default configuration, lots of time for a streaming response to return
-    // Needs as long as our longest bake
+	// Needs as long as our longest bake
 	config := &Config{
 		ConnectTimeout:   5 * time.Second,
 		ReadWriteTimeout: 1200 * time.Second,

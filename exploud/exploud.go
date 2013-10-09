@@ -90,6 +90,7 @@ func CreateApp(args common.Command) {
 	fmt.Println(response)
 }
 
+// List the apps 
 func ListApps() {
     response, err := common.GetString(exploudUrl("/applications"))
     if err != nil {
@@ -99,6 +100,7 @@ func ListApps() {
     fmt.Println(response)
 }
 
+// AppExists returns true if the application exists according to the exploud service
 func AppExists(appName string) bool {
     resp, _ := common.Head(exploudUrl("/applications/" + appName))
     return resp
