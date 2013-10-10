@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// Perform an HHTP PUT on the supplied url withe the body of the supplied object reference
+// Perform an HTTP PUT on the supplied url with the body of the supplied object reference
 // Returns a non nil error on non 200 series response or other error.
 func PostJson(url string, body interface{}) (string, error) {
 	b, err := json.Marshal(body)
@@ -35,8 +35,19 @@ func PostJson(url string, body interface{}) (string, error) {
 		return string(responseBody), nil
 	}
 	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
-	return string(responseBody), errors.New(fmt.Sprintf("Got non 200 series response calling:",
-		url, "with body", b))
+	return string(responseBody),
+		errors.New(fmt.Sprintf("Got non 200 series response calling: %s with body: %s",
+			url, string(b)))
+}
+
+// Posts the supplied JSON to the url and unmarshals the response to the supplied
+// struct.
+func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) error {
+	responseBody, err := PostJson(url, &body)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal([]byte(responseBody), &v)
 }
 
 // Performs an HTTP PUT on the supplied url with the body of the supplied object reference
@@ -115,7 +126,7 @@ func Head(url string) (bool, error) {
 	case 404:
 		return false, nil
 	default:
-		panic(fmt.Sprintf("Unknwon response: %d from HEAD on URL: %s Is your proxy set correctly?",
+		panic(fmt.Sprintf("Unknown response: %d from HEAD on URL: %s Is your proxy set correctly?",
 			resp.StatusCode, url))
 	}
 
