@@ -38,6 +38,7 @@ func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
 	fmt.Println("\n")
+    fmt.Println("[New and updated]\n    \033[36mlist-apps\n    deploy\n\033[0m")
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
 }
