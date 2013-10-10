@@ -1,13 +1,11 @@
 package exploud
 
 import (
-	"encoding/json"
 	"fmt"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-//	"os"
 	"strings"
-//	"time"
+	"time"
 )
 
 type DeployRequest struct {
@@ -25,6 +23,12 @@ func exploudUrl(end string) string {
 	return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
+type TaskReference struct {
+	TaskId string `json:"taskId"`
+}
+
+// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
+// Must pass SecondPos and Ami arguments
 func Exploud(args common.Command) {
 	if args.SecondPos == "" {
 		console.Fail("Must supply an application name as the second positional argument")
@@ -39,39 +43,91 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
-    /*
-	fmt.Println("Starting our rewriting tests")
-
-    fmt.Println("Line 1 to overwrite")
-    fmt.Println("Another line to overwrite")
-
-    time.Sleep(500 * time.Millisecond)
-
-	for i := 0; i < 10; i++ {
-        time.Sleep(100 * time.Millisecond)
-        fmt.Println("\033[31m\033[2A\rOverwriting first line", i)
-        fmt.Println(fmt.Sprintf("\033[%dmOverwriting second line  ", 30 + i))
-	}
-
-    fmt.Print("\033[0m")
-
-	os.Exit(0)
-    */
-
 	deployRequest := DeployRequest{args.Ami, "dev"}
-	b, err := json.Marshal(deployRequest)
-	if err != nil {
-		console.Fail("Unable to create exploud deploy requset body")
-	}
-	fmt.Println("Calling exploud:", deployUrl, string(b))
+	task := TaskReference{}
 
-    resp, err := common.PostJson(deployUrl, &deployRequest)
+	err := common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
 	if err != nil {
-        fmt.Println(err, resp)
+		fmt.Println(err)
 		console.Fail("Error calling exploud, exiting.")
 	}
 
-    fmt.Println(resp)
+	PollDeploy(task.TaskId, args.SecondPos)
+}
+
+// Exploud JSON task log message
+type TaskLog struct {
+	Date    string `json:"Date"`
+	Message string `json:"message"`
+}
+
+// Exploud JSON task
+type Task struct {
+	DurationString string    `json:"durationString"`
+	Id             string    `json:"_id"`
+	Log            []TaskLog `json:"log"`
+	Operation      string    `json:"operation"`
+	Region         string    `json:"region"`
+	RunId          string    `json:"runId"`
+	Status         string    `json:"status"`
+	UpdateTime     string    `json:"updateTime"`
+	WorkflowId     string    `json:"workflowId"`
+}
+
+// Get the task for the supplied id
+func GetTask(taskId string) Task {
+	taskUrl := exploudUrl(fmt.Sprintf("/tasks/%s", taskId))
+	task := Task{}
+
+	err := common.GetJson(taskUrl, &task)
+	if err != nil {
+		fmt.Println(err)
+		console.Fail("Unable to get task from exploud")
+	}
+	return task
+}
+
+// Prints out the status line for the deploy
+func Status(taskId string, serviceName string, status string) {
+	fmt.Print(fmt.Sprintf("\033[1m\033[31m    Explouding %s: ", serviceName))
+	fmt.Println("\033[32m", taskId)
+	statusColor := 33
+	if status == "completed" {
+		statusColor = 32
+	}
+	fmt.Println(fmt.Sprintf("\033[1m\033[31m              Status:\033[%dm  %s",
+		statusColor, status))
+	fmt.Println("\033[0m")
+}
+
+// Poll the supplied taskId, printing the status to the console. Finishing
+// after either the task is marked as completed or a timeout is reached
+func PollDeploy(taskId string, serviceName string) {
+	fmt.Println("\n")
+	Status(taskId, serviceName, "pending")
+	task := GetTask(taskId)
+
+	// TODO: TIMEOUT
+
+    timeout := time.Now().Add((20 * time.Minute))
+	previousLength := 0
+	for (task.Status != "completed") && time.Now().Before(timeout) {
+		time.Sleep(5 * time.Second)
+		task = GetTask(taskId)
+
+		// Jump the cursor up the right number of lines and clear
+		for i := 0; i < previousLength+4; i++ {
+			fmt.Println("\033[2A\033[2K\r")
+		}
+		Status(taskId, serviceName, task.Status)
+
+		previousLength = len(task.Log) - 1
+		for line := range task.Log {
+			fmt.Println(task.Log[line])
+		}
+	}
+
+	fmt.Print("\033[0m")
 }
 
 // Register a new application with exploud, should have the knock on effect
