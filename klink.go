@@ -31,6 +31,7 @@ var cmd = `[command] [application] [options]
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
+    find-amis           Lists the latest amis for the supplied application name
     update              Update to the current version of klink.`
 
 func printHelpAndExit() {
@@ -113,6 +114,8 @@ func handleAction(args common.Command) {
 		exploud.CreateApp(args)
 	case "doctor":
 		fmt.Println("The Doctor is in the house")
+    case "find-amis":
+        ditto.FindAmis(args)
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}

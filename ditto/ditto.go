@@ -52,3 +52,27 @@ func Bake(args common.Command) {
 
 	io.Copy(os.Stdout, resp.Body)
 }
+
+type Ami struct {
+    Name string
+    ImageId string
+}
+
+func FindAmis(args common.Command) {
+    if args.SecondPos == "" {
+        console.Fail("Application must be supplied as second positional argument")
+    }
+
+    amis := make([]Ami, 10)
+    err := common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
+
+    if err != nil {
+        fmt.Println(err)
+        console.Fail("Could not list amis from ditto")
+    }
+
+    for key := range amis {
+        fmt.Println(fmt.Sprintf("%s : \033[32m%s\033[37m", amis[key].Name, amis[key].ImageId))
+    }
+    fmt.Println("")
+}

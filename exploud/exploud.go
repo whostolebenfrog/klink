@@ -1,14 +1,13 @@
 package exploud
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+//	"os"
 	"strings"
+//	"time"
 )
 
 type DeployRequest struct {
@@ -26,8 +25,6 @@ func exploudUrl(end string) string {
 	return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
-// TODO: use http lib and add polling here!
-// TODO: handle message when exploud supports it
 func Exploud(args common.Command) {
 	if args.SecondPos == "" {
 		console.Fail("Must supply an application name as the second positional argument")
@@ -42,27 +39,39 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
+    /*
+	fmt.Println("Starting our rewriting tests")
+
+    fmt.Println("Line 1 to overwrite")
+    fmt.Println("Another line to overwrite")
+
+    time.Sleep(500 * time.Millisecond)
+
+	for i := 0; i < 10; i++ {
+        time.Sleep(100 * time.Millisecond)
+        fmt.Println("\033[31m\033[2A\rOverwriting first line", i)
+        fmt.Println(fmt.Sprintf("\033[%dmOverwriting second line  ", 30 + i))
+	}
+
+    fmt.Print("\033[0m")
+
+	os.Exit(0)
+    */
+
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	b, err := json.Marshal(deployRequest)
 	if err != nil {
-		console.BigFail("Unable to create exploud deploy requset body")
+		console.Fail("Unable to create exploud deploy requset body")
 	}
 	fmt.Println("Calling exploud:", deployUrl, string(b))
 
-	resp, err := http.Post(deployUrl, "application/json", bytes.NewReader(b))
+    resp, err := common.PostJson(deployUrl, &deployRequest)
 	if err != nil {
-		console.BigFail("Error response from exploud")
+        fmt.Println(err, resp)
+		console.Fail("Error calling exploud, exiting.")
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			console.BigFail("Failed to read exploud response body, that's bad :-(")
-		}
-		fmt.Println("200 response from exploud - that's good!")
-		fmt.Println(string(body))
-	}
+    fmt.Println(resp)
 }
 
 // Register a new application with exploud, should have the knock on effect
@@ -86,7 +95,7 @@ func CreateApp(args common.Command) {
 	response, err := common.PutJson(exploudUrl("/applications/"+args.SecondPos), createBody)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err, response)
 		console.BigFail("Unable to register new application with exploud")
 	}
 
