@@ -18,6 +18,7 @@ func bakeUrl(app string, version string) string {
 	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
 }
 
+// Bake the ami
 func Bake(args common.Command) {
 	if args.SecondPos == "" {
 		console.Fail("Application must be supplied as second positional argument")
@@ -58,6 +59,8 @@ type Ami struct {
     ImageId string
 }
 
+// FindAmis using the service name for the second positional command line arg
+// Prints out a list of the most recent ami names and image ids
 func FindAmis(args common.Command) {
     if args.SecondPos == "" {
         console.Fail("Application must be supplied as second positional argument")
@@ -74,5 +77,5 @@ func FindAmis(args common.Command) {
     for key := range amis {
         fmt.Println(fmt.Sprintf("%s : \033[32m%s\033[37m", amis[key].Name, amis[key].ImageId))
     }
-    fmt.Println("")
+    fmt.Print("\033[0m")
 }
