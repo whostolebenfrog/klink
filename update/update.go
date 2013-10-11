@@ -53,7 +53,9 @@ func errorWithHelper(nextVersionUrl string) {
 func Update(argsPath string) {
     fmt.Println("in update")
 	path, pathErr := exec.LookPath("klink")
+    fmt.Println(argsPath)
 	if pathErr != nil {
+        fmt.Println("using args path")
 		path = argsPath
 	}
 
@@ -87,6 +89,7 @@ func Update(argsPath string) {
 
 func doUpdate(nextVersionUrl string, path string) {
 	// get the latest version, save to a tmp file
+    fmt.Println(nextVersionUrl)
 
 	resp, err := http.Get(nextVersionUrl)
 	if err != nil {
@@ -101,8 +104,17 @@ func doUpdate(nextVersionUrl string, path string) {
     }
 
     fmt.Println("about to write!")
-	ioutil.WriteFile(path, file, 0755)
+	err = ioutil.WriteFile(path, file, 0755)
+    if err != nil {
+        fmt.Println(err)
+    }
     fmt.Println("should have written")
+
+    err = ioutil.WriteFile("C:\\Users\\bgriffit\\klink\\yolo.exe", file, 0755)
+    if err != nil {
+        fmt.Println(err)
+    }
+    fmt.Println("le fin")
 
 	/*
 	   wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
