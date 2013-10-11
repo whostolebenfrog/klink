@@ -37,8 +37,8 @@ var cmd = `[command] [application] [options]
 func printHelpAndExit() {
 	console.Klink()
 	update.PrintVersion()
-	fmt.Println("\n")
-    fmt.Println("[New and updated]\n    \033[36mlist-amis\n    deploy\n\033[0m")
+	fmt.Println("")
+    fmt.Println("[New and updated] \033[36mlist-amis, deploy\n\033[0m")
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
 }
@@ -117,6 +117,8 @@ func handleAction(args common.Command) {
 		fmt.Println("The Doctor is in the house")
     case "list-amis":
         ditto.FindAmis(args)
+    case "find-amis":
+        fmt.Println("Did you mean list-amis?")
 	default:
 		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
 	}
