@@ -47,13 +47,15 @@ func Update(argsPath string) {
 		path = argsPath
 	}
 
-	if LatestVersion() == Version {
+    latestVersion := LatestVersion()
+
+	if latestVersion == Version {
 		fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
 		PrintVersion()
 		return
 	}
 
-	nextVersion := fmt.Sprintf("klink-%d-%s-%s", LatestVersion(), runtime.GOOS, runtime.GOARCH)
+	nextVersion := fmt.Sprintf("klink-%d-%s-%s", latestVersion, runtime.GOOS, runtime.GOARCH)
 
 	nextVersionUrl := benkinsUrl(nextVersion)
 
