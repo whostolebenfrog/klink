@@ -1,8 +1,10 @@
 package update
 
 import (
-	"bytes"
+	//"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	"os/exec"
@@ -54,13 +56,14 @@ func Update(argsPath string) {
 		path = argsPath
 	}
 
-    latestVersion := LatestVersion()
+	latestVersion := LatestVersion()
 
+    /*
 	if latestVersion == Version {
 		fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
 		PrintVersion()
 		return
-	}
+	}*/
 
 	nextVersion := fmt.Sprintf("klink-%d-%s-%s", latestVersion, runtime.GOOS, runtime.GOARCH)
 	nextVersionUrl := benkinsUrl(nextVersion)
@@ -72,7 +75,7 @@ func Update(argsPath string) {
 	}
 
 	if exists {
-        doUpdate(nextVersionUrl, path)
+		doUpdate(nextVersionUrl, path)
 	} else {
 		fmt.Println(err)
 		errorWithHelper(nextVersionUrl)
@@ -80,46 +83,58 @@ func Update(argsPath string) {
 }
 
 func doUpdate(nextVersionUrl string, path string) {
-    // get the latest version, save to a tmp file
+	// get the latest version, save to a tmp file
 
+	resp, err := http.Get(nextVersionUrl)
+	if err != nil {
+		errorWithHelper(nextVersionUrl)
+	}
+	defer resp.Body.Close()
 
-
-    wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
-    var wgetStderr bytes.Buffer
-    wget.Stderr = &wgetStderr
-    wgetErr := wget.Run()
-
-    if wgetErr != nil {
-        fmt.Println(fmt.Sprint(wgetErr) + ":" + wgetStderr.String())
-        fmt.Println("Failed to wget the latest version. Ensure it's installed!")
+    file, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
         errorWithHelper(nextVersionUrl)
     }
 
-    // TODO: don't -f on windows
-    // overwrite the old version with the new one
-    mv := exec.Command("mv", "-f", path+".tmp", path)
-    var mvStderr bytes.Buffer
-    mv.Stderr = &mvStderr
-    mvErr := mv.Run()
+	ioutil.WriteFile(path, file, 0755)
 
-    if mvErr != nil {
-        fmt.Println(fmt.Sprint(mvErr) + ":" + mvStderr.String())
-        fmt.Println("Can't overwrite the previous version. You might be able to do it yourself")
-        errorWithHelper(nextVersionUrl)
-    }
+	/*
+	   wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
+	   var wgetStderr bytes.Buffer
+	   wget.Stderr = &wgetStderr
+	   wgetErr := wget.Run()
 
-    // Don't do this on windows!
-    // make the new one executable
-    chmod := exec.Command("chmod", "+x", path)
-    var chmodStderr bytes.Buffer
-    chmod.Stderr = &chmodStderr
-    chmodErr := chmod.Run()
+	   if wgetErr != nil {
+	       fmt.Println(fmt.Sprint(wgetErr) + ":" + wgetStderr.String())
+	       fmt.Println("Failed to wget the latest version. Ensure it's installed!")
+	       errorWithHelper(nextVersionUrl)
+	   }
 
-    if chmodErr != nil {
-        fmt.Println(fmt.Sprint(chmodErr) + ":" + chmodStderr.String())
-        fmt.Println("Failed to +x on klink. You might be able to do it yourself")
-        errorWithHelper(nextVersionUrl)
-    }
+	   // TODO: don't -f on windows
+	   // overwrite the old version with the new one
+	   mv := exec.Command("mv", "-f", path+".tmp", path)
+	   var mvStderr bytes.Buffer
+	   mv.Stderr = &mvStderr
+	   mvErr := mv.Run()
 
-    fmt.Println("Klink has been updated to the latest version!")
+	   if mvErr != nil {
+	       fmt.Println(fmt.Sprint(mvErr) + ":" + mvStderr.String())
+	       fmt.Println("Can't overwrite the previous version. You might be able to do it yourself")
+	       errorWithHelper(nextVersionUrl)
+	   }
+
+	   // Don't do this on windows!
+	   // make the new one executable
+	   chmod := exec.Command("chmod", "+x", path)
+	   var chmodStderr bytes.Buffer
+	   chmod.Stderr = &chmodStderr
+	   chmodErr := chmod.Run()
+
+	   if chmodErr != nil {
+	       fmt.Println(fmt.Sprint(chmodErr) + ":" + chmodStderr.String())
+	       fmt.Println("Failed to +x on klink. You might be able to do it yourself")
+	       errorWithHelper(nextVersionUrl)
+	   }
+
+	   fmt.Println("Klink has been updated to the latest version!") */
 }
