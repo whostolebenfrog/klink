@@ -58,12 +58,11 @@ func Update(argsPath string) {
 
 	latestVersion := LatestVersion()
 
-    /*
 	if latestVersion == Version {
 		fmt.Println("You are using the latest version already. Good work kid, don't get cocky.")
 		PrintVersion()
 		return
-	}*/
+	}
 
 	nextVersion := fmt.Sprintf("klink-%d-%s-%s", latestVersion, runtime.GOOS, runtime.GOARCH)
 	nextVersionUrl := benkinsUrl(nextVersion)
@@ -82,6 +81,7 @@ func Update(argsPath string) {
 	}
 }
 
+// Does the update
 func doUpdate(nextVersionUrl string, path string) {
 	resp, err := http.Get(nextVersionUrl)
 	if err != nil {
@@ -124,6 +124,8 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
     os.Exit(0)
 }
 
+// Write and run a script to copy the new version over ourselves, avoids
+// file locks
 func deferCopy(nextVersionUrl string, path string) {
     script := "sleep 1\n" + "mv " + path + ".update " + path + "\nrm -f updateklink.sh"
     scriptBytes := []byte(script)
