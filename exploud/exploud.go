@@ -87,6 +87,7 @@ func GetTask(taskId string) Task {
 	return task
 }
 
+// TODO - lining up depends on version length! BENKINS!
 // Prints out the status line for the deploy
 func Status(taskId string, serviceName string, status string) {
 	fmt.Print(fmt.Sprintf("\033[1m\033[31m    Explouding %s: ", serviceName))
@@ -109,7 +110,10 @@ func PollDeploy(taskId string, serviceName string) {
 
 	timeout := time.Now().Add((20 * time.Minute))
 	previousLength := 0
-	for (task.Status == "running") && time.Now().Before(timeout) {
+	for (task.Status != "completed") &&
+		(task.Status != "failed") &&
+		(task.Status != "teminated") &&
+		time.Now().Before(timeout) {
 
 		time.Sleep(5 * time.Second)
 		task = GetTask(taskId)
