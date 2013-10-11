@@ -90,15 +90,23 @@ func GetTask(taskId string) Task {
 // TODO - lining up depends on version length! BENKINS!
 // Prints out the status line for the deploy
 func Status(taskId string, serviceName string, status string) {
-	fmt.Print(fmt.Sprintf("\033[1m\033[31m    Explouding %s: ", serviceName))
-	fmt.Println("\033[32m", taskId)
-	statusColor := 33
+    // first line
+    console.Red()
+    console.Bold()
+    fmt.Print(fmt.Sprintf("    Explouding %s: ", serviceName))
+    console.Green()
+	fmt.Println(taskId)
+
+    // status line
+    console.Red()
+    fmt.Print("              Status: ")
 	if status == "completed" {
-		statusColor = 32
-	}
-	fmt.Println(fmt.Sprintf("\033[1m\033[31m              Status:\033[%dm  %s",
-		statusColor, status))
-	fmt.Println("\033[0m")
+        console.Green()
+    } else {
+        console.Brown()
+    }
+    fmt.Println(status)
+    console.FReset()
 }
 
 // Poll the supplied taskId, printing the status to the console. Finishing
@@ -130,7 +138,7 @@ func PollDeploy(taskId string, serviceName string) {
 		}
 	}
 
-	fmt.Print("\033[0m")
+    console.Reset()
 }
 
 // Register a new application with exploud, should have the knock on effect

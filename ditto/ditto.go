@@ -75,7 +75,11 @@ func FindAmis(args common.Command) {
     }
 
     for key := range amis {
-        fmt.Println(fmt.Sprintf("%s : \033[32m%s\033[37m", amis[key].Name, amis[key].ImageId))
+        fmt.Print(amis[key].Name, " : ")
+        console.Brown()
+        fmt.Print(amis[key].ImageId)
+        console.Grey()
+        fmt.Println()
     }
-    fmt.Print("\033[0m")
+    console.Reset()
 }

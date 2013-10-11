@@ -36,9 +36,13 @@ var cmd = `[command] [application] [options]
 
 func printHelpAndExit() {
 	console.Klink()
+    console.Green()
 	update.PrintVersion()
-	fmt.Println("")
-    fmt.Println("[New and updated] \033[36mlist-amis, deploy\n\033[0m")
+    console.Reset()
+    fmt.Print("\n[New and updated] ")
+    console.Red()
+    fmt.Print("list-amis, deploy\n")
+    console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
 }
