@@ -111,7 +111,7 @@ func doUpdate(nextVersionUrl string, path string) {
 // Write and run a script to copy the new version over ourselves, avoids
 // file locks
 func deferCopyForWindows(nextVersionUrl string, path string) {
-    script := "Start-sleep 1\n\r" + "mv " + path + ".update " + path
+    script := "Start-sleep 1\r\n" + "rm " + path + "\r\n" + "mv " + path + ".update " + path
     scriptBytes := []byte(script)
     ioutil.WriteFile("updateklink.PS1", scriptBytes, 0755)
 
