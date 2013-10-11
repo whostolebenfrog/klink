@@ -107,11 +107,12 @@ func PollDeploy(taskId string, serviceName string) {
 	Status(taskId, serviceName, "pending")
 	task := GetTask(taskId)
 
-	// TODO: TIMEOUT
-
-    timeout := time.Now().Add((20 * time.Minute))
+	timeout := time.Now().Add((20 * time.Minute))
 	previousLength := 0
-	for (task.Status != "completed") && time.Now().Before(timeout) {
+	for (task.Status != "completed") &&
+		(task.Status != "failed") &&
+		time.Now().Before(timeout) {
+
 		time.Sleep(5 * time.Second)
 		task = GetTask(taskId)
 

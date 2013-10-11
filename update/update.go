@@ -78,6 +78,7 @@ func Update(argsPath string) {
 			errorWithHelper(nextVersionUrl)
 		}
 
+        // TODO: don't -f on windows
 		// overwrite the old version with the new one
 		mv := exec.Command("mv", "-f", path+".tmp", path)
 		var mvStderr bytes.Buffer
@@ -90,6 +91,7 @@ func Update(argsPath string) {
 			errorWithHelper(nextVersionUrl)
 		}
 
+        // Don't do this on windows!
 		// make the new one executable
 		chmod := exec.Command("chmod", "+x", path)
 		var chmodStderr bytes.Buffer
