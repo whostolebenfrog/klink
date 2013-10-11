@@ -97,6 +97,7 @@ func doUpdate(nextVersionUrl string, path string) {
     if !common.IsWindows() {
         err = ioutil.WriteFile(path, file, 0755)
         if err != nil {
+            fmt.Println("here2")
             fmt.Println(err)
             errorWithHelper(nextVersionUrl)
         }
@@ -109,7 +110,9 @@ func doUpdate(nextVersionUrl string, path string) {
     }
 
     fmt.Println("Klink has been updated to the latest version!")
-    deferCopyForWindows(nextVersionUrl, path)
+    if common.IsWindows() {
+        deferCopyForWindows(nextVersionUrl, path)
+    }
 }
 
 // Windows refuses to us overwrite ourselves so make a script with a small sleep
