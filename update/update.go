@@ -94,37 +94,45 @@ func doUpdate(nextVersionUrl string, path string) {
         errorWithHelper(nextVersionUrl)
     }
 
-    if !common.IsWindows() {
-        err = ioutil.WriteFile(path, file, 0755)
-        if err != nil {
-            fmt.Println("here2")
-            fmt.Println(err)
-            errorWithHelper(nextVersionUrl)
-        }
-    } else {
-        err = ioutil.WriteFile(path+".update", file, 0755)
-        if err != nil {
-            fmt.Println(err)
-            errorWithHelper(nextVersionUrl)
-        }
+    err = ioutil.WriteFile(path+".update", file, 0755)
+    if err != nil {
+        fmt.Println(err)
+        errorWithHelper(nextVersionUrl)
     }
 
     fmt.Println("Klink has been updated to the latest version!")
     if common.IsWindows() {
         deferCopyForWindows(nextVersionUrl, path)
+    } else {
+        deferCopy(nextVersionUrl, path)
     }
 }
 
-// Windows refuses to us overwrite ourselves so make a script with a small sleep
-// that overwrites us with the new version. NEVER GIVE UP.
-func deferCopyForWindows (nextVersionUrl string, path string) {
+// Write and run a script to copy the new version over ourselves, avoids
+// file locks
+func deferCopyForWindows(nextVersionUrl string, path string) {
     script := "Start-sleep 1\n\r" + "mv " + path + ".update " + path
     scriptBytes := []byte(script)
-    ioutil.WriteFile("update.PS1", scriptBytes, 0755)
+    ioutil.WriteFile("updateklink.PS1", scriptBytes, 0755)
 
-    cmd := exec.Command("powershell", "-ExecutionPolicy", "ByPass", "-File", "update.PS1")
+    cmd := exec.Command("powershell", "-ExecutionPolicy", "ByPass", "-File", "updateklink.PS1")
     err := cmd.Start()
     if err != nil {
+        fmt.Println(err)
+        errorWithHelper(nextVersionUrl)
+    }
+    os.Exit(0)
+}
+
+func deferCopy(nextVersionUrl string, path string) {
+    script := "sleep 1\n" + "mv " + path + ".update " + path
+    scriptBytes := []byte(script)
+    ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
+
+    cmd := exec.Command("sh", "updateklink.sh")
+    err := cmd.Start()
+    if err != nil {
+        fmt.Println(err)
         errorWithHelper(nextVersionUrl)
     }
     os.Exit(0)
