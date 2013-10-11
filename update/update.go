@@ -125,7 +125,7 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 }
 
 func deferCopy(nextVersionUrl string, path string) {
-    script := "sleep 1\n" + "mv " + path + ".update " + path
+    script := "sleep 1\n" + "mv " + path + ".update " + path + "\nrm -f updateklink.sh"
     scriptBytes := []byte(script)
     ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
