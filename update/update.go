@@ -51,6 +51,7 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(argsPath string) {
+    fmt.Println("in update")
 	path, pathErr := exec.LookPath("klink")
 	if pathErr != nil {
 		path = argsPath
@@ -75,6 +76,8 @@ func Update(argsPath string) {
 	}
 
 	if exists {
+        fmt.Println("about to update")
+        fmt.Println(path)
 		doUpdate(nextVersionUrl, path)
 	} else {
 		fmt.Println(err)
@@ -90,13 +93,16 @@ func doUpdate(nextVersionUrl string, path string) {
 		errorWithHelper(nextVersionUrl)
 	}
 	defer resp.Body.Close()
+    fmt.Println("got the old body")
 
     file, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         errorWithHelper(nextVersionUrl)
     }
 
+    fmt.Println("about to write!")
 	ioutil.WriteFile(path, file, 0755)
+    fmt.Println("should have written")
 
 	/*
 	   wget := exec.Command("wget", nextVersionUrl, "-O", path+".tmp")
