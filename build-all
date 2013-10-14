@@ -21,10 +21,8 @@ for PLATFORM in $PLATFORMS; do
     GOARCH=${PLATFORM#*/}
     OUTPUT=`echo $@ | sed 's/\.go//'` 
     NAME="klink-$VERSION-${GOOS}-${GOARCH}"
-    if [ "$GOARCH" == "windows" ]; then
-        echo $NAME
+    if [ "$GOOS" == "windows" ]; then
         NAME="$NAME.exe"
-        echo $NAME
     fi
     CMD="go-${GOOS}-${GOARCH} build -o builds/$NAME $@"
     echo "$CMD"
