@@ -113,12 +113,12 @@ func Status(taskId string, serviceName string, status string) {
 // Poll the supplied taskId, printing the status to the console. Finishing
 // after either the task is marked as completed or a timeout is reached
 func PollDeploy(taskId string, serviceName string) {
-	fmt.Println("\n")
 	Status(taskId, serviceName, "pending")
 	task := GetTask(taskId)
 
 	timeout := time.Now().Add((20 * time.Minute))
 	previousLength := 0
+    // can't check == running as wont be set when we first call
 	for (task.Status != "completed") &&
 		(task.Status != "failed") &&
 		(task.Status != "teminated") &&
@@ -127,18 +127,14 @@ func PollDeploy(taskId string, serviceName string) {
 		time.Sleep(5 * time.Second)
 		task = GetTask(taskId)
 
-		// Jump the cursor up the right number of lines and clear
-		for i := 0; i < previousLength+4; i++ {
-			fmt.Println("\033[2A\033[2K\r")
+		for i := previousLength; i < len(task.Log); i++ {
+			fmt.Println(task.Log[i])
 		}
-		Status(taskId, serviceName, task.Status)
 
-		previousLength = len(task.Log) - 1
-		for line := range task.Log {
-			fmt.Println(task.Log[line])
-		}
+		previousLength = len(task.Log)
 	}
 
+	Status(taskId, serviceName, task.Status)
     console.Reset()
 }
 
