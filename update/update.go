@@ -65,6 +65,9 @@ func Update(argsPath string) {
 	}
 
 	nextVersion := fmt.Sprintf("klink-%d-%s-%s", latestVersion, runtime.GOOS, runtime.GOARCH)
+    if common.IsWindows() {
+        nextVersion += ".exe"
+    }
 	nextVersionUrl := benkinsUrl(nextVersion)
 
 	exists, err := common.Head(nextVersionUrl)
