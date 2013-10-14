@@ -41,7 +41,7 @@ func printHelpAndExit() {
     console.Reset()
     fmt.Print("\n[New and updated] ")
     console.Red()
-    fmt.Print("list-amis, deploy\n")
+    fmt.Print("Bake no longer takes an iteration!\n")
     console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
