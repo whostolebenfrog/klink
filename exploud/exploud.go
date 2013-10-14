@@ -43,6 +43,7 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
+    // TODO: add support for another environment
 	deployRequest := DeployRequest{args.Ami, "dev"}
 	task := TaskReference{}
 
@@ -87,19 +88,19 @@ func GetTask(taskId string) Task {
 	return task
 }
 
-// TODO - lining up depends on version length! BENKINS!
 // Prints out the status line for the deploy
 func Status(taskId string, serviceName string, status string) {
     // first line
+	fmt.Println("")
     console.Red()
     console.Bold()
-    fmt.Print(fmt.Sprintf("    Explouding %s: ", serviceName))
+    fmt.Print(fmt.Sprintf("%30s",  "Explouding " + serviceName + ": "))
     console.Green()
 	fmt.Println(taskId)
 
     // status line
     console.Red()
-    fmt.Print("              Status: ")
+    fmt.Print(fmt.Sprintf("%30s", "Status: "))
 	if status == "completed" {
         console.Green()
     } else {
