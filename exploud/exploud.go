@@ -53,6 +53,9 @@ func Exploud(args common.Command) {
 		console.Fail("Error calling exploud, exiting.")
 	}
 
+    // TODO: environment, user and version (can be parsed from the ami name)
+    console.Hubot(fmt.Sprintf("Deploying ami: %s to service: %s", args.Ami, args.SecondPos))
+
 	PollDeploy(task.TaskId, args.SecondPos)
 }
 
