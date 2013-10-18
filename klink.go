@@ -25,13 +25,13 @@ var cmd = `[command] [application] [options]
                         Creates a new application in onix only.
     create-app-tyr      {application}
                         Creates a new application in tyranitar only.
-    deploy              {application} -a {ami}
-                        Deploy the AMI {ami} for {application}.
+    deploy              {application} {environment} {ami}
+                        Deploy the AMI {ami} for {application} to {environment}.
     doctor              Not yet implemented.
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
-    list-amis           Lists the latest amis for the supplied application name
+    list-amis           {application} Lists the latest amis for the supplied application name
     update              Update to the current version of klink.`
 
 func printHelpAndExit() {
@@ -56,12 +56,13 @@ func loadFlags() common.Command {
 	optarg.Add("h", "help", "Displays this help message", false)
 	optarg.Header("Deployment based flags")
 	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
-	optarg.Add("e", "environment", "Sets the environment", "ent-dev")
+	optarg.Add("e", "environment", "Sets the environment", "dev, prod")
 	optarg.Add("m", "message", "Sets an informational message", "")
 	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
 	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
+	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "true, false")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
@@ -81,6 +82,8 @@ func loadFlags() common.Command {
 			command.Email = opt.String()
 		case "o":
 			command.Owner = opt.String()
+        case "s":
+            command.Silent = opt.Bool()
 		}
 	}
 
@@ -90,9 +93,16 @@ func loadFlags() common.Command {
 	}
 	command.Action = os.Args[1]
 	// some commands need a second positional argument
+    // let's do this better eh!?
 	if len(os.Args) > 2 {
 		command.SecondPos = os.Args[2]
 	}
+    if len(os.Args) > 3 {
+        command.ThirdPos = os.Args[3]
+    }
+    if len(os.Args) > 4 {
+        command.ForthPos = os.Args[4]
+    }
 
 	return command
 }
@@ -124,7 +134,7 @@ func handleAction(args common.Command) {
     case "find-amis":
         fmt.Println("Did you mean list-amis?")
 	default:
-		console.Fail(fmt.Sprintf("Unknown or no action: %s", args.Action))
+        printHelpAndExit()
 	}
 }
 

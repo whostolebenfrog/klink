@@ -34,10 +34,11 @@ func PostJson(url string, body interface{}) (string, error) {
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody), nil
 	}
-	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
+	fmt.Println(string(responseBody))
+	fmt.Println("%d response calling URL: ", resp.StatusCode, resp.StatusCode)
 	return string(responseBody),
-		errors.New(fmt.Sprintf("Got non 200 series response calling: %s with body: %s",
-			url, string(b)))
+		errors.New(fmt.Sprintf("Got %d series response calling: %s with body: %s",
+			resp.StatusCode, url, string(b)))
 }
 
 // Posts the supplied JSON to the url and unmarshals the response to the supplied
@@ -78,9 +79,9 @@ func PutJson(url string, body interface{}) (string, error) {
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody), nil
 	}
-	fmt.Println("Non 200 response calling URL: ", resp.StatusCode)
-	return string(responseBody), errors.New(fmt.Sprintf("Got non 200 series response calling:",
-		url, "with body", b))
+	fmt.Println("%d response calling URL: %s", resp.StatusCode, url)
+	return string(responseBody), errors.New(fmt.Sprintf("Got %d response calling: %s with body: %s",
+		resp.StatusCode, url, b))
 }
 
 // Performs an HTTP GET request on the supplied url and returns the result
@@ -100,7 +101,8 @@ func GetString(url string) (string, error) {
 	if resp.StatusCode == 200 {
 		return string(body), nil
 	}
-	return string(body), errors.New(fmt.Sprintf("Non 200 response from: %s", url))
+	fmt.Println(string(body))
+	return string(body), errors.New(fmt.Sprintf("%d response from: %s", resp.StatusCode, url))
 }
 
 // Performs an HTTP GET request on the supplied url and unmarshals the response

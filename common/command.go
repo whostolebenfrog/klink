@@ -12,10 +12,13 @@ type Command struct {
 	Environment string
 	Message     string
 	SecondPos   string
+	ThirdPos    string
+	ForthPos    string
 	Version     string
 	Description string
 	Email       string
 	Owner       string
+	Silent      bool
 }
 
 // Do we have to do stupid shit to get around windows being a moron?

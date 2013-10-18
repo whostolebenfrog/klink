@@ -31,20 +31,25 @@ type TaskReference struct {
 // Must pass SecondPos and Ami arguments
 func Exploud(args common.Command) {
 	if args.SecondPos == "" {
-		console.Fail("Must supply an application name as the second positional argument")
+		console.Fail("Must supply an application name as the second positional argument.")
 	}
-	if args.Ami == "" {
-		console.Fail("Must supply an ami to deploy using --ami")
+	if args.ThirdPos == "" {
+		console.Fail("Must supply an environment as third postional argument. Use dev or prod.")
+	}
+	if args.ForthPos == "" {
+		if args.Ami == "" {
+			console.Fail("Must supply an ami as the forth argument or with --ami.")
+		}
+		args.ForthPos = args.Ami
 	}
 	if !AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst exploud!",
+		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst exploud.",
 			args.SecondPos))
 	}
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
-    // TODO: add support for another environment
-	deployRequest := DeployRequest{args.Ami, "dev"}
+	deployRequest := DeployRequest{args.ForthPos, args.ThirdPos}
 	task := TaskReference{}
 
 	err := common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
@@ -53,8 +58,9 @@ func Exploud(args common.Command) {
 		console.Fail("Error calling exploud, exiting.")
 	}
 
-    // TODO: environment, user and version (can be parsed from the ami name)
-    console.Hubot(fmt.Sprintf("Deploying ami: %s to service: %s", args.Ami, args.SecondPos))
+	// TODO: user and version (can be parsed from the ami name)
+	console.Hubot(fmt.Sprintf("Deploying ami: %s for service: %s to: %s",
+		args.ForthPos, args.SecondPos, args.ThirdPos), args)
 
 	PollDeploy(task.TaskId, args.SecondPos)
 }
@@ -86,31 +92,31 @@ func GetTask(taskId string) Task {
 	err := common.GetJson(taskUrl, &task)
 	if err != nil {
 		fmt.Println(err)
-		console.Fail("Unable to get task from exploud")
+		console.Fail("")
 	}
 	return task
 }
 
 // Prints out the status line for the deploy
 func Status(taskId string, serviceName string, status string) {
-    // first line
+	// first line
 	fmt.Println("")
-    console.Red()
-    console.Bold()
-    fmt.Print(fmt.Sprintf("%30s",  "Explouding " + serviceName + ": "))
-    console.Green()
+	console.Red()
+	console.Bold()
+	fmt.Print(fmt.Sprintf("%30s", "Explouding "+serviceName+": "))
+	console.Green()
 	fmt.Println(taskId)
 
-    // status line
-    console.Red()
-    fmt.Print(fmt.Sprintf("%30s", "Status: "))
+	// status line
+	console.Red()
+	fmt.Print(fmt.Sprintf("%30s", "Status: "))
 	if status == "completed" {
-        console.Green()
-    } else {
-        console.Brown()
-    }
-    fmt.Println(status)
-    console.FReset()
+		console.Green()
+	} else {
+		console.Brown()
+	}
+	fmt.Println(status)
+	console.FReset()
 }
 
 // Poll the supplied taskId, printing the status to the console. Finishing
@@ -121,7 +127,7 @@ func PollDeploy(taskId string, serviceName string) {
 
 	timeout := time.Now().Add((20 * time.Minute))
 	previousLength := 0
-    // can't check == running as wont be set when we first call
+	// can't check == running as wont be set when we first call
 	for (task.Status != "completed") &&
 		(task.Status != "failed") &&
 		(task.Status != "teminated") &&
@@ -138,7 +144,7 @@ func PollDeploy(taskId string, serviceName string) {
 	}
 
 	Status(taskId, serviceName, task.Status)
-    console.Reset()
+	console.Reset()
 }
 
 // Register a new application with exploud, should have the knock on effect
