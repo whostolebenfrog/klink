@@ -44,15 +44,8 @@ func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) {
     }
 }
 
-// Performs an HTTP PUT on the supplied url with the body of the supplied object reference
-// Returns a non nil error on non 200 series response or other error.
-func PutJson(url string, body interface{}) string {
-	b, err := json.Marshal(body)
-	if err != nil {
-        panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
-	}
-
-	req, err := http.NewRequest("PUT", url, bytes.NewReader(b))
+func PutByteArray(url string, data []byte) string {
+	req, err := http.NewRequest("PUT", url, bytes.NewReader(data))
     if err != nil {
         panic(fmt.Sprintf("Error making PUT request to url: %s", url))
     }
@@ -74,7 +67,21 @@ func PutJson(url string, body interface{}) string {
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody)
 	}
-    panic(fmt.Sprintf("Got %d response calling: %s with body: %s", resp.StatusCode, url, b))
+    panic(fmt.Sprintf("Got %d response calling: %s with body: %s", resp.StatusCode, url, data))
+}
+
+// Performs an HTTP PUT on the supplied url with the body of the supplied string.
+func PutString(url string, body string) string {
+    return PutByteArray(url, []byte(body))
+}
+
+// Performs an HTTP PUT on the supplied url with the body of the supplied object reference
+func PutJson(url string, body interface{}) string {
+	b, err := json.Marshal(body)
+	if err != nil {
+        panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
+	}
+    return PutByteArray(url, b)
 }
 
 // Performs an HTTP GET request on the supplied url and returns the result

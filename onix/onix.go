@@ -44,5 +44,20 @@ func Info(args common.Command) {
 }
 
 // Adds a property in onix to the supplied application
+//PUT /1.x/applications/{app}/{key} (create/update a metadata item)
+//    PUT http://onix.ent.nokia.com:8080/1.x/applications/empoleon/stats
+//    {
+//      "value" : [
+//        {
+//          "hp" : 84
+//        },
+//        {
+//          "attack" : 86
+//        },
+//        {
+//          "defense" : 88
+//        }
+//      ]
+//    }
 func AddProperty(args common.Command) {
 }
