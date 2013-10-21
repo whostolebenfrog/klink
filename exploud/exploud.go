@@ -59,8 +59,12 @@ func Exploud(args common.Command) {
 	}
 
 	// TODO: user and version (can be parsed from the ami name)
-	console.Hubot(fmt.Sprintf("Deploying ami: %s for service: %s to: %s",
-		args.ForthPos, args.SecondPos, args.ThirdPos), args)
+	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s.",
+		args.ForthPos, args.SecondPos, args.ThirdPos)
+	if args.Message != "" {
+		hubotMessage += " " + args.Message + "."
+	}
+	console.Hubot(hubotMessage, args)
 
 	PollDeploy(task.TaskId, args.SecondPos)
 }
