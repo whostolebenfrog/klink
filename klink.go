@@ -28,6 +28,7 @@ var cmd = `[command] [application] [options]
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}.
     doctor              Not yet implemented.
+    info                {application} Return information about the application
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
@@ -148,6 +149,8 @@ func handleAction(args common.Command) {
         ditto.FindAmis(args)
     case "find-amis":
         fmt.Println("Did you mean list-amis?")
+    case "info":
+        onix.Info(args)
 	default:
         printHelpAndExit()
 	}

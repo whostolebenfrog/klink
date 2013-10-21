@@ -14,6 +14,7 @@ func onixUrl(end string) string {
     return "http://onix.brislabs.com:8080/1.x" + end
 }
 
+// Create a new application in onix
 func CreateApp(args common.Command) {
     if args.SecondPos == "" {
         console.Fail("Must supply an application name as second positional argument")
@@ -27,10 +28,21 @@ func CreateApp(args common.Command) {
     fmt.Println(response)
 }
 
+// List all apps that onix knows about
 func ListApps() {
     fmt.Println(common.GetString(onixUrl("/applications")))
 }
 
+// Returns true if the app exists
 func AppExists(appName string) bool {
     return common.Head(onixUrl("/applications/" + appName))
+}
+
+// Returns all information stored in onix about the supplied application
+func Info(args common.Command) {
+    fmt.Println(common.GetString(onixUrl("/applications/" + args.SecondPos)))
+}
+
+// Adds a property in onix to the supplied application
+func AddProperty(args common.Command) {
 }
