@@ -148,8 +148,6 @@ func handleAction(args common.Command) {
         ditto.FindAmis(args)
     case "find-amis":
         fmt.Println("Did you mean list-amis?")
-    case "fail":
-        panic("Failing. Fail. Fail. Fail.")
 	default:
         printHelpAndExit()
 	}
