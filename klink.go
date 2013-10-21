@@ -62,7 +62,8 @@ func loadFlags() common.Command {
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
 	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
-	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "true, false")
+	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "")
+	optarg.Add("D", "debug", "Set's debug mode. Gives more info on fails.", "")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
@@ -84,6 +85,8 @@ func loadFlags() common.Command {
 			command.Owner = opt.String()
         case "s":
             command.Silent = opt.Bool()
+        case "D":
+            command.Debug = opt.Bool()
 		}
 	}
 
@@ -108,6 +111,15 @@ func loadFlags() common.Command {
 }
 
 func handleAction(args common.Command) {
+    defer func() {
+        if p := recover(); p != nil {
+            if args.Debug == true {
+                panic(p)
+            }
+            console.Fail("An error has occured. You may get more information using --debug true")
+        }
+    }()
+
 	switch args.Action {
 	case "update":
 		update.Update(os.Args[0])
@@ -133,6 +145,8 @@ func handleAction(args common.Command) {
         ditto.FindAmis(args)
     case "find-amis":
         fmt.Println("Did you mean list-amis?")
+    case "fail":
+        panic("Failing. Fail. Fail. Fail.")
 	default:
         printHelpAndExit()
 	}

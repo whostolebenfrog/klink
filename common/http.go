@@ -16,6 +16,7 @@ import (
 func PostJson(url string, body interface{}) (string, error) {
 	b, err := json.Marshal(body)
 	if err != nil {
+        panic(fmt.Sprintf("Can't marshall body attempting to call %s", url))
 		fmt.Println("Can't marshall body")
 		return "", errors.New("Unable to Marshall json for http post")
 	}

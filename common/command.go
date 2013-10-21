@@ -19,6 +19,7 @@ type Command struct {
 	Email       string
 	Owner       string
 	Silent      bool
+    Debug       bool
 }
 
 // Do we have to do stupid shit to get around windows being a moron?
