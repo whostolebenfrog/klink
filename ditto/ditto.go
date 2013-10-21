@@ -67,12 +67,7 @@ func FindAmis(args common.Command) {
     }
 
     amis := make([]Ami, 10)
-    err := common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
-
-    if err != nil {
-        fmt.Println(err)
-        console.Fail("Could not list amis from ditto")
-    }
+    common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
 
     for key := range amis {
         fmt.Print(amis[key].Name, " : ")

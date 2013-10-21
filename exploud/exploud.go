@@ -52,11 +52,7 @@ func Exploud(args common.Command) {
 	deployRequest := DeployRequest{args.ForthPos, args.ThirdPos}
 	task := TaskReference{}
 
-	err := common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
-	if err != nil {
-		fmt.Println(err)
-		console.Fail("Error calling exploud, exiting.")
-	}
+	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
 
 	// TODO: user and version (can be parsed from the ami name)
 	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s.",
@@ -91,13 +87,9 @@ type Task struct {
 // Get the task for the supplied id
 func GetTask(taskId string) Task {
 	taskUrl := exploudUrl(fmt.Sprintf("/tasks/%s", taskId))
-	task := Task{}
 
-	err := common.GetJson(taskUrl, &task)
-	if err != nil {
-		fmt.Println(err)
-		console.Fail("")
-	}
+	task := Task{}
+	common.GetJson(taskUrl, &task)
 	return task
 }
 
@@ -169,12 +161,7 @@ func CreateApp(args common.Command) {
 
 	createBody := CreateAppRequest{args.Description, args.Email, args.Owner}
 
-	response, err := common.PutJson(exploudUrl("/applications/"+args.SecondPos), createBody)
-
-	if err != nil {
-		fmt.Println(err, response)
-		console.BigFail("Unable to register new application with exploud")
-	}
+	response := common.PutJson(exploudUrl("/applications/"+args.SecondPos), createBody)
 
 	fmt.Println("Exploud has created our application for us!")
 	fmt.Println(response)
@@ -182,16 +169,10 @@ func CreateApp(args common.Command) {
 
 // List the apps known by exploud
 func ListApps() {
-	response, err := common.GetString(exploudUrl("/applications"))
-	if err != nil {
-		fmt.Println(response, err)
-		console.Fail("Error listing applications")
-	}
-	fmt.Println(response)
+	fmt.Println(common.GetString(exploudUrl("/applications")))
 }
 
 // AppExists returns true if the application exists according to the exploud service
 func AppExists(appName string) bool {
-	resp, _ := common.Head(exploudUrl("/applications/" + appName))
-	return resp
+	return common.Head(exploudUrl("/applications/" + appName))
 }

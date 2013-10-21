@@ -3,7 +3,6 @@ package common
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -12,128 +11,118 @@ import (
 )
 
 // Perform an HTTP PUT on the supplied url with the body of the supplied object reference
-// Returns a non nil error on non 200 series response or other error.
-func PostJson(url string, body interface{}) (string, error) {
+func PostJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
         panic(fmt.Sprintf("Can't marshall body attempting to call %s", url))
-		fmt.Println("Can't marshall body")
-		return "", errors.New("Unable to Marshall json for http post")
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
-		fmt.Println("Error posting to url:", url)
-		return "", errors.New(fmt.Sprintf("Error trying to call URL: %s", url))
+        panic(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
+        panic(fmt.Sprintf("Failed to read response body from: %s", url))
 	}
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
-		return string(responseBody), nil
+		return string(responseBody)
 	}
 	fmt.Println(string(responseBody))
-	fmt.Println("%d response calling URL: ", resp.StatusCode, resp.StatusCode)
-	return string(responseBody),
-		errors.New(fmt.Sprintf("Got %d series response calling: %s with body: %s",
-			resp.StatusCode, url, string(b)))
+    panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode, resp.StatusCode))
 }
 
 // Posts the supplied JSON to the url and unmarshals the response to the supplied
 // struct.
-func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) error {
-	responseBody, err := PostJson(url, &body)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal([]byte(responseBody), &v)
+func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) {
+	responseBody := PostJson(url, &body)
+    err := json.Unmarshal([]byte(responseBody), &v)
+    if err != nil {
+        panic(fmt.Sprintf("Unable to unmarshal response from %s", url))
+    }
 }
 
 // Performs an HTTP PUT on the supplied url with the body of the supplied object reference
 // Returns a non nil error on non 200 series response or other error.
-func PutJson(url string, body interface{}) (string, error) {
+func PutJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
-		fmt.Println("Can't marshall body")
-		return "", errors.New("Unable to Marshall json for http put")
+        panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
 	}
 
-	req, _ := http.NewRequest("PUT", url, bytes.NewReader(b))
+	req, err := http.NewRequest("PUT", url, bytes.NewReader(b))
+    if err != nil {
+        panic(fmt.Sprintf("Error making PUT request to url: %s", url))
+    }
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Error trying to call URL: %s", url))
+        panic(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Failed to read response body from: %s", url))
+        panic(fmt.Sprintf("Failed to read response body from: %s", url))
 	}
 
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
-		return string(responseBody), nil
+		return string(responseBody)
 	}
-	fmt.Println("%d response calling URL: %s", resp.StatusCode, url)
-	return string(responseBody), errors.New(fmt.Sprintf("Got %d response calling: %s with body: %s",
-		resp.StatusCode, url, b))
+    panic(fmt.Sprintf("Got %d response calling: %s with body: %s", resp.StatusCode, url, b))
 }
 
 // Performs an HTTP GET request on the supplied url and returns the result
 // as a string. Returns non nil err on non 200 response.
-func GetString(url string) (string, error) {
+func GetString(url string) string {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Error calling URL: %s", url))
+        panic(fmt.Sprintf("Error calling URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Failed to read body response from: %s", url))
+        panic(fmt.Sprintf("Failed to read body response from: %s", url))
 	}
 
 	if resp.StatusCode == 200 {
-		return string(body), nil
+		return string(body)
 	}
-	fmt.Println(string(body))
-	return string(body), errors.New(fmt.Sprintf("%d response from: %s", resp.StatusCode, url))
+    panic(fmt.Sprintf("Got %d response calling: %s. Response was:\n%s",
+        resp.StatusCode, url, string(body)))
 }
 
 // Performs an HTTP GET request on the supplied url and unmarshals the response
 // into the supplied object. Returns non nil error on failure
-func GetJson(url string, v interface{}) error {
-	body, err := GetString(url)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal([]byte(body), &v)
+func GetJson(url string, v interface{}) {
+	err := json.Unmarshal([]byte(GetString(url)), &v)
+    if err != nil {
+        panic(fmt.Sprintf("Umable to marshall response from url %s", url))
+    }
 }
 
 // Performs an HTTP HEAD call on the supplied URL. Returns true if
 // the response code is 200.
-func Head(url string) (bool, error) {
+func Head(url string) bool {
 	resp, err := http.Head(url)
 	if err != nil {
-		return false, errors.New(fmt.Sprintf("Error calling head on URL: %s", url))
+        panic(fmt.Sprintf("Error calling head on URL: %s", url))
 	}
 	switch resp.StatusCode {
 	case 200:
-		return true, nil
+		return true
 	case 404:
-		return false, nil
+		return false
 	default:
 		panic(fmt.Sprintf("Unknown response: %d from HEAD on URL: %s Is your proxy set correctly?",
 			resp.StatusCode, url))
 	}
-
-	return resp.StatusCode == 200, nil
 }
 
 // Config defines the configuration for a TimeoutDialer or TimeoutClient

@@ -21,22 +21,12 @@ func CreateApp(args common.Command) {
 
     createBody := App{args.SecondPos}
 
-    response, err := common.PostJson(tyrUrl("/applications"), createBody)
+    response := common.PostJson(tyrUrl("/applications"), createBody)
 
-    if err != nil {
-        fmt.Println(err)
-        console.BigFail("Unable to register new application with tyranitar")
-    }
-
-    fmt.Println("We are not registered with tyranitar!")
+    fmt.Println("Service registered with tyrnaitar")
     fmt.Println(response)
 }
 
 func ListApps() {
-    response, err := common.GetString(tyrUrl("/applications"))
-    if err != nil {
-        fmt.Println(err)
-        console.Fail("Error listing applications with Tyranitar")
-    }
-    fmt.Println(response)
+    fmt.Println(common.GetString(tyrUrl("/applications")))
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    "os"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -24,11 +24,7 @@ func PrintVersion() {
 
 // Return the latest released version of klink
 func LatestVersion() int {
-	latestFromServer, err := common.GetString(benkinsUrl("version"))
-	if err != nil {
-		fmt.Println(err)
-		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
-	}
+	latestFromServer := common.GetString(benkinsUrl("version"))
 
 	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
 	if err != nil {
@@ -65,21 +61,14 @@ func Update(argsPath string) {
 	}
 
 	nextVersion := fmt.Sprintf("klink-%d-%s-%s", latestVersion, runtime.GOOS, runtime.GOARCH)
-    if common.IsWindows() {
-        nextVersion += ".exe"
-    }
+	if common.IsWindows() {
+		nextVersion += ".exe"
+	}
 	nextVersionUrl := benkinsUrl(nextVersion)
 
-	exists, err := common.Head(nextVersionUrl)
-	if err != nil {
-		fmt.Println(err)
-		errorWithHelper(nextVersionUrl)
-	}
-
-	if exists {
+	if common.Head(nextVersionUrl) {
 		doUpdate(nextVersionUrl, path)
 	} else {
-		fmt.Println(err)
 		errorWithHelper(nextVersionUrl)
 	}
 }
@@ -92,53 +81,53 @@ func doUpdate(nextVersionUrl string, path string) {
 	}
 	defer resp.Body.Close()
 
-    file, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        errorWithHelper(nextVersionUrl)
-    }
+	file, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		errorWithHelper(nextVersionUrl)
+	}
 
-    err = ioutil.WriteFile(path+".update", file, 0755)
-    if err != nil {
-        fmt.Println(err)
-        errorWithHelper(nextVersionUrl)
-    }
+	err = ioutil.WriteFile(path+".update", file, 0755)
+	if err != nil {
+		fmt.Println(err)
+		errorWithHelper(nextVersionUrl)
+	}
 
-    fmt.Println("Klink has been updated to the latest version!")
-    if common.IsWindows() {
-        deferCopyForWindows(nextVersionUrl, path)
-    } else {
-        deferCopy(nextVersionUrl, path)
-    }
+	fmt.Println("Klink has been updated to the latest version!")
+	if common.IsWindows() {
+		deferCopyForWindows(nextVersionUrl, path)
+	} else {
+		deferCopy(nextVersionUrl, path)
+	}
 }
 
 // Write and run a script to copy the new version over ourselves, avoids
 // file locks
 func deferCopyForWindows(nextVersionUrl string, path string) {
-    script := "Start-sleep 1\r\n" + "rm " + path + "\r\n" + "mv " + path + ".update " + path
-    scriptBytes := []byte(script)
-    ioutil.WriteFile("updateklink.PS1", scriptBytes, 0755)
+	script := "Start-sleep 1\r\n" + "rm " + path + "\r\n" + "mv " + path + ".update " + path
+	scriptBytes := []byte(script)
+	ioutil.WriteFile("updateklink.PS1", scriptBytes, 0755)
 
-    cmd := exec.Command("powershell", "-ExecutionPolicy", "ByPass", "-File", "updateklink.PS1")
-    err := cmd.Start()
-    if err != nil {
-        fmt.Println(err)
-        errorWithHelper(nextVersionUrl)
-    }
-    os.Exit(0)
+	cmd := exec.Command("powershell", "-ExecutionPolicy", "ByPass", "-File", "updateklink.PS1")
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println(err)
+		errorWithHelper(nextVersionUrl)
+	}
+	os.Exit(0)
 }
 
 // Write and run a script to copy the new version over ourselves, avoids
 // file locks
 func deferCopy(nextVersionUrl string, path string) {
-    script := "sleep 1\n" + "mv " + path + ".update " + path + "\nrm -f updateklink.sh"
-    scriptBytes := []byte(script)
-    ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
+	script := "sleep 1\n" + "mv " + path + ".update " + path + "\nrm -f updateklink.sh"
+	scriptBytes := []byte(script)
+	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
-    cmd := exec.Command("sh", "updateklink.sh")
-    err := cmd.Start()
-    if err != nil {
-        fmt.Println(err)
-        errorWithHelper(nextVersionUrl)
-    }
-    os.Exit(0)
+	cmd := exec.Command("sh", "updateklink.sh")
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println(err)
+		errorWithHelper(nextVersionUrl)
+	}
+	os.Exit(0)
 }

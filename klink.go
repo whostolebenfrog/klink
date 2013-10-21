@@ -116,6 +116,9 @@ func handleAction(args common.Command) {
             if args.Debug == true {
                 panic(p)
             }
+            console.Red()
+            fmt.Println(p)
+            console.Reset()
             console.Fail("An error has occured. You may get more information using --debug true")
         }
     }()

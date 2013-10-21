@@ -21,27 +21,16 @@ func CreateApp(args common.Command) {
 
     createBody := App{args.SecondPos}
 
-    response, err := common.PostJson(onixUrl("/applications"), createBody)
-
-    if err != nil {
-        fmt.Println(err)
-        console.BigFail("Unable to register new application with onix")
-    }
+    response := common.PostJson(onixUrl("/applications"), createBody)
 
     fmt.Println("Onix has created our application for us!")
     fmt.Println(response)
 }
 
 func ListApps() {
-    response, err := common.GetString(onixUrl("/applications"))
-    if err != nil {
-        fmt.Println(err)
-        console.Fail("Error listing applications")
-    }
-    fmt.Println(response)
+    fmt.Println(common.GetString(onixUrl("/applications")))
 }
 
 func AppExists(appName string) bool {
-    resp, _ := common.Head(onixUrl("/applications/" + appName))
-    return resp
+    return common.Head(onixUrl("/applications/" + appName))
 }
