@@ -17,6 +17,7 @@ import (
 var cmd = `[command] [application] [options]
 
 [Commands]
+    add-onix-prop       {application} -N property name -V json value
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}.
     create-app          {application} -E {email} -o {owner} -d {description}
@@ -42,7 +43,7 @@ func printHelpAndExit() {
     console.Reset()
     fmt.Print("\n[New and updated] ")
     console.Red()
-    fmt.Print("Bake no longer takes an iteration!\n")
+    fmt.Print("info, add-onix-prop, --debug mode on errors\n")
     console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -65,6 +66,8 @@ func loadFlags() common.Command {
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
 	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "")
 	optarg.Add("D", "debug", "Set's debug mode. Gives more info on fails.", "")
+	optarg.Add("N", "name", "Set's the property name", "")
+	optarg.Add("V", "value", "Set's the property value", "")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
@@ -88,6 +91,10 @@ func loadFlags() common.Command {
             command.Silent = opt.Bool()
         case "D":
             command.Debug = opt.Bool()
+        case "N":
+            command.Name = opt.String()
+        case "V":
+            command.Value = opt.String()
 		}
 	}
 
@@ -151,6 +158,8 @@ func handleAction(args common.Command) {
         fmt.Println("Did you mean list-amis?")
     case "info":
         onix.Info(args)
+    case "add-onix-prop":
+        onix.AddProperty(args)
 	default:
         printHelpAndExit()
 	}

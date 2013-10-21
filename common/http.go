@@ -14,74 +14,75 @@ import (
 func PostJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
-        panic(fmt.Sprintf("Can't marshall body attempting to call %s", url))
+		panic(fmt.Sprintf("Can't marshall body attempting to call %s", url))
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
-        panic(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-        panic(fmt.Sprintf("Failed to read response body from: %s", url))
+		panic(fmt.Sprintf("Failed to read response body from: %s", url))
 	}
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody)
 	}
 	fmt.Println(string(responseBody))
-    panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode, resp.StatusCode))
+	panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode, resp.StatusCode))
 }
 
 // Posts the supplied JSON to the url and unmarshals the response to the supplied
 // struct.
 func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) {
 	responseBody := PostJson(url, &body)
-    err := json.Unmarshal([]byte(responseBody), &v)
-    if err != nil {
-        panic(fmt.Sprintf("Unable to unmarshal response from %s", url))
-    }
+	err := json.Unmarshal([]byte(responseBody), &v)
+	if err != nil {
+		panic(fmt.Sprintf("Unable to unmarshal response from %s", url))
+	}
 }
 
 func PutByteArray(url string, data []byte) string {
 	req, err := http.NewRequest("PUT", url, bytes.NewReader(data))
-    if err != nil {
-        panic(fmt.Sprintf("Error making PUT request to url: %s", url))
-    }
+	if err != nil {
+		panic(fmt.Sprintf("Error making PUT request to url: %s", url))
+	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
 	if err != nil {
-        panic(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(fmt.Sprintf("Error trying to call URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-        panic(fmt.Sprintf("Failed to read response body from: %s", url))
+		panic(fmt.Sprintf("Failed to read response body from: %s", url))
 	}
 
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody)
 	}
-    panic(fmt.Sprintf("Got %d response calling: %s with body: %s", resp.StatusCode, url, data))
+	panic(fmt.Sprintf("Got %d response calling: %s with body: %s.\nResponse was: %s",
+		resp.StatusCode, url, data, string(responseBody)))
 }
 
 // Performs an HTTP PUT on the supplied url with the body of the supplied string.
 func PutString(url string, body string) string {
-    return PutByteArray(url, []byte(body))
+	return PutByteArray(url, []byte(body))
 }
 
 // Performs an HTTP PUT on the supplied url with the body of the supplied object reference
 func PutJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
-        panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
+		panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
 	}
-    return PutByteArray(url, b)
+	return PutByteArray(url, b)
 }
 
 // Performs an HTTP GET request on the supplied url and returns the result
@@ -89,29 +90,29 @@ func PutJson(url string, body interface{}) string {
 func GetString(url string) string {
 	resp, err := http.Get(url)
 	if err != nil {
-        panic(fmt.Sprintf("Error calling URL: %s", url))
+		panic(fmt.Sprintf("Error calling URL: %s", url))
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-        panic(fmt.Sprintf("Failed to read body response from: %s", url))
+		panic(fmt.Sprintf("Failed to read body response from: %s", url))
 	}
 
 	if resp.StatusCode == 200 {
 		return string(body)
 	}
-    panic(fmt.Sprintf("Got %d response calling: %s. Response was:\n%s",
-        resp.StatusCode, url, string(body)))
+	panic(fmt.Sprintf("Got %d response calling: %s. Response was:\n%s",
+		resp.StatusCode, url, string(body)))
 }
 
 // Performs an HTTP GET request on the supplied url and unmarshals the response
 // into the supplied object. Returns non nil error on failure
 func GetJson(url string, v interface{}) {
 	err := json.Unmarshal([]byte(GetString(url)), &v)
-    if err != nil {
-        panic(fmt.Sprintf("Umable to marshall response from url %s", url))
-    }
+	if err != nil {
+		panic(fmt.Sprintf("Umable to marshall response from url %s", url))
+	}
 }
 
 // Performs an HTTP HEAD call on the supplied URL. Returns true if
@@ -119,7 +120,7 @@ func GetJson(url string, v interface{}) {
 func Head(url string) bool {
 	resp, err := http.Head(url)
 	if err != nil {
-        panic(fmt.Sprintf("Error calling head on URL: %s", url))
+		panic(fmt.Sprintf("Error calling head on URL: %s", url))
 	}
 	switch resp.StatusCode {
 	case 200:

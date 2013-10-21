@@ -20,6 +20,8 @@ type Command struct {
 	Owner       string
 	Silent      bool
     Debug       bool
+    Name        string
+    Value       string
 }
 
 // Do we have to do stupid shit to get around windows being a moron?
