@@ -4,6 +4,7 @@ import (
 	"fmt"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -27,36 +28,52 @@ type TaskReference struct {
 	TaskId string `json:"taskId"`
 }
 
-// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
-// Must pass SecondPos and Ami arguments
-func Exploud(args common.Command) {
+func validateDeploymentArgs(args common.Command) {
 	if args.SecondPos == "" {
 		console.Fail("Must supply an application name as the second positional argument.")
-	}
-	if args.ThirdPos == "" {
-		console.Fail("Must supply an environment as third postional argument. Use dev or prod.")
-	}
-	if args.ForthPos == "" {
-		if args.Ami == "" {
-			console.Fail("Must supply an ami as the forth argument or with --ami.")
-		}
-		args.ForthPos = args.Ami
 	}
 	if !AppExists(args.SecondPos) {
 		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst exploud.",
 			args.SecondPos))
 	}
 
+	if args.ThirdPos == "" {
+		console.Fail("Must supply an environment as third postional argument.")
+	} else if !(args.ThirdPos == "dev" || args.ThirdPos == "prod") {
+		console.Fail(fmt.Sprintf("Third argument \"%s\" must be an environment. dev or prod.",
+			args.ThirdPos))
+	}
+
+	if args.FourthPos == "" {
+		if args.Ami == "" {
+			console.Fail("Must supply an ami as the fourth argument or with --ami.")
+		}
+		args.FourthPos = args.Ami
+	}
+	matched, err := regexp.MatchString("^ami-.+$", args.FourthPos)
+	if err != nil {
+		panic(err)
+	}
+	if !matched {
+		console.Fail(fmt.Sprintf("%s Doesn't look like an ami", args.FourthPos))
+	}
+}
+
+// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
+// Must pass SecondPos and Ami arguments
+func Exploud(args common.Command) {
+	validateDeploymentArgs(args)
+
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
-	deployRequest := DeployRequest{args.ForthPos, args.ThirdPos}
+	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos}
 	task := TaskReference{}
 
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
 
 	// TODO: user and version (can be parsed from the ami name)
 	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s.",
-		args.ForthPos, args.SecondPos, args.ThirdPos)
+		args.FourthPos, args.SecondPos, args.ThirdPos)
 	if args.Message != "" {
 		hubotMessage += " " + args.Message + "."
 	}
