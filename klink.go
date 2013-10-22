@@ -38,13 +38,13 @@ var cmd = `[command] [application] [options]
 
 func printHelpAndExit() {
 	console.Klink()
-    console.Green()
+	console.Green()
 	update.PrintVersion()
-    console.Reset()
-    fmt.Print("\n[New and updated] ")
-    console.Red()
-    fmt.Print("info, add-onix-prop, --debug mode on errors\n")
-    console.FReset()
+	console.Reset()
+	fmt.Print("\n[New and updated] ")
+	console.Red()
+	fmt.Print("info, add-onix-prop, --debug mode on errors\n")
+	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
 }
@@ -87,14 +87,14 @@ func loadFlags() common.Command {
 			command.Email = opt.String()
 		case "o":
 			command.Owner = opt.String()
-        case "s":
-            command.Silent = opt.Bool()
-        case "D":
-            command.Debug = opt.Bool()
-        case "N":
-            command.Name = opt.String()
-        case "V":
-            command.Value = opt.String()
+		case "s":
+			command.Silent = opt.Bool()
+		case "D":
+			command.Debug = opt.Bool()
+		case "N":
+			command.Name = opt.String()
+		case "V":
+			command.Value = opt.String()
 		}
 	}
 
@@ -104,32 +104,32 @@ func loadFlags() common.Command {
 	}
 	command.Action = os.Args[1]
 	// some commands need a second positional argument
-    // let's do this better eh!?
+	// let's do this better eh!?
 	if len(os.Args) > 2 {
 		command.SecondPos = os.Args[2]
 	}
-    if len(os.Args) > 3 {
-        command.ThirdPos = os.Args[3]
-    }
-    if len(os.Args) > 4 {
-        command.ForthPos = os.Args[4]
-    }
+	if len(os.Args) > 3 {
+		command.ThirdPos = os.Args[3]
+	}
+	if len(os.Args) > 4 {
+		command.ForthPos = os.Args[4]
+	}
 
 	return command
 }
 
 func handleAction(args common.Command) {
-    defer func() {
-        if p := recover(); p != nil {
-            if args.Debug == true {
-                panic(p)
-            }
-            console.Red()
-            fmt.Println(p)
-            console.Reset()
-            console.Fail("An error has occured. You may get more information using --debug true")
-        }
-    }()
+	defer func() {
+		if p := recover(); p != nil {
+			if args.Debug == true {
+				panic(p)
+			}
+			console.Red()
+			fmt.Println(p)
+			console.Reset()
+			console.Fail("An error has occured. You may get more information using --debug true")
+		}
+	}()
 
 	switch args.Action {
 	case "update":
@@ -152,16 +152,16 @@ func handleAction(args common.Command) {
 		exploud.CreateApp(args)
 	case "doctor":
 		fmt.Println("The Doctor is in the house")
-    case "list-amis":
-        ditto.FindAmis(args)
-    case "find-amis":
-        fmt.Println("Did you mean list-amis?")
-    case "info":
-        onix.Info(args)
-    case "add-onix-prop":
-        onix.AddProperty(args)
+	case "list-amis":
+		ditto.FindAmis(args)
+	case "find-amis":
+		fmt.Println("Did you mean list-amis?")
+	case "info":
+		onix.Info(args)
+	case "add-onix-prop":
+		onix.AddProperty(args)
 	default:
-        printHelpAndExit()
+		printHelpAndExit()
 	}
 }
 
