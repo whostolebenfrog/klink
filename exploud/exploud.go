@@ -208,7 +208,9 @@ const (
 
 // Returns true if the user wants to cancel the deployment
 func cancelDeploymentPerchance() int {
+    console.Red()
     fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
+    console.Reset()
     var response string
 
     fmt.Scan(&response)
