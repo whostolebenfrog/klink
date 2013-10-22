@@ -4,6 +4,8 @@ import (
 	"fmt"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+    "os"
+    "os/signal"
 	"regexp"
 	"strings"
 	"time"
@@ -135,6 +137,9 @@ func Status(taskId string, serviceName string, status string) {
 // Poll the supplied taskId, printing the status to the console. Finishing
 // after either the task is marked as completed or a timeout is reached
 func PollDeploy(taskId string, serviceName string) {
+    chnl := HandleDeployInterrupt()
+    defer DeregisterInterupt(chnl)
+
 	Status(taskId, serviceName, "pending")
 	task := GetTask(taskId)
 
@@ -192,4 +197,58 @@ func ListApps() {
 // AppExists returns true if the application exists according to the exploud service
 func AppExists(appName string) bool {
 	return common.Head(exploudUrl("/applications/" + appName))
+}
+
+// Interrupt constants
+const (
+    Yes = iota
+    No
+    Continue
+)
+
+// Returns true if the user wants to cancel the deployment
+func cancelDeploymentPerchance() int {
+    fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
+    var response string
+
+    fmt.Scan(&response)
+
+    switch response {
+        case "yes", "Yes", "YES", "y", "Y":
+            return Yes
+        case "no", "No", "NO", "n", "N":
+            return No
+        case "continue", "cont", "Continue", "c", "C":
+            return Continue
+        default:
+            fmt.Println("Type better.")
+            return cancelDeploymentPerchance()
+    }
+}
+
+// Handle interupts and ask the user if they want to rollback the deployment
+func HandleDeployInterrupt() chan os.Signal {
+    c := make(chan os.Signal, 1)
+    signal.Notify(c, os.Interrupt)
+    go func() {
+        for sig := range c {
+            fmt.Println(sig)
+            switch cancelDeploymentPerchance() {
+                case Yes:
+                    fmt.Println("This will rollback the deployment when exploud is ready!")
+                    os.Exit(0)
+                case No:
+                    fmt.Println("Not rollingback. Just exiting. Your deployment will continue.")
+                    os.Exit(1)
+                case Continue:
+                    fmt.Println("Continuing...")
+            }
+        }
+    }()
+    return c
+}
+
+// Deregister the interupt
+func DeregisterInterupt(c chan<- os.Signal) {
+    signal.Stop(c)
 }
