@@ -65,9 +65,9 @@ func loadFlags() common.Command {
 	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
 	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "")
-	optarg.Add("D", "debug", "Set's debug mode. Gives more info on fails.", "")
-	optarg.Add("N", "name", "Set's the property name", "")
-	optarg.Add("V", "value", "Set's the property value", "")
+	optarg.Add("D", "debug", "Sets debug mode. Gives more info on fails.", "")
+	optarg.Add("N", "name", "Sets the property name", "")
+	optarg.Add("V", "value", "Sets the property value", "")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
