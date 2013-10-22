@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
+	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
@@ -12,6 +13,7 @@ import (
 	update "nokia.com/klink/update"
 	"os"
 	"strings"
+    "time"
 )
 
 var cmd = `[command] [application] [options]
@@ -165,6 +167,12 @@ func handleAction(args common.Command) {
 	}
 }
 
+func setupDefaults() {
+	// FILTH. Set the default timeout header.
+	http.DefaultTransport.(*http.Transport).ResponseHeaderTimeout = time.Second * 5
+}
+
 func main() {
+    setupDefaults()
 	handleAction(loadFlags())
 }
