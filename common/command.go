@@ -13,15 +13,15 @@ type Command struct {
 	Message     string
 	SecondPos   string
 	ThirdPos    string
-	ForthPos    string
+	FourthPos   string
 	Version     string
 	Description string
 	Email       string
 	Owner       string
 	Silent      bool
-    Debug       bool
-    Name        string
-    Value       string
+	Debug       bool
+	Name        string
+	Value       string
 }
 
 // Do we have to do stupid shit to get around windows being a moron?
