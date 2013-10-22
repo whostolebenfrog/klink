@@ -14,18 +14,21 @@ import (
 func PostJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
-		panic(fmt.Sprintf("Can't marshall body attempting to call %s", url))
+        fmt.Println(fmt.Sprintf("Can't marshall body attempting to call %s", url))
+		panic(err)
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
 	if err != nil {
-		panic(fmt.Sprintf("Error trying to call URL: %s", url))
+        fmt.Println(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read response body from: %s", url))
+        fmt.Println(fmt.Sprintf("Failed to read response body from: %s", url))
+		panic(err)
 	}
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
 		return string(responseBody)
@@ -40,14 +43,16 @@ func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) {
 	responseBody := PostJson(url, &body)
 	err := json.Unmarshal([]byte(responseBody), &v)
 	if err != nil {
-		panic(fmt.Sprintf("Unable to unmarshal response from %s", url))
+        fmt.Println(fmt.Sprintf("Unable to unmarshal response from %s", url))
+		panic(err)
 	}
 }
 
 func PutByteArray(url string, data []byte) string {
 	req, err := http.NewRequest("PUT", url, bytes.NewReader(data))
 	if err != nil {
-		panic(fmt.Sprintf("Error making PUT request to url: %s", url))
+        fmt.Println(fmt.Sprintf("Error making PUT request to url: %s", url))
+		panic(err)
 	}
 	req.Header.Add("Content-Type", "application/json")
 
@@ -55,13 +60,15 @@ func PutByteArray(url string, data []byte) string {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		panic(fmt.Sprintf("Error trying to call URL: %s", url))
+        fmt.Println(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read response body from: %s", url))
+        fmt.Println(fmt.Sprintf("Failed to read response body from: %s", url))
+		panic(err)
 	}
 
 	if resp.StatusCode == 200 || resp.StatusCode == 201 {
@@ -80,7 +87,8 @@ func PutString(url string, body string) string {
 func PutJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
 	if err != nil {
-		panic(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
+        fmt.Println(fmt.Sprintf("Unable to Marshall json for http put to url %s", url))
+		panic(err)
 	}
 	return PutByteArray(url, b)
 }
@@ -90,13 +98,15 @@ func PutJson(url string, body interface{}) string {
 func GetString(url string) string {
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(fmt.Sprintf("Error calling URL: %s", url))
+        fmt.Println(fmt.Sprintf("Error calling URL: %s", url))
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read body response from: %s", url))
+        fmt.Println(fmt.Sprintf("Failed to read body response from: %s", url))
+		panic(err)
 	}
 
 	if resp.StatusCode == 200 {
@@ -111,7 +121,8 @@ func GetString(url string) string {
 func GetJson(url string, v interface{}) {
 	err := json.Unmarshal([]byte(GetString(url)), &v)
 	if err != nil {
-		panic(fmt.Sprintf("Umable to marshall response from url %s", url))
+        fmt.Println(fmt.Sprintf("Umable to marshall response from url %s", url))
+		panic(err)
 	}
 }
 
@@ -120,7 +131,8 @@ func GetJson(url string, v interface{}) {
 func Head(url string) bool {
 	resp, err := http.Head(url)
 	if err != nil {
-		panic(fmt.Sprintf("Error calling head on URL: %s", url))
+        fmt.Println(fmt.Sprintf("Error calling head on URL: %s", url))
+		panic(err)
 	}
 	switch resp.StatusCode {
 	case 200:
