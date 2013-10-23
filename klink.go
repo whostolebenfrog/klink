@@ -34,6 +34,7 @@ var cmd = `[command] [application] [options]
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
     list-amis           {application} Lists the latest amis for the supplied application name
+    status              {application} Checks the status of the app
     update              Update to the current version of klink.`
 
 func printHelpAndExit() {
@@ -43,7 +44,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("info, add-onix-prop, --debug mode on errors\n")
+	fmt.Print("status\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -160,6 +161,8 @@ func handleAction(args common.Command) {
 		onix.Info(args)
 	case "add-onix-prop":
 		onix.AddProperty(args)
+    case "status":
+        onix.Status(args)
 	default:
 		printHelpAndExit()
 	}

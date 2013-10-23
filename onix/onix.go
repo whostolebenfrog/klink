@@ -56,3 +56,36 @@ func AddProperty(args common.Command) {
 	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name),
 		args.Value))
 }
+
+type InfoResp struct {
+    Name string `json:"name"`
+    Metadata map[string]string `json:"metadata"`
+}
+
+func ensureProp(m map[string]string, service string, prop string) {
+    if m[prop] == "" {
+        fmt.Println(fmt.Sprintf("Service %s doesn't have a %s defined, add one with:\n",
+            service, prop))
+        console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '{\"value\" : \"value\"}'\n",
+            service, prop))
+    }
+}
+
+func Status(args common.Command) {
+    if args.SecondPos == "" {
+		console.Fail("Must supply service name as a second positional argument")
+    }
+    info := InfoResp{}
+
+    common.GetJson(onixUrl("/applications/" + args.SecondPos), &info)
+
+    ensureProp(info.Metadata, args.SecondPos, "serviceUrl")
+    ensureProp(info.Metadata, args.SecondPos, "statusPath")
+
+    statusUrl := info.Metadata["serviceUrl"] + info.Metadata["statusPath"]
+    fmt.Println(fmt.Sprintf("Checking status at: %s", statusUrl))
+
+    console.Green()
+    fmt.Println(common.GetString(statusUrl))
+    console.Reset()
+}
