@@ -4,8 +4,8 @@ import (
 	"fmt"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    "os"
-    "os/signal"
+	"os"
+	"os/signal"
 	"regexp"
 	"strings"
 	"time"
@@ -26,8 +26,8 @@ func exploudUrl(end string) string {
 	return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
-type TaskReference struct {
-	TaskId string `json:"taskId"`
+type DeploymentReference struct {
+	Id string `json:"id"`
 }
 
 func validateDeploymentArgs(args common.Command) {
@@ -69,9 +69,9 @@ func Exploud(args common.Command) {
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
 	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos}
-	task := TaskReference{}
+	deployRef := DeploymentReference{}
 
-	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &task)
+	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
 	// TODO: user and version (can be parsed from the ami name)
 	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s.",
@@ -79,9 +79,10 @@ func Exploud(args common.Command) {
 	if args.Message != "" {
 		hubotMessage += " " + args.Message + "."
 	}
-	console.Hubot(hubotMessage, args)
 
-	PollDeploy(task.TaskId, args.SecondPos)
+    // TODO: put this back
+	//console.Hubot(hubotMessage, args)
+	PollDeployNew(deployRef.Id, args.SecondPos)
 }
 
 // Exploud JSON task log message
@@ -92,24 +93,38 @@ type TaskLog struct {
 
 // Exploud JSON task
 type Task struct {
-	DurationString string    `json:"durationString"`
-	Id             string    `json:"_id"`
-	Log            []TaskLog `json:"log"`
-	Operation      string    `json:"operation"`
-	Region         string    `json:"region"`
-	RunId          string    `json:"runId"`
-	Status         string    `json:"status"`
-	UpdateTime     string    `json:"updateTime"`
-	WorkflowId     string    `json:"workflowId"`
+    Action string `json:"action"`
+	DurationString   string        `json:"durationString"`
+	End              string        `json:"end"`
+	Id               string        `json:"_id"`
+	Log              []TaskLog     `json:"log"`
+	Operation        string        `json:"operation"`
+	Start            string        `json:"start"`
+	Status           string        `json:"status"`
+	Url              string        `json:"url"`
 }
 
-// Get the task for the supplied id
-func GetTask(taskId string) Task {
-	taskUrl := exploudUrl(fmt.Sprintf("/tasks/%s", taskId))
+// Exploud JSON deployment
+type Deployment struct {
+	Ami         string        `json:"ami"`
+	Application string        `json:"application"`
+	Created     string        `json:"created"`
+	End         string        `json:"end"`
+	Environment string        `json:"environment"`
+	Hash        string        `json:"hash"`
+	Id          string        `json:"id"`
+	Region      string        `json:"region"`
+	Start       string        `json:"start"`
+	Tasks       []Task        `json:"tasks"`
+	User        string        `json:"user"`
+}
 
-	task := Task{}
-	common.GetJson(taskUrl, &task)
-	return task
+func GetDeployment(deploymentId string) Deployment {
+	url := exploudUrl(fmt.Sprintf("/deployments/%s", deploymentId))
+
+	deployment := Deployment{}
+	common.GetJson(url, &deployment)
+	return deployment
 }
 
 // Prints out the status line for the deploy
@@ -134,35 +149,49 @@ func Status(taskId string, serviceName string, status string) {
 	console.FReset()
 }
 
-// Poll the supplied taskId, printing the status to the console. Finishing
-// after either the task is marked as completed or a timeout is reached
-func PollDeploy(taskId string, serviceName string) {
-    chnl := HandleDeployInterrupt()
-    defer DeregisterInterupt(chnl)
+// Poll the supplied deployment printing out the status to the console.
+func PollDeployNew(deploymentId string, serviceName string) {
+	chnl := HandleDeployInterrupt()
+	defer DeregisterInterupt(chnl)
 
-	Status(taskId, serviceName, "pending")
-	task := GetTask(taskId)
+	Status(deploymentId, serviceName, "pending")
+	deployment := GetDeployment(deploymentId)
 
 	timeout := time.Now().Add((20 * time.Minute))
-	previousLength := 0
-	// can't check == running as wont be set when we first call
-	for (task.Status != "completed") &&
-		(task.Status != "failed") &&
-		(task.Status != "teminated") &&
-		time.Now().Before(timeout) {
+    for i := 0; i < len(deployment.Tasks) && time.Now().Before(timeout); i++ {
+        task := deployment.Tasks[i]
 
-		time.Sleep(5 * time.Second)
-		task = GetTask(taskId)
+        console.Green()
+        fmt.Println(fmt.Sprintf("Starting task: %s\n", task.Action))
+        console.Reset()
 
-		for i := previousLength; i < len(task.Log); i++ {
-			fmt.Println(task.Log[i])
-		}
+        previousLength := 0
+        // can't check == running as wont be set when we first call
+        for (task.Status != "completed") &&
+            (task.Status != "failed") &&
+            (task.Status != "teminated") &&
+            time.Now().Before(timeout) {
 
-		previousLength = len(task.Log)
-	}
+            // if we see something failed then kill everything - exploud doesn't recover
+            if task.Status == "failed" || task.Status == "terminated" {
+                console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
+            }
 
-	Status(taskId, serviceName, task.Status)
-	console.Reset()
+            time.Sleep(5 * time.Second)
+            deployment = GetDeployment(deploymentId)
+            task = deployment.Tasks[i]
+
+            for i := previousLength; i < len(task.Log); i++ {
+                fmt.Println(task.Log[i])
+            }
+
+            previousLength = len(task.Log)
+        }
+    }
+
+    console.Green()
+    Status(deploymentId, serviceName, "Finished!")
+    console.Reset()
 }
 
 // Register a new application with exploud, should have the knock on effect
@@ -201,56 +230,56 @@ func AppExists(appName string) bool {
 
 // Interrupt constants
 const (
-    Yes = iota
-    No
-    Continue
+	Yes = iota
+	No
+	Continue
 )
 
 // Returns true if the user wants to cancel the deployment
 func cancelDeploymentPerchance() int {
-    console.Red()
-    fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
-    console.Reset()
-    var response string
+	console.Red()
+	fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
+	console.Reset()
+	var response string
 
-    fmt.Scan(&response)
+	fmt.Scan(&response)
 
-    switch response {
-        case "yes", "Yes", "YES", "y", "Y":
-            return Yes
-        case "no", "No", "NO", "n", "N":
-            return No
-        case "continue", "cont", "Continue", "c", "C":
-            return Continue
-        default:
-            fmt.Println("Type better.")
-            return cancelDeploymentPerchance()
-    }
+	switch response {
+	case "yes", "Yes", "YES", "y", "Y":
+		return Yes
+	case "no", "No", "NO", "n", "N":
+		return No
+	case "continue", "cont", "Continue", "c", "C":
+		return Continue
+	default:
+		fmt.Println("Type better.")
+		return cancelDeploymentPerchance()
+	}
 }
 
 // Handle interupts and ask the user if they want to rollback the deployment
 func HandleDeployInterrupt() chan os.Signal {
-    c := make(chan os.Signal, 1)
-    signal.Notify(c, os.Interrupt)
-    go func() {
-        for sig := range c {
-            fmt.Println(sig)
-            switch cancelDeploymentPerchance() {
-                case Yes:
-                    fmt.Println("This will rollback the deployment when exploud is ready!")
-                    os.Exit(0)
-                case No:
-                    fmt.Println("Not rollingback. Just exiting. Your deployment will continue.")
-                    os.Exit(1)
-                case Continue:
-                    fmt.Println("Continuing...")
-            }
-        }
-    }()
-    return c
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			fmt.Println(sig)
+			switch cancelDeploymentPerchance() {
+			case Yes:
+				fmt.Println("This will rollback the deployment when exploud is ready!")
+				os.Exit(0)
+			case No:
+				fmt.Println("Not rollingback. Just exiting. Your deployment will continue.")
+				os.Exit(1)
+			case Continue:
+				fmt.Println("Continuing...")
+			}
+		}
+	}()
+	return c
 }
 
 // Deregister the interupt
 func DeregisterInterupt(c chan<- os.Signal) {
-    signal.Stop(c)
+	signal.Stop(c)
 }
