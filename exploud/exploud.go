@@ -41,8 +41,8 @@ func validateDeploymentArgs(args common.Command) {
 
 	if args.ThirdPos == "" {
 		console.Fail("Must supply an environment as third postional argument.")
-	} else if !(args.ThirdPos == "dev" || args.ThirdPos == "prod") {
-		console.Fail(fmt.Sprintf("Third argument \"%s\" must be an environment. dev or prod.",
+	} else if !(args.ThirdPos == "poke" || args.ThirdPos == "prod") {
+		console.Fail(fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.",
 			args.ThirdPos))
 	}
 

@@ -59,7 +59,7 @@ func loadFlags() common.Command {
 	optarg.Add("h", "help", "Displays this help message", false)
 	optarg.Header("Deployment based flags")
 	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
-	optarg.Add("e", "environment", "Sets the environment", "dev, prod")
+	optarg.Add("e", "environment", "Sets the environment", "poke, prod")
 	optarg.Add("m", "message", "Sets an informational message", "")
 	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
