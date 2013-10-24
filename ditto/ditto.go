@@ -47,9 +47,10 @@ func Bake(args common.Command) {
 	if resp.StatusCode == 404 {
 		console.Fail("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
 	} else if resp.StatusCode != 200 {
-		console.Fail(fmt.Sprintf("Non 200 response from ditto: ", resp.StatusCode))
+        fmt.Println(fmt.Sprintf("Got %d response calling ditto to bake ami.", resp.StatusCode))
+        io.Copy(os.Stdout, resp.Body)
+        panic("\nFailed to bake ami.")
 	}
-	defer resp.Body.Close()
 
 	io.Copy(os.Stdout, resp.Body)
 }
