@@ -8,6 +8,7 @@ import (
 	ditto "nokia.com/klink/ditto"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
+	props "nokia.com/klink/props"
 	tyr "nokia.com/klink/tyranitar"
 	update "nokia.com/klink/update"
 	"os"
@@ -169,5 +170,6 @@ func handleAction(args common.Command) {
 }
 
 func main() {
+    props.EnsureRCFile()
 	handleAction(loadFlags())
 }

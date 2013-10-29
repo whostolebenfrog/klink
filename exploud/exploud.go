@@ -4,6 +4,7 @@ import (
 	"fmt"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+	props "nokia.com/klink/props"
 	"os"
 	"os/signal"
 	"regexp"
@@ -15,6 +16,7 @@ type DeployRequest struct {
 	Ami         string `json:"ami"`
 	Environment string `json:"environment"`
 	Message     string `json:"message"`
+	Username    string `json:"username"`
 }
 
 type CreateAppRequest struct {
@@ -73,14 +75,15 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
-	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos, args.Message}
+	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos,
+		args.Message, props.GetUsername()}
 	deployRef := DeploymentReference{}
 
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
-	// TODO: user and version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s. %s",
-		args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	// TODO: version (can be parsed from the ami name)
+	hubotMessage := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
+		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
 	console.Hubot(hubotMessage, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
