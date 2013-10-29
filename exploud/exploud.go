@@ -14,6 +14,7 @@ import (
 type DeployRequest struct {
 	Ami         string `json:"ami"`
 	Environment string `json:"environment"`
+	Message     string `json:"message"`
 }
 
 type CreateAppRequest struct {
@@ -59,6 +60,10 @@ func validateDeploymentArgs(args common.Command) {
 	if !matched {
 		console.Fail(fmt.Sprintf("%s Doesn't look like an ami", args.FourthPos))
 	}
+
+	if args.Message == "" {
+		console.Fail("Must supply a deploy message using -m")
+	}
 }
 
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
@@ -68,20 +73,16 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
 
-	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos}
+	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos, args.Message}
 	deployRef := DeploymentReference{}
 
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
 	// TODO: user and version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s.",
-		args.FourthPos, args.SecondPos, args.ThirdPos)
-	if args.Message != "" {
-		hubotMessage += " " + args.Message + "."
-	}
+	hubotMessage := fmt.Sprintf("Deploying %s for service %s to %s. %s",
+		args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	console.Hubot(hubotMessage, args)
 
-    // TODO: put this back
-	//console.Hubot(hubotMessage, args)
 	PollDeployNew(deployRef.Id, args.SecondPos)
 }
 
@@ -93,30 +94,30 @@ type TaskLog struct {
 
 // Exploud JSON task
 type Task struct {
-    Action string `json:"action"`
-	DurationString   string        `json:"durationString"`
-	End              string        `json:"end"`
-	Id               string        `json:"_id"`
-	Log              []TaskLog     `json:"log"`
-	Operation        string        `json:"operation"`
-	Start            string        `json:"start"`
-	Status           string        `json:"status"`
-	Url              string        `json:"url"`
+	Action         string    `json:"action"`
+	DurationString string    `json:"durationString"`
+	End            string    `json:"end"`
+	Id             string    `json:"_id"`
+	Log            []TaskLog `json:"log"`
+	Operation      string    `json:"operation"`
+	Start          string    `json:"start"`
+	Status         string    `json:"status"`
+	Url            string    `json:"url"`
 }
 
 // Exploud JSON deployment
 type Deployment struct {
-	Ami         string        `json:"ami"`
-	Application string        `json:"application"`
-	Created     string        `json:"created"`
-	End         string        `json:"end"`
-	Environment string        `json:"environment"`
-	Hash        string        `json:"hash"`
-	Id          string        `json:"id"`
-	Region      string        `json:"region"`
-	Start       string        `json:"start"`
-	Tasks       []Task        `json:"tasks"`
-	User        string        `json:"user"`
+	Ami         string `json:"ami"`
+	Application string `json:"application"`
+	Created     string `json:"created"`
+	End         string `json:"end"`
+	Environment string `json:"environment"`
+	Hash        string `json:"hash"`
+	Id          string `json:"id"`
+	Region      string `json:"region"`
+	Start       string `json:"start"`
+	Tasks       []Task `json:"tasks"`
+	User        string `json:"user"`
 }
 
 func GetDeployment(deploymentId string) Deployment {
@@ -158,40 +159,40 @@ func PollDeployNew(deploymentId string, serviceName string) {
 	deployment := GetDeployment(deploymentId)
 
 	timeout := time.Now().Add((20 * time.Minute))
-    for i := 0; i < len(deployment.Tasks) && time.Now().Before(timeout); i++ {
-        task := deployment.Tasks[i]
+	for i := 0; i < len(deployment.Tasks) && time.Now().Before(timeout); i++ {
+		task := deployment.Tasks[i]
 
-        console.Green()
-        fmt.Println(fmt.Sprintf("Starting task: %s\n", task.Action))
-        console.Reset()
+		console.Green()
+		fmt.Println(fmt.Sprintf("Starting task: %s\n", task.Action))
+		console.Reset()
 
-        previousLength := 0
-        // can't check == running as wont be set when we first call
-        for (task.Status != "completed") &&
-            (task.Status != "failed") &&
-            (task.Status != "teminated") &&
-            time.Now().Before(timeout) {
+		previousLength := 0
+		// can't check == running as wont be set when we first call
+		for (task.Status != "completed") &&
+			(task.Status != "failed") &&
+			(task.Status != "teminated") &&
+			time.Now().Before(timeout) {
 
-            // if we see something failed then kill everything - exploud doesn't recover
-            if task.Status == "failed" || task.Status == "terminated" {
-                console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
-            }
+			// if we see something failed then kill everything - exploud doesn't recover
+			if task.Status == "failed" || task.Status == "terminated" {
+				console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
+			}
 
-            time.Sleep(5 * time.Second)
-            deployment = GetDeployment(deploymentId)
-            task = deployment.Tasks[i]
+			time.Sleep(5 * time.Second)
+			deployment = GetDeployment(deploymentId)
+			task = deployment.Tasks[i]
 
-            for i := previousLength; i < len(task.Log); i++ {
-                fmt.Println(task.Log[i])
-            }
+			for i := previousLength; i < len(task.Log); i++ {
+				fmt.Println(task.Log[i])
+			}
 
-            previousLength = len(task.Log)
-        }
-    }
+			previousLength = len(task.Log)
+		}
+	}
 
-    console.Green()
-    Status(deploymentId, serviceName, "Finished!")
-    console.Reset()
+	console.Green()
+	Status(deploymentId, serviceName, "Finished!")
+	console.Reset()
 }
 
 // Register a new application with exploud, should have the knock on effect
