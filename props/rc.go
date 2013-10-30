@@ -1,8 +1,8 @@
 package props
 
 import (
+	"encoding/json"
 	"fmt"
-    "encoding/json"
 	"io/ioutil"
 	console "nokia.com/klink/console"
 	"os"
@@ -16,32 +16,32 @@ type RCProps struct {
 // Returns the current username
 func GetUsername() string {
 	EnsureRCFile()
-    return getRCProperties().Username
+	return getRCProperties().Username
 }
 
 // Creates a klinkrc file and prompts the user for a username
 func createRCFile(rcPath string) {
 	fmt.Println(fmt.Sprintf("\nNo home file found at: %s Creating one for you.\n", rcPath))
 	console.Green()
-	fmt.Println("Please enter you brislabs username:\n")
+	fmt.Println("Please enter your brislabs username:\n")
 	console.Reset()
 
 	var username string
 	fmt.Scan(&username)
 
-    rcProps := RCProps{username}
+	rcProps := RCProps{username}
 
 	rcBytes, err := json.Marshal(rcProps)
 	if err != nil {
 		panic(err)
 	}
 
-    err = ioutil.WriteFile(rcPath, rcBytes, 0755)
+	err = ioutil.WriteFile(rcPath, rcBytes, 0755)
 	if err != nil {
 		panic(err)
 	}
 
-    fmt.Println(fmt.Sprintf("\nThanks %s, I've created a home file for you.", username))
+	fmt.Println(fmt.Sprintf("\nThanks %s, I've created a home file for you.", username))
 }
 
 // Ensures that the user has a rc file. If it doesn't exist create it
@@ -58,7 +58,8 @@ func EnsureRCFile() {
 func RCFilePath() string {
 	usr, err := user.Current()
 	if err != nil {
-		panic("Unable to find the current user. Better report this to Ben Griffiths :-(")
+		fmt.Println("Unable to find the current user. Better report this to Ben Griffiths :-(")
+		panic(err)
 	}
 
 	return usr.HomeDir + "/.klinkrc"
@@ -70,19 +71,19 @@ func updateRCProperties() {
 
 // Returns the users RC properties
 func getRCProperties() RCProps {
-    rcBytes, err := ioutil.ReadFile(RCFilePath())
+	rcBytes, err := ioutil.ReadFile(RCFilePath())
 
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 
-    rcProps := RCProps{}
-    err = json.Unmarshal(rcBytes, &rcProps)
+	rcProps := RCProps{}
+	err = json.Unmarshal(rcBytes, &rcProps)
 
-    if err != nil {
-        panic(err)
-    }
-    return rcProps
+	if err != nil {
+		panic(err)
+	}
+	return rcProps
 }
 
 // Exists reports whether the named file or directory exists.

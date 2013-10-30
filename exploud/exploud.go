@@ -16,7 +16,7 @@ type DeployRequest struct {
 	Ami         string `json:"ami"`
 	Environment string `json:"environment"`
 	Message     string `json:"message"`
-	Username    string `json:"username"`
+	Username    string `json:"user"`
 }
 
 type CreateAppRequest struct {
