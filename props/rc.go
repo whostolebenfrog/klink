@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	console "nokia.com/klink/console"
 	"os"
-	"os/user"
+	"runtime"
 )
 
 type RCProps struct {
@@ -56,13 +56,7 @@ func EnsureRCFile() {
 
 // Returns the path of the klink rc file
 func RCFilePath() string {
-	usr, err := user.Current()
-	if err != nil {
-		fmt.Println("Unable to find the current user. Better report this to Ben Griffiths :-(")
-		panic(err)
-	}
-
-	return usr.HomeDir + "/.klinkrc"
+	return userHomeDir() + "/.klinkrc"
 }
 
 // Updates the users rc file properties
@@ -94,4 +88,19 @@ func Exists(name string) bool {
 		}
 	}
 	return true
+}
+
+// This is required as user.Current fails on darwin when cross compiled from linux.
+// If anyone reading this understands enough about builders to fix it - this seems
+// to be the same issue:
+// https://groups.google.com/forum/#!topic/golang-dev/zzBrnKMYctQ
+func userHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
 }
