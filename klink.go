@@ -22,10 +22,12 @@ var cmd = `[command] [application] [options]
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}.
     create-app          {application} -E {email} -o {owner} -d {description}
-                        Creates a new application via exploud.
-    create-app-onix     {application}
-                        Creates a new application in onix only.
-    create-app-tyr      {application}
+                        Creates a new application. You probably want this when adding
+                        a new service.
+    register-app-onix   {application}
+                        Creates a new application in onix only, useful for services
+                        that won't be deployed using the cloud tooling.
+    register-app-tyr    {application}
                         Creates a new application in tyranitar only.
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}.
@@ -140,11 +142,11 @@ func handleAction(args common.Command) {
 		exploud.Exploud(args)
 	case "bake":
 		ditto.Bake(args)
-	case "create-app-onix":
+	case "register-app-onix":
 		onix.CreateApp(args)
 	case "list-apps-onix":
 		onix.ListApps()
-	case "create-app-tyr":
+	case "register-app-tyr":
 		tyr.CreateApp(args)
 	case "list-apps-tyr":
 		tyr.ListApps()
