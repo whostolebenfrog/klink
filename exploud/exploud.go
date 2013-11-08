@@ -89,6 +89,30 @@ func Exploud(args common.Command) {
 	PollDeployNew(deployRef.Id, args.SecondPos)
 }
 
+// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
+// Must pass SecondPos and Ami arguments
+func Rollback(args common.Command) {
+    // TODO - remove this hack! allows the common validation to pass
+    args.FourthPos = "ami-blah"
+	validateDeploymentArgs(args)
+
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/rollback"), args.SecondPos)
+
+    // TODO - don't send fourthpos
+	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos,
+		args.Message, props.GetUsername()}
+	deployRef := DeploymentReference{}
+
+	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
+
+	// TODO: version (can be parsed from the ami name)
+	hubotMessage := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
+		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	console.Hubot(hubotMessage, args)
+
+	PollDeployNew(deployRef.Id, args.SecondPos)
+}
+
 // Exploud JSON task log message
 type TaskLog struct {
 	Date    string `json:"Date"`

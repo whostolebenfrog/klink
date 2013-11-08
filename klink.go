@@ -31,6 +31,8 @@ var cmd = `[command] [application] [options]
                         Creates a new application in tyranitar only.
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}.
+    rollback            {application} {environment} rolls the application back to the last
+                        successful deploy
     doctor              Not yet implemented.
     info                {application} Return information about the application
     list-apps           Lists the applications that exist (via exploud)
@@ -47,7 +49,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("status\n")
+	fmt.Print("rollback\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -140,6 +142,8 @@ func handleAction(args common.Command) {
 		update.Update(os.Args[0])
 	case "deploy":
 		exploud.Exploud(args)
+    case "rollback":
+        exploud.Rollback(args)
 	case "bake":
 		ditto.Bake(args)
 	case "register-app-onix":
