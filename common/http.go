@@ -34,7 +34,7 @@ func PostJson(url string, body interface{}) string {
 		return string(responseBody)
 	}
 	fmt.Println(string(responseBody))
-	panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode, resp.StatusCode))
+	panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode))
 }
 
 // Posts the supplied JSON to the url and unmarshals the response to the supplied

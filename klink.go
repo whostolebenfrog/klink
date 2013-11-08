@@ -39,6 +39,7 @@ var cmd = `[command] [application] [options]
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
     list-amis           {application} Lists the latest amis for the supplied application name
+    allow-prod          {application} Allows the prod aws account access to the supplied application (or base/public)
     status              {application} Checks the status of the app
     update              Update to the current version of klink.`
 
@@ -49,7 +50,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("rollback\n")
+	fmt.Print("rollback, allow-prod\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -146,6 +147,8 @@ func handleAction(args common.Command) {
         exploud.Rollback(args)
 	case "bake":
 		ditto.Bake(args)
+    case "allow-prod":
+        ditto.AllowProd(args)
 	case "register-app-onix":
 		onix.CreateApp(args)
 	case "list-apps-onix":

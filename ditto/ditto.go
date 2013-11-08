@@ -18,6 +18,25 @@ func bakeUrl(app string, version string) string {
 	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
 }
 
+func AllowProd(args common.Command) {
+    if args.SecondPos == "" {
+        console.Fail("Application must be provided as the second positional argument")
+    }
+
+    url := dittoUrl("/make-public/" + args.SecondPos)
+
+    resp, err := http.Post(url, "application/json", nil)
+    if err != nil {
+        panic(err)
+    }
+
+    if resp.StatusCode == 200 {
+        fmt.Println("Success")
+    } else {
+        panic(fmt.Sprintf("%d response calling URL: ", resp.StatusCode))
+    }
+}
+
 // Bake the ami
 func Bake(args common.Command) {
 	if args.SecondPos == "" {
