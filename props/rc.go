@@ -4,23 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+    "reflect"
 	"os"
-	"runtime"
 )
 
 type RCProps struct {
-	Username string `json:"username"`
+	Username     string `json:"username"`
+	DoctorHasRun string `json:"doctorHasRun"`
 }
 
 // Returns the current username
 func GetUsername() string {
 	EnsureRCFile()
-	return getRCProperties().Username
+	return GetRCProperties().Username
 }
 
 // Creates a klinkrc file and prompts the user for a username
-func createRCFile(rcPath string) {
+func createRCFile() {
+    rcPath := RCFilePath()
 	fmt.Println(fmt.Sprintf("\nNo home file found at: %s Creating one for you.\n", rcPath))
 	console.Green()
 	fmt.Println("Please enter your brislabs username:\n")
@@ -29,17 +32,10 @@ func createRCFile(rcPath string) {
 	var username string
 	fmt.Scan(&username)
 
-	rcProps := RCProps{username}
+	rcProps := RCProps{}
+    rcProps.Username = username
 
-	rcBytes, err := json.Marshal(rcProps)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ioutil.WriteFile(rcPath, rcBytes, 0755)
-	if err != nil {
-		panic(err)
-	}
+    writeRCProperties(rcProps)
 
 	fmt.Println(fmt.Sprintf("\nThanks %s, I've created a home file for you.", username))
 }
@@ -50,21 +46,25 @@ func EnsureRCFile() {
 	if Exists(RCFilePath()) {
 		return
 	} else {
-		createRCFile(RCFilePath())
+		createRCFile()
 	}
 }
 
 // Returns the path of the klink rc file
 func RCFilePath() string {
-	return userHomeDir() + "/.klinkrc"
+	return common.UserHomeDir() + "/.klinkrc"
 }
 
 // Updates the users rc file properties
-func updateRCProperties() {
+func UpdateRCProperties(name string, value string) {
+    rcProps := GetRCProperties()
+    reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
+    fmt.Println(rcProps)
+    writeRCProperties(rcProps)
 }
 
 // Returns the users RC properties
-func getRCProperties() RCProps {
+func GetRCProperties() RCProps {
 	rcBytes, err := ioutil.ReadFile(RCFilePath())
 
 	if err != nil {
@@ -80,6 +80,18 @@ func getRCProperties() RCProps {
 	return rcProps
 }
 
+func writeRCProperties(rcProps RCProps) {
+	rcBytes, err := json.Marshal(rcProps)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ioutil.WriteFile(RCFilePath(), rcBytes, 0755)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Exists reports whether the named file or directory exists.
 func Exists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
@@ -88,19 +100,4 @@ func Exists(name string) bool {
 		}
 	}
 	return true
-}
-
-// This is required as user.Current fails on darwin when cross compiled from linux.
-// If anyone reading this understands enough about builders to fix it - this seems
-// to be the same issue:
-// https://groups.google.com/forum/#!topic/golang-dev/zzBrnKMYctQ
-func userHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }

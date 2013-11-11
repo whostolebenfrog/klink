@@ -197,13 +197,9 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		// can't check == running as wont be set when we first call
 		for (task.Status != "completed") &&
 			(task.Status != "failed") &&
+            (task.Status != "skipped") &&
 			(task.Status != "teminated") &&
 			time.Now().Before(timeout) {
-
-			// if we see something failed then kill everything - exploud doesn't recover
-			if task.Status == "failed" || task.Status == "terminated" {
-				console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
-			}
 
 			time.Sleep(5 * time.Second)
 			deployment = GetDeployment(deploymentId)
@@ -215,6 +211,11 @@ func PollDeployNew(deploymentId string, serviceName string) {
 
 			previousLength = len(task.Log)
 		}
+
+        // if we see something failed then kill everything - exploud doesn't recover
+        if task.Status == "failed" || task.Status == "terminated" {
+            console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
+        }
 	}
 
 	console.Green()

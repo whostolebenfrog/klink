@@ -53,7 +53,10 @@ func Bake(args common.Command) {
 	url := bakeUrl(args.SecondPos, args.Version)
 
     httpClient := common.NewTimeoutClient()
-    req, _ := http.NewRequest("POST", url, nil)
+    req, err := http.NewRequest("POST", url, nil)
+    if err != nil {
+        panic(err)
+    }
     req.Header.Add("Content-Type", "application/json")
 
     resp, err := httpClient.Do(req)

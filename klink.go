@@ -6,6 +6,7 @@ import (
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
+	doctor "nokia.com/klink/doctor"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
@@ -33,7 +34,7 @@ var cmd = `[command] [application] [options]
                         Deploy the AMI {ami} for {application} to {environment}.
     rollback            {application} {environment} rolls the application back to the last
                         successful deploy
-    doctor              Not yet implemented.
+    doctor              Test that everything is setup for klink to function
     info                {application} Return information about the application
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix).
@@ -162,7 +163,7 @@ func handleAction(args common.Command) {
 	case "create-app":
 		exploud.CreateApp(args)
 	case "doctor":
-		fmt.Println("The Doctor is in the house")
+		doctor.Doctor(args)
 	case "list-amis":
 		ditto.FindAmis(args)
 	case "find-amis":
@@ -171,14 +172,14 @@ func handleAction(args common.Command) {
 		onix.Info(args)
 	case "add-onix-prop":
 		onix.AddProperty(args)
-    case "status":
-        onix.Status(args)
+	case "status":
+		onix.Status(args)
 	default:
 		printHelpAndExit()
 	}
 }
 
 func main() {
-    props.EnsureRCFile()
+	props.EnsureRCFile()
 	handleAction(loadFlags())
 }
