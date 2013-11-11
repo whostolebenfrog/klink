@@ -1,3 +1,3 @@
 package update
 
-const Version = 68
+const Version = 69
