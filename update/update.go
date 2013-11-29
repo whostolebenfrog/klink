@@ -147,7 +147,6 @@ func EnsureUpdatedRecently(argsPath string) {
     }
 
     now := int32(time.Now().Unix())
-    fmt.Println(now - lastUpdated)
     if (now - lastUpdated) > (60 * 60 * 1) {
         if LatestVersion() != Version {
             Update(argsPath)
