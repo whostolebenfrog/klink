@@ -6,11 +6,13 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+    props "nokia.com/klink/props"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
+    "time"
 )
 
 func benkinsUrl(end string) string {
@@ -71,6 +73,7 @@ func Update(argsPath string) {
 	} else {
 		errorWithHelper(nextVersionUrl)
 	}
+    props.SetLastUpdated(time.Now().UnixNano()%1e6/1e3)
 }
 
 // Does the update
@@ -130,4 +133,21 @@ func deferCopy(nextVersionUrl string, path string) {
 		errorWithHelper(nextVersionUrl)
 	}
 	os.Exit(0)
+}
+
+// If we haven't tried to update recently then run an update first
+func EnsureUpdatedRecently(argsPath string) {
+    lastUpdated := props.GetLastUpdated()
+    if props.GetLastUpdated() == 0 {
+        if LatestVersion() != Version {
+            Update(argsPath)
+        }
+    }
+
+    now := time.Now().UnixNano()%1e6/1e3
+    if (now - lastUpdated) > (1000 * 60 * 60 * 1) {
+        if LatestVersion() != Version {
+            Update(argsPath)
+        }
+    }
 }

@@ -66,7 +66,9 @@ func Bake(args common.Command) {
     }
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 404 {
+    if resp.StatusCode == 503 {
+        console.Fail("Ditto is currently not available. This is most likely due it being redeployed. If it's not back in 10 minutes ask in Campfire or speak to Ben Griffiths.")
+    } else if resp.StatusCode == 404 {
 		console.Fail("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
 	} else if resp.StatusCode != 200 {
         fmt.Println(fmt.Sprintf("Got %d response calling ditto to bake ami.", resp.StatusCode))
@@ -100,4 +102,24 @@ func FindAmis(args common.Command) {
         fmt.Println()
     }
     console.Reset()
+}
+
+// ditto helps to lock, unlock and clean amis
+// not intended to be a part of the public klink functionality
+func Helpers(args common.Command) {
+    if args.SecondPos == "lock" {
+        lockUrl := dittoUrl("/lock")
+        fmt.Println(common.PostJson(lockUrl, nil))
+    } else if args.SecondPos == "unlock" {
+        unlockUrl := dittoUrl("/unlock")
+        fmt.Println(common.PostJson(unlockUrl, nil))
+    } else if args.SecondPos == "clean" {
+        cleanUrl := dittoUrl("/clean/")
+        if args.ThirdPos == "" {
+            cleanUrl += "all"
+        } else {
+            cleanUrl += args.ThirdPos
+        }
+        fmt.Println(common.PostJson(cleanUrl, nil))
+    }
 }

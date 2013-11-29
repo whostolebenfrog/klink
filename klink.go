@@ -174,6 +174,10 @@ func handleAction(args common.Command) {
 		onix.AddProperty(args)
 	case "status":
 		onix.Status(args)
+    case "ditto":
+        ditto.Helpers(args)
+    case "speak":
+        console.Speak(args)
 	default:
 		printHelpAndExit()
 	}
@@ -181,5 +185,6 @@ func handleAction(args common.Command) {
 
 func main() {
 	props.EnsureRCFile()
+    update.EnsureUpdatedRecently(os.Args[0])
 	handleAction(loadFlags())
 }
