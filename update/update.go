@@ -140,13 +140,15 @@ func deferCopy(nextVersionUrl string, path string) {
 func EnsureUpdatedRecently(argsPath string) {
     lastUpdated := props.GetLastUpdated()
     if props.GetLastUpdated() == 0 {
+        props.SetLastUpdated(int32(time.Now().Unix()))
         if LatestVersion() != Version {
             Update(argsPath)
         }
     }
 
     now := int32(time.Now().Unix())
-    if (now - lastUpdated) > (1000 * 60 * 60 * 1) {
+    fmt.Println(now - lastUpdated)
+    if (now - lastUpdated) > (60 * 60 * 1) {
         if LatestVersion() != Version {
             Update(argsPath)
         }

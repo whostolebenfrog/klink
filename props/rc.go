@@ -109,7 +109,6 @@ func GetLastUpdated() int32 {
 
 // Write the last time we checked for an update
 func SetLastUpdated(t int32) {
-    fmt.Println("here")
     props := GetRCProperties()
     props.LastUpdated = t
     writeRCProperties(props)
