@@ -49,6 +49,8 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(argsPath string) {
+    props.SetLastUpdated(int32(time.Now().Unix()))
+
 	path, pathErr := exec.LookPath("klink")
 	if pathErr != nil {
 		path = argsPath
@@ -73,7 +75,6 @@ func Update(argsPath string) {
 	} else {
 		errorWithHelper(nextVersionUrl)
 	}
-    props.SetLastUpdated(time.Now().UnixNano()%1e6/1e3)
 }
 
 // Does the update
@@ -144,7 +145,7 @@ func EnsureUpdatedRecently(argsPath string) {
         }
     }
 
-    now := time.Now().UnixNano()%1e6/1e3
+    now := int32(time.Now().Unix())
     if (now - lastUpdated) > (1000 * 60 * 60 * 1) {
         if LatestVersion() != Version {
             Update(argsPath)

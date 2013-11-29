@@ -12,7 +12,7 @@ import (
 
 type RCProps struct {
 	Username     string `json:"username"`
-    LastUpdated  int64  `json:"lastUpdated"`
+    LastUpdated  int32  `json:"lastUpdated"`
 	DoctorHasRun string `json:"doctorHasRun"`
 }
 
@@ -103,12 +103,13 @@ func Exists(name string) bool {
 	return true
 }
 
-func GetLastUpdated() int64 {
+func GetLastUpdated() int32 {
     return GetRCProperties().LastUpdated
 }
 
 // Write the last time we checked for an update
-func SetLastUpdated(t int64) {
+func SetLastUpdated(t int32) {
+    fmt.Println("here")
     props := GetRCProperties()
     props.LastUpdated = t
     writeRCProperties(props)
