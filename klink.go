@@ -20,27 +20,27 @@ var cmd = `[command] [application] [options]
 
 [Commands]
     add-onix-prop       {application} -N property name -V json value
+    allow-prod          {application} Allows the prod aws account access to the supplied application (or base/public)
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}.
     create-app          {application} -E {email} -o {owner} -d {description}
                         Creates a new application. You probably want this when adding
                         a new service.
-    register-app-onix   {application}
-                        Creates a new application in onix only, useful for services
-                        that won't be deployed using the cloud tooling.
-    register-app-tyr    {application}
-                        Creates a new application in tyranitar only.
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}.
-    rollback            {application} {environment} rolls the application back to the last
-                        successful deploy
     doctor              Test that everything is setup for klink to function
     info                {application} Return information about the application
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix).
     list-apps-tyr       Lists the applications that exist (in tyranitar).
     list-amis           {application} Lists the latest amis for the supplied application name
-    allow-prod          {application} Allows the prod aws account access to the supplied application (or base/public)
+    register-app-onix   {application}
+                        Creates a new application in onix only, useful for services
+                        that won't be deployed using the cloud tooling.
+    register-app-tyr    {application}
+                        Creates a new application in tyranitar only.
+    rollback            {application} {environment} rolls the application back to the last
+                        successful deploy
     status              {application} Checks the status of the app
     update              Update to the current version of klink.`
 
@@ -51,7 +51,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("rollback, allow-prod\n")
+	fmt.Print("undo\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
