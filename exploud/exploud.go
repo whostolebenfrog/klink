@@ -14,7 +14,6 @@ import (
 
 type DeployRequest struct {
 	Ami         string `json:"ami"`
-	Environment string `json:"environment"`
 	Message     string `json:"message"`
 	Username    string `json:"user"`
 }
@@ -73,16 +72,41 @@ func validateDeploymentArgs(args common.Command) {
 func Exploud(args common.Command) {
 	validateDeploymentArgs(args)
 
-	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/deploy"), args.SecondPos)
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), args.SecondPos, args.ThirdPos)
 
-	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos,
-		args.Message, props.GetUsername()}
+	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
 	deployRef := DeploymentReference{}
 
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
 	// TODO: version (can be parsed from the ami name)
 	hubotMessage := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
+		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	console.Hubot(hubotMessage, args)
+
+	PollDeployNew(deployRef.Id, args.SecondPos)
+}
+
+// TODO - all these three deployment things need to be factored into one function
+
+// Undo the steps from a borked deployment
+// Must pass SecondPos and Ami arguments
+func Undo(args common.Command) {
+    // TODO - remove this hack! allows the common validation to pass
+    args.FourthPos = "ami-blah"
+	validateDeploymentArgs(args)
+
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"),
+        args.SecondPos, args.ThirdPos)
+
+    // TODO - don't send fourthpos as not required for a rollback and is fake anyway
+	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
+	deployRef := DeploymentReference{}
+
+	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
+
+	// TODO: version (can be parsed from the ami name)
+	hubotMessage := fmt.Sprintf("%s is undoing deployment of %s for service %s to %s. %s",
 		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
 	console.Hubot(hubotMessage, args)
 
@@ -96,11 +120,11 @@ func Rollback(args common.Command) {
     args.FourthPos = "ami-blah"
 	validateDeploymentArgs(args)
 
-	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/rollback"), args.SecondPos)
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"),
+        args.SecondPos, args.ThirdPos)
 
-    // TODO - don't send fourthpos
-	deployRequest := DeployRequest{args.FourthPos, args.ThirdPos,
-		args.Message, props.GetUsername()}
+    // TODO - don't send fourthpos as not required for a rollback and is fake anyway
+	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
 	deployRef := DeploymentReference{}
 
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
