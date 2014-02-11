@@ -37,7 +37,7 @@ func validateDeploymentArgs(args common.Command) {
 		console.Fail("Must supply an application name as the second positional argument.")
 	}
 	if !AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word aginst exploud.",
+		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word against exploud.",
 			args.SecondPos))
 	}
 

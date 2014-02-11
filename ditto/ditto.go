@@ -46,7 +46,7 @@ func Bake(args common.Command) {
 		console.Fail("Version must be supplied using --version")
 	}
 	if !exploud.AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word aginst exploud!",
+		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against exploud!",
 			args.SecondPos))
 	}
 
