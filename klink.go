@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
+    asgard "nokia.com/klink/asgard"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
@@ -163,6 +164,8 @@ func handleAction(args common.Command) {
 		tyr.ListApps()
 	case "list-apps":
 		exploud.ListApps()
+    case "list-servers":
+        asgard.ListServers(args)
 	case "create-app":
 		exploud.CreateApp(args)
 	case "doctor":

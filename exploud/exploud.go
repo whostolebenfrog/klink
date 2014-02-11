@@ -106,8 +106,8 @@ func Undo(args common.Command) {
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
 	// TODO: version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("%s is undoing deployment of %s for service %s to %s. %s",
-		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	hubotMessage := fmt.Sprintf("%s is undoing deployment of service %s in %s. %s",
+		props.GetUsername(), args.SecondPos, args.ThirdPos, args.Message)
 	console.Hubot(hubotMessage, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
@@ -130,8 +130,8 @@ func Rollback(args common.Command) {
 	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
 
 	// TODO: version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
-		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
+	hubotMessage := fmt.Sprintf("%s is rollingback service %s in %s. %s",
+		props.GetUsername(), args.SecondPos, args.ThirdPos, args.Message)
 	console.Hubot(hubotMessage, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
