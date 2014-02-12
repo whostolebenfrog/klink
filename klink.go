@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
-    asgard "nokia.com/klink/asgard"
+	asgard "nokia.com/klink/asgard"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	doctor "nokia.com/klink/doctor"
 	exploud "nokia.com/klink/exploud"
+	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
 	tyr "nokia.com/klink/tyranitar"
@@ -146,14 +147,14 @@ func handleAction(args common.Command) {
 		update.Update(os.Args[0])
 	case "deploy":
 		exploud.Exploud(args)
-    case "rollback":
-        exploud.Rollback(args)
-    case "undo":
-        exploud.Undo(args)
+	case "rollback":
+		exploud.Rollback(args)
+	case "undo":
+		exploud.Undo(args)
 	case "bake":
 		ditto.Bake(args)
-    case "allow-prod":
-        ditto.AllowProd(args)
+	case "allow-prod":
+		ditto.AllowProd(args)
 	case "register-app-onix":
 		onix.CreateApp(args)
 	case "list-apps-onix":
@@ -164,8 +165,8 @@ func handleAction(args common.Command) {
 		tyr.ListApps()
 	case "list-apps":
 		exploud.ListApps()
-    case "list-servers":
-        asgard.ListServers(args)
+	case "list-servers":
+		asgard.ListServers(args)
 	case "create-app":
 		exploud.CreateApp(args)
 	case "doctor":
@@ -180,10 +181,12 @@ func handleAction(args common.Command) {
 		onix.AddProperty(args)
 	case "status":
 		onix.Status(args)
-    case "ditto":
-        ditto.Helpers(args)
-    case "speak":
-        console.Speak(args)
+	case "ditto":
+		ditto.Helpers(args)
+	case "speak":
+		console.Speak(args)
+	case "build":
+		jenkins.Build(args)
 	default:
 		printHelpAndExit()
 	}
@@ -191,6 +194,6 @@ func handleAction(args common.Command) {
 
 func main() {
 	props.EnsureRCFile()
-    update.EnsureUpdatedRecently(os.Args[0])
+	update.EnsureUpdatedRecently(os.Args[0])
 	handleAction(loadFlags())
 }

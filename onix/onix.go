@@ -89,3 +89,6 @@ func Status(args common.Command) {
     fmt.Println(common.GetString(statusUrl))
     console.Reset()
 }
+
+func GetProperty(name string) {
+}
