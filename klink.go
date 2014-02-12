@@ -136,6 +136,9 @@ func handleAction(args common.Command) {
 	defer func() {
 		if p := recover(); p != nil {
 			if args.Debug == true {
+                console.Red()
+                fmt.Println("\nThis may print out a trace with bgriffit's home directory - don't worry that's just where it was built.")
+                console.Reset()
 				panic(p)
 			}
 			console.Red()
