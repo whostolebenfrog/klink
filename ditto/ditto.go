@@ -37,21 +37,7 @@ func AllowProd(args common.Command) {
 	}
 }
 
-// Bake the ami
-func Bake(args common.Command) {
-	if args.SecondPos == "" {
-		console.Fail("Application must be supplied as second positional argument")
-	}
-	if args.Version == "" {
-		console.Fail("Version must be supplied using --version")
-	}
-	if !onix.AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against onix!",
-			args.SecondPos))
-	}
-
-	url := bakeUrl(args.SecondPos, args.Version)
-
+func DoBake(url string) {
 	httpClient := common.NewTimeoutClient()
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -77,6 +63,23 @@ func Bake(args common.Command) {
 	}
 
 	io.Copy(os.Stdout, resp.Body)
+}
+
+// Bake the ami
+func Bake(args common.Command) {
+	if args.SecondPos == "" {
+		console.Fail("Application must be supplied as second positional argument")
+	}
+	if args.Version == "" {
+		console.Fail("Version must be supplied using --version")
+	}
+	if !onix.AppExists(args.SecondPos) {
+		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against onix!",
+			args.SecondPos))
+	}
+
+	url := bakeUrl(args.SecondPos, args.Version)
+    DoBake(url)
 }
 
 type Ami struct {
@@ -114,12 +117,18 @@ func Helpers(args common.Command) {
 		unlockUrl := dittoUrl("/unlock")
 		fmt.Println(common.PostJson(unlockUrl, nil))
 	} else if args.SecondPos == "clean" {
-		cleanUrl := dittoUrl("/clean/")
+		cleanUrl := dittoUrl("/clean")
 		if args.ThirdPos == "" {
 			cleanUrl += "all"
 		} else {
 			cleanUrl += args.ThirdPos
 		}
 		fmt.Println(common.PostJson(cleanUrl, nil))
-	}
+	} else if args.SecondPos == "entertainment" {
+        bakeUrl := dittoUrl("/bake/entertainment-ami");
+        DoBake(bakeUrl)
+    } else if args.SecondPos == "public" {
+        bakeUrl := dittoUrl("/bake/public-ami");
+        DoBake(bakeUrl)
+    }
 }
