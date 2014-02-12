@@ -51,11 +51,14 @@ func AddProperty(args common.Command) {
 	if args.Name == "" {
 		console.Fail("Must supply property name using -N")
 	}
-	if args.Value == "" {
+    value := args.Value
+	if value == "" {
 		console.Fail("Must supply value using -V in json format. Remember to quote!")
 	}
-	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name),
-		args.Value))
+    value = "{\"value\" : \"" + value + "\"}"
+    fmt.Println(value)
+
+	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name), value))
 }
 
 func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
@@ -63,7 +66,7 @@ func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Application %s doesn't have a %s defined, add one with:\n",
 			app, name))
-		console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '{\"value\" : \"value\"}'\n",
+		console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
 			app, name))
 	}
 	return obj
@@ -88,4 +91,16 @@ func Status(args common.Command) {
 func GetProperty(app string, name string) string {
 	jq := common.GetAsJsonq(onixUrl("/applications/" + app))
 	return EnsureProp(jq, app, name)
+}
+
+func GetPropertyFromArgs(args common.Command) {
+    app := args.SecondPos
+    name := args.ThirdPos
+    if app == "" {
+        console.Fail("Don't forget to bring a towel ^H^H^H^H pass a application name")
+    }
+    if name == "" {
+        console.Fail("You forgot to pass the property name")
+    }
+    fmt.Println(GetProperty(app, name))
 }
