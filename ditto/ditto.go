@@ -110,13 +110,14 @@ func FindAmis(args common.Command) {
 // ditto helps to lock, unlock and clean amis
 // not intended to be a part of the public klink functionality
 func Helpers(args common.Command) {
-	if args.SecondPos == "lock" {
+    command := args.SecondPos
+	if command == "lock" {
 		lockUrl := dittoUrl("/lock")
 		fmt.Println(common.PostJson(lockUrl, nil))
-	} else if args.SecondPos == "unlock" {
+	} else if command == "unlock" {
 		unlockUrl := dittoUrl("/unlock")
 		fmt.Println(common.PostJson(unlockUrl, nil))
-	} else if args.SecondPos == "clean" {
+	} else if command == "clean" {
 		cleanUrl := dittoUrl("/clean")
 		if args.ThirdPos == "" {
 			cleanUrl += "all"
@@ -124,11 +125,16 @@ func Helpers(args common.Command) {
 			cleanUrl += args.ThirdPos
 		}
 		fmt.Println(common.PostJson(cleanUrl, nil))
-	} else if args.SecondPos == "entertainment" {
-        bakeUrl := dittoUrl("/bake/entertainment-ami");
+	} else if command == "entertainment" {
+        bakeUrl := dittoUrl("/bake/entertainment-ami")
         DoBake(bakeUrl)
-    } else if args.SecondPos == "public" {
-        bakeUrl := dittoUrl("/bake/public-ami");
+    } else if command == "public" {
+        bakeUrl := dittoUrl("/bake/public-ami")
         DoBake(bakeUrl)
+    } else if command == "inprogress" {
+        progUrl := dittoUrl("/inprogress")
+        fmt.Println(common.GetString(progUrl))
+    } else {
+        console.Fail("Requires a second arg: lock, unlock, clean, entertainment, public or inprogress")
     }
 }
