@@ -2,6 +2,7 @@ package onix
 
 import (
 	"fmt"
+	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 )
@@ -57,38 +58,34 @@ func AddProperty(args common.Command) {
 		args.Value))
 }
 
-type InfoResp struct {
-    Name string `json:"name"`
-    Metadata map[string]string `json:"metadata"`
-}
-
-func ensureProp(m map[string]string, service string, prop string) {
-    if m[prop] == "" {
-        fmt.Println(fmt.Sprintf("Service %s doesn't have a %s defined, add one with:\n",
-            service, prop))
-        console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '{\"value\" : \"value\"}'\n",
-            service, prop))
-    }
+func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
+	obj, err := jq.String("metadata", name)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Application %s doesn't have a %s defined, add one with:\n",
+			app, name))
+		console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '{\"value\" : \"value\"}'\n",
+			app, name))
+	}
+	return obj
 }
 
 func Status(args common.Command) {
-    if args.SecondPos == "" {
+	app := args.SecondPos
+	if app == "" {
 		console.Fail("Must supply service name as a second positional argument")
-    }
-    info := InfoResp{}
+	}
 
-    common.GetJson(onixUrl("/applications/" + args.SecondPos), &info)
+	jq := common.GetAsJsonq(onixUrl("/applications/" + app))
 
-    ensureProp(info.Metadata, args.SecondPos, "serviceUrl")
-    ensureProp(info.Metadata, args.SecondPos, "statusPath")
+	statusUrl := EnsureProp(jq, app, "servicePathPoke") + EnsureProp(jq, app, "statusPath")
+	fmt.Println(fmt.Sprintf("Checking status at: %s", statusUrl))
 
-    statusUrl := info.Metadata["serviceUrl"] + info.Metadata["statusPath"]
-    fmt.Println(fmt.Sprintf("Checking status at: %s", statusUrl))
-
-    console.Green()
-    fmt.Println(common.GetString(statusUrl))
-    console.Reset()
+	console.Green()
+	fmt.Println(common.GetString(statusUrl))
+	console.Reset()
 }
 
-func GetProperty(name string) {
+func GetProperty(app string, name string) string {
+	jq := common.GetAsJsonq(onixUrl("/applications/" + app))
+	return EnsureProp(jq, app, name)
 }
