@@ -25,12 +25,15 @@ var cmd = `[command] [application] [options]
     allow-prod          {application} Allows the prod aws account access to the supplied application (or base/public)
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}
+    build               {application} builds the jenkins release job for an application
     create-app          {application} -E {email} -o {owner} -d {description}
                         Creates a new application. You probably want this when adding
                         a new service.
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}
+    ditto               Various helpers; lock, unlock, clean, build public and ent base amis
     doctor              Test that everything is setup for klink to function
+    get-onix-prop       {application} {property-name} get the property for the application
     info                {application} Return information about the application
     list-amis           {application} Lists the latest amis for the supplied application name
     list-apps           Lists the applications that exist (via exploud)
@@ -54,7 +57,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("undo\n")
+	fmt.Print("build, ditto\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -179,6 +182,8 @@ func handleAction(args common.Command) {
 		onix.Info(args)
 	case "add-onix-prop":
 		onix.AddProperty(args)
+    case "get-onix-prop":
+        onix.GetPropertyFromArgs(args)
 	case "status":
 		onix.Status(args)
 	case "ditto":
