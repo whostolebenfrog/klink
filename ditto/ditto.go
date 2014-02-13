@@ -118,7 +118,7 @@ func Helpers(args common.Command) {
 		unlockUrl := dittoUrl("/unlock")
 		fmt.Println(common.PostJson(unlockUrl, nil))
 	case "clean":
-		cleanUrl := dittoUrl("/clean")
+		cleanUrl := dittoUrl("/clean/")
 		if args.ThirdPos == "" {
 			cleanUrl += "all"
 		} else {
