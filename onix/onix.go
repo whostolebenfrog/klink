@@ -1,6 +1,7 @@
 package onix
 
 import (
+	"encoding/json"
 	"fmt"
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
@@ -44,6 +45,18 @@ func Info(args common.Command) {
 	fmt.Println(common.GetString(onixUrl("/applications/" + args.SecondPos)))
 }
 
+func ToJsonValue(in string) (string, error) {
+	in = "{\"value\" : " + in + "}"
+	var generic interface{}
+	err := json.Unmarshal([]byte(in), &generic)
+	if err != nil {
+		return "", err
+	}
+
+	x, err := json.Marshal(generic)
+	return string(x), err
+}
+
 func AddProperty(args common.Command) {
 	if args.SecondPos == "" {
 		console.Fail("Must supply service name as a second positional argument")
@@ -51,14 +64,22 @@ func AddProperty(args common.Command) {
 	if args.Name == "" {
 		console.Fail("Must supply property name using -N")
 	}
-    value := args.Value
+	value := args.Value
 	if value == "" {
 		console.Fail("Must supply value using -V in json format. Remember to quote!")
 	}
-    value = "{\"value\" : \"" + value + "\"}"
-    fmt.Println(value)
 
-	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name), value))
+	valueString, err := ToJsonValue(value)
+	if err != nil {
+		valueString, err = ToJsonValue("\"" + value + "\"")
+        if err != nil {
+            fmt.Println("That doesn't look like json")
+            panic(err)
+        }
+	}
+
+	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name),
+		valueString))
 }
 
 func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
@@ -94,13 +115,13 @@ func GetProperty(app string, name string) string {
 }
 
 func GetPropertyFromArgs(args common.Command) {
-    app := args.SecondPos
-    name := args.ThirdPos
-    if app == "" {
-        console.Fail("Don't forget to bring a towel ^H^H^H^H pass a application name")
-    }
-    if name == "" {
-        console.Fail("You forgot to pass the property name")
-    }
-    fmt.Println(GetProperty(app, name))
+	app := args.SecondPos
+	name := args.ThirdPos
+	if app == "" {
+		console.Fail("Don't forget to bring a towel ^H^H^H^H pass a application name")
+	}
+	if name == "" {
+		console.Fail("You forgot to pass the property name")
+	}
+	fmt.Println(GetProperty(app, name))
 }
