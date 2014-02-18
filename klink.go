@@ -62,7 +62,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("build, ditto\n")
+	fmt.Print("build, ditto, clone-tyr, clone-shuppet\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
