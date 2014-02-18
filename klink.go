@@ -9,6 +9,7 @@ import (
 	ditto "nokia.com/klink/ditto"
 	doctor "nokia.com/klink/doctor"
 	exploud "nokia.com/klink/exploud"
+    git "nokia.com/klink/git"
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
@@ -26,6 +27,10 @@ var cmd = `[command] [application] [options]
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}
     build               {application} builds the jenkins release job for an application
+    clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env}
+                        to optionally only clone that env. Defaults to all
+    clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env}
+                        to optionally only clone that env. Defaults to all
     create-app          {application} -E {email} -o {owner} -d {description}
                         Creates a new application. You probably want this when adding
                         a new service.
@@ -195,6 +200,10 @@ func handleAction(args common.Command) {
 		console.Speak(args)
 	case "build":
 		jenkins.Build(args)
+    case "clone-tyr":
+        git.CloneTyranitar(args)
+    case "clone-shuppet":
+        git.CloneShuppet(args)
 	default:
 		printHelpAndExit()
 	}
