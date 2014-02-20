@@ -20,14 +20,19 @@ BUILDS=builds/*
 
 for build in $BUILDS
 do
-    scp $build benkins.brislabs.com:/opt/klink/
+    echo "scp: " $build
+    #scp $build benkins.brislabs.com:/opt/klink/
 done
 
 # Update the version file on the remote server to provide the latest version
 
-scp version benkins.brislabs.com:/opt/klink/
+#scp version benkins.brislabs.com:/opt/klink/
+echo "scp" `cat version`
 
 # Update git
+
+echo "exit before git"
+exit 0
 
 git add -A
 git commit -m "Bumped version number for release: $NEXT_VERSION"
