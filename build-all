@@ -27,7 +27,6 @@ for PLATFORM in $PLATFORMS; do
     CMD="go-${GOOS}-${GOARCH} build -o builds/$NAME $@"
     echo "$CMD"
     $CMD || FAILURES="$FAILURES $PLATFORM"
-    #scp -i ~/.ssh/dmt-key builds/$NAME root@benkins.brislabs.com:/opt/klink/
 done
 if [ "$FAILURES" != "" ]; then
     echo "*** go-build-all FAILED on $FAILURES ***"
