@@ -38,9 +38,6 @@ fi
 
 # Update git
 
-echo "exit before git"
-exit 0
-
 git add -A
 git commit -m "Bumped version number for release: $NEXT_VERSION"
 git push origin master
