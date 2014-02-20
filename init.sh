@@ -86,7 +86,9 @@ vercomp $version "1.1.2"
 case $? in
         0) cyan "OK\n";;
         1) cyan "OK\n";;
-        2) red "Fail. Your version of go is too old. Please update to at least 1.1.2 to use klink\n";;
+        2) red "Fail\n\n"
+           red "Your version of go is too old. Please update to at least 1.1.2 to use klink\n"
+           exit 1;;
 esac
 
 echo -n "Checking go path: "
@@ -95,6 +97,7 @@ if [ -z "$GOPATH" ]; then
     red "Fail\n\n"
     red "Your GOPATH environment variable isn't set.\n" 
     red "Please set your GOPATH, check the readme.md for more information on the format for this.\n"
+    exit 1
 else
     cyan "OK\n"
 fi
@@ -110,6 +113,7 @@ if [ $klinkpath != $current ]; then
     red "Due to go's package management it must be: \$GOPATH/src/nokia.com/klink\n"
     red "Found: $current\n"
     red "Expected: $klinkpath\n"
+    exit 1
 else
     cyan "OK\n"
 fi
