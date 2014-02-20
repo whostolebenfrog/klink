@@ -20,14 +20,21 @@ BUILDS=builds/*
 
 for build in $BUILDS
 do
-    echo "scp: " $build
-    #scp $build benkins.brislabs.com:/opt/klink/
+    # if this is wrong I don't want to know what right is.
+    if [ $(whoami) == "jenkins" ] then;
+        cp $build /opt/klink/
+    else
+        scp $build benkins.brislabs.com:/opt/klink/
+    fi
 done
 
 # Update the version file on the remote server to provide the latest version
 
-#scp version benkins.brislabs.com:/opt/klink/
-echo "scp" `cat version`
+if [ $(whoami) == "jenkins" ] then;
+    cp version /opt/klink
+else
+    scp version benkins.brislabs.com:/opt/klink/
+fi
 
 # Update git
 
