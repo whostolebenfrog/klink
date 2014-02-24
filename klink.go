@@ -23,10 +23,11 @@ var cmd = `[command] [application] [options]
 
 [Commands]
     add-onix-prop       {application} -N property name -V json value
-    allow-prod          {application} Allows the prod aws account access to the supplied application (or base/public)
+    allow-prod          {application} Allows the prod aws account access to the supplied application 
     bake                {application} -v {version}
                         Bakes an AMI for {application} with version {version}
     build               {application} builds the jenkins release job for an application
+    boxes               {application} {env} -f format (text / json) -S status (e.g. stopped)
     clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env}
                         to optionally only clone that env. Defaults to all
     clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env}
@@ -62,7 +63,7 @@ func printHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("build, ditto, clone-tyr, clone-shuppet\n")
+	fmt.Print("boxes, build, clone-tyr, clone-shuppet\n")
 	console.FReset()
 	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
 	os.Exit(0)
@@ -77,41 +78,47 @@ func loadFlags() common.Command {
 	optarg.Add("h", "help", "Displays this help message", false)
 	optarg.Header("Deployment based flags")
 	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
-	optarg.Add("e", "environment", "Sets the environment", "poke, prod")
-	optarg.Add("m", "message", "Sets an informational message", "")
-	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
+	optarg.Add("D", "debug", "Sets debug mode. Gives more info on fails.", "")
+	optarg.Add("e", "environment", "Sets the environment", "poke, prod")
 	optarg.Add("E", "email", "Sets the email address for commands that require it", "")
+	optarg.Add("f", "format", "Sets the format property value", "")
+	optarg.Add("m", "message", "Sets an informational message", "")
+	optarg.Add("N", "name", "Sets the property name", "")
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
 	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "")
-	optarg.Add("D", "debug", "Sets debug mode. Gives more info on fails.", "")
-	optarg.Add("N", "name", "Sets the property name", "")
+	optarg.Add("S", "status", "Sets the status property value", "")
+	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("V", "value", "Sets the property value", "")
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
-		case "h":
-			printHelpAndExit()
 		case "a":
 			command.Ami = opt.String()
-		case "e":
-			command.Environment = opt.String()
-		case "m":
-			command.Message = opt.String()
-		case "v":
-			command.Version = opt.String()
 		case "d":
 			command.Description = opt.String()
+		case "D":
+			command.Debug = opt.Bool()
+		case "e":
+			command.Environment = opt.String()
 		case "E":
 			command.Email = opt.String()
+        case "f":
+            command.Format = opt.String()
+		case "h":
+			printHelpAndExit()
+		case "m":
+			command.Message = opt.String()
+		case "N":
+			command.Name = opt.String()
 		case "o":
 			command.Owner = opt.String()
 		case "s":
 			command.Silent = opt.Bool()
-		case "D":
-			command.Debug = opt.Bool()
-		case "N":
-			command.Name = opt.String()
+        case "S":
+            command.Status = opt.String()
+		case "v":
+			command.Version = opt.String()
 		case "V":
 			command.Value = opt.String()
 		}
@@ -204,6 +211,8 @@ func handleAction(args common.Command) {
         git.CloneTyranitar(args)
     case "clone-shuppet":
         git.CloneShuppet(args)
+    case "boxes":
+        exploud.Boxes(args)
 	default:
 		printHelpAndExit()
 	}

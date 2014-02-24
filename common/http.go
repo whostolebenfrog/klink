@@ -121,6 +121,36 @@ func GetString(url string) string {
 		resp.StatusCode, url, string(body)))
 }
 
+func GetPlainString(url string) string {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error creating GET request for url: %s", url))
+		panic(err)
+	}
+	req.Header.Add("accept", "text/plain")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Failed to read response body from: %s", url))
+		panic(err)
+	}
+
+	if resp.StatusCode == 200 {
+		return string(responseBody)
+	}
+	panic(fmt.Sprintf("Got %d response calling: %s \nResponse was: %s",
+		resp.StatusCode, url, string(responseBody)))
+}
+
 // Returns the result of an http get request as a jsonq object
 func GetAsJsonq(url string) *jsonq.JsonQuery {
 	jsonstring := GetString(url)

@@ -336,3 +336,28 @@ func HandleDeployInterrupt() chan os.Signal {
 func DeregisterInterupt(c chan<- os.Signal) {
 	signal.Stop(c)
 }
+
+func Boxes(args common.Command) {
+    if args.SecondPos == "" {
+        console.Fail("You must supply a service as the second positional argument")
+    }
+    app := args.SecondPos
+    if args.ThirdPos == "" {
+        console.Fail("You must supply an environment as the third positional argument")
+    }
+    env := args.ThirdPos
+
+    describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+    if args.Status != "" {
+        describeUrl += "?state=" + args.Status
+    }
+
+    if args.Format == "text" {
+        fmt.Println(common.GetPlainString(describeUrl))
+    } else if args.Format == "" {
+        fmt.Println(common.GetString(describeUrl))
+    } else {
+        console.Fail("Unknown format: " + args.Format)
+    }
+
+}

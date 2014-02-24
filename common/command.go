@@ -10,19 +10,21 @@ type Command struct {
 	Action      string
 	Ami         string
 	Application string
-	Environment string
-	Message     string
-	SecondPos   string
-	ThirdPos    string
-	FourthPos   string
-	Version     string
+	Debug       bool
 	Description string
 	Email       string
-	Owner       string
-	Silent      bool
-	Debug       bool
+	Environment string
+	Format      string
+	FourthPos   string
+	Message     string
 	Name        string
+	Owner       string
+	SecondPos   string
+	Silent      bool
+	Status      string
+	ThirdPos    string
 	Value       string
+	Version     string
 }
 
 // Do we have to do stupid shit to get around windows being a moron?
