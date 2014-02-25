@@ -1,14 +1,33 @@
 package common
 
-var Components = []Component {}
+import (
+	"fmt"
+    "sort"
+)
+
+var Components = []Component{}
 
 type Component struct {
-    Command string
-    Description string
-    Callback func(Command)
+	Command     string
+	Callback    func(Command)
+	Description string
 }
 
-// Register your component with klink
-func Register(component Component) {
-    Components = append(Components, component)
+func (c Component) String() string {
+	return fmt.Sprintf("%s\t%s", c.Command, c.Description)
+}
+
+// make Components sortable - sometimes go is a little primative...
+type ByCommand []Component
+func (a ByCommand) Len() int           { return len(a) }
+func (a ByCommand) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByCommand) Less(i, j int) bool { return a[i].Command < a[j].Command }
+
+// Register your components with klink
+// Takes var args of common.Component
+func Register(toReg ...Component) {
+	for i := range toReg {
+		Components = append(Components, toReg[i])
+	}
+    sort.Sort(ByCommand(Components))
 }

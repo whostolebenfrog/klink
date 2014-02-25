@@ -11,7 +11,13 @@ import (
 )
 
 func init() {
-    common.Register(common.Component{"ditto", "Various helpers; lock, unlock, clean, build public and ent base amis", Helpers})
+	common.Register(
+		common.Component{"ditto", Helpers,
+			"Various helpers; lock, unlock, clean, build public and ent base amis"},
+		common.Component{"bake", Bake,
+			"{application} -v {version} Bakes an AMI for {application} with version {version}"},
+        common.Component{"allow-prod", AllowProd,
+            "{application} Allows the prod aws account access to the supplied application"})
 }
 
 func dittoUrl(end string) string {

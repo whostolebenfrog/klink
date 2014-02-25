@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bytes"
 	"fmt"
 	optarg "github.com/jteeuwen/go-pkg-optarg"
 	asgard "nokia.com/klink/asgard"
@@ -17,15 +18,13 @@ import (
 	update "nokia.com/klink/update"
 	"os"
 	"strings"
+    "text/tabwriter"
 )
 
 var cmd = `[command] [application] [options]
 
 [Commands]
     add-onix-prop       {application} -N property name -V json value
-    allow-prod          {application} Allows the prod aws account access to the supplied application 
-    bake                {application} -v {version}
-                        Bakes an AMI for {application} with version {version}
     build               {application} builds the jenkins release job for an application
     boxes               {application} {env} -f format (text / json) -S status (e.g. stopped)
     clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env}
@@ -37,7 +36,6 @@ var cmd = `[command] [application] [options]
                         a new service.
     deploy              {application} {environment} {ami}
                         Deploy the AMI {ami} for {application} to {environment}
-    ditto               Various helpers; lock, unlock, clean, build public and ent base amis
     doctor              Test that everything is setup for klink to function
     get-onix-prop       {application} {property-name} get the property for the application
     info                {application} Return information about the application
@@ -57,6 +55,7 @@ var cmd = `[command] [application] [options]
     update              Update to the current version of klink.`
 
 func printHelpAndExit() {
+    // Top text
 	console.Klink()
 	console.Green()
 	update.PrintVersion()
@@ -65,11 +64,24 @@ func printHelpAndExit() {
 	console.Red()
 	fmt.Print("boxes, build, clone-tyr, clone-shuppet\n")
 	console.FReset()
-	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", cmd, 1))
+
+    // [commands]
+    w := new(tabwriter.Writer)
+    output := new(bytes.Buffer)
+
+	w.Init(output, 18, 8, 0, '\t', 0)
+    for i := range(common.Components) {
+        helpString := "\n    " + common.Components[i].String()
+        fmt.Fprint(w, helpString)
+    }
+	w.Flush()
+    outString := "[command] [app] [options]\n\n[commands]" + string(output.Bytes())
+
+    // optstring and commands
+	fmt.Println(strings.Replace(optarg.UsageString(), "[options]:", outString, 1))
 	os.Exit(0)
 }
 
-// TODO: general - json output mode? jq mode?
 func loadFlags() common.Command {
 	command := common.Command{}
 
@@ -177,10 +189,6 @@ func handleAction(args common.Command) {
 		exploud.Rollback(args)
 	case "undo":
 		exploud.Undo(args)
-	case "bake":
-		ditto.Bake(args)
-	case "allow-prod":
-		ditto.AllowProd(args)
 	case "register-app-onix":
 		onix.CreateApp(args)
 	case "list-apps-onix":
