@@ -10,6 +10,10 @@ import (
 	"os"
 )
 
+func init() {
+    common.Register(common.Component{"ditto", "Various helpers; lock, unlock, clean, build public and ent base amis", Helpers})
+}
+
 func dittoUrl(end string) string {
 	return "http://ditto.brislabs.com:8080/1.x" + end
 }

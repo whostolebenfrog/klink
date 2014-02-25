@@ -160,6 +160,14 @@ func handleAction(args common.Command) {
 		}
 	}()
 
+    for i := range common.Components {
+        component := common.Components[i]
+        if args.Action == component.Command {
+            component.Callback(args)
+            return
+        }
+    }
+
 	switch args.Action {
 	case "update":
 		update.Update(os.Args[0])
@@ -201,8 +209,6 @@ func handleAction(args common.Command) {
         onix.GetPropertyFromArgs(args)
 	case "status":
 		onix.Status(args)
-	case "ditto":
-		ditto.Helpers(args)
 	case "speak":
 		console.Speak(args)
 	case "build":
@@ -223,3 +229,4 @@ func main() {
 	update.EnsureUpdatedRecently(os.Args[0])
 	handleAction(loadFlags())
 }
+
