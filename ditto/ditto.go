@@ -10,14 +10,16 @@ import (
 	"os"
 )
 
-func init() {
+func Init() {
 	common.Register(
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis"},
 		common.Component{"bake", Bake,
 			"{application} -v {version} Bakes an AMI for {application} with version {version}"},
         common.Component{"allow-prod", AllowProd,
-            "{application} Allows the prod aws account access to the supplied application"})
+            "{application} Allows the prod aws account access to the supplied application"},
+        common.Component{"list-amis", FindAmis,
+            "{application} Lists the latest amis for the supplied application name"})
 }
 
 func dittoUrl(end string) string {

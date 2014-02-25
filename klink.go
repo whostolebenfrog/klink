@@ -7,7 +7,7 @@ import (
 	asgard "nokia.com/klink/asgard"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	ditto "nokia.com/klink/ditto"
+    ditto "nokia.com/klink/ditto"
 	doctor "nokia.com/klink/doctor"
 	exploud "nokia.com/klink/exploud"
     git "nokia.com/klink/git"
@@ -39,7 +39,6 @@ var cmd = `[command] [application] [options]
     doctor              Test that everything is setup for klink to function
     get-onix-prop       {application} {property-name} get the property for the application
     info                {application} Return information about the application
-    list-amis           {application} Lists the latest amis for the supplied application name
     list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix)
     list-apps-tyr       Lists the applications that exist (in tyranitar)
@@ -205,10 +204,6 @@ func handleAction(args common.Command) {
 		exploud.CreateApp(args)
 	case "doctor":
 		doctor.Doctor(args)
-	case "list-amis":
-		ditto.FindAmis(args)
-	case "find-amis":
-		fmt.Println("Did you mean list-amis?")
 	case "info":
 		onix.Info(args)
 	case "add-onix-prop":
@@ -230,6 +225,15 @@ func handleAction(args common.Command) {
 	default:
 		printHelpAndExit()
 	}
+}
+
+func init() {
+    // This whole thing makes me sad. Go demands that stuff like this is explicit
+    // if we don't reference the namespace then even the .init() function won't be
+    // called. We can't reference the namespace without using it so we basically
+    // need to manually call the psuedo init methods, Init(), on each component
+    // namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
+    ditto.Init()
 }
 
 func main() {
