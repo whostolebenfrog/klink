@@ -26,20 +26,13 @@ var cmd = `[command] [application] [options]
 [Commands]
     add-onix-prop       {application} -N property name -V json value
     build               {application} builds the jenkins release job for an application
-    boxes               {application} {env} -f format (text / json) -S status (e.g. stopped)
     clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env}
                         to optionally only clone that env. Defaults to all
     clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env}
                         to optionally only clone that env. Defaults to all
-    create-app          {application} -E {email} -o {owner} -d {description}
-                        Creates a new application. You probably want this when adding
-                        a new service.
-    deploy              {application} {environment} {ami}
-                        Deploy the AMI {ami} for {application} to {environment}
     doctor              Test that everything is setup for klink to function
     get-onix-prop       {application} {property-name} get the property for the application
     info                {application} Return information about the application
-    list-apps           Lists the applications that exist (via exploud)
     list-apps-onix      Lists the applications that exist (in onix)
     list-apps-tyr       Lists the applications that exist (in tyranitar)
     register-app-onix   {application}
@@ -47,10 +40,7 @@ var cmd = `[command] [application] [options]
                         that won't be deployed using the cloud tooling
     register-app-tyr    {application}
                         Creates a new application in tyranitar only
-    rollback            {application} {environment} rolls the application back to the last
-                        successful deploy
     status              {application} Checks the status of the app
-    undo                {application} {environment} Undo the steps of a broken deployment
     update              Update to the current version of klink.`
 
 func printHelpAndExit() {
@@ -182,12 +172,6 @@ func handleAction(args common.Command) {
 	switch args.Action {
 	case "update":
 		update.Update(os.Args[0])
-	case "deploy":
-		exploud.Exploud(args)
-	case "rollback":
-		exploud.Rollback(args)
-	case "undo":
-		exploud.Undo(args)
 	case "register-app-onix":
 		onix.CreateApp(args)
 	case "list-apps-onix":
@@ -196,12 +180,8 @@ func handleAction(args common.Command) {
 		tyr.CreateApp(args)
 	case "list-apps-tyr":
 		tyr.ListApps()
-	case "list-apps":
-		exploud.ListApps()
 	case "list-servers":
 		asgard.ListServers(args)
-	case "create-app":
-		exploud.CreateApp(args)
 	case "doctor":
 		doctor.Doctor(args)
 	case "info":
@@ -220,8 +200,6 @@ func handleAction(args common.Command) {
         git.CloneTyranitar(args)
     case "clone-shuppet":
         git.CloneShuppet(args)
-    case "boxes":
-        exploud.Boxes(args)
 	default:
 		printHelpAndExit()
 	}
@@ -234,6 +212,7 @@ func init() {
     // need to manually call the psuedo init methods, Init(), on each component
     // namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
     ditto.Init()
+    exploud.Init()
 }
 
 func main() {

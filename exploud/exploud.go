@@ -12,10 +12,26 @@ import (
 	"time"
 )
 
+func Init() {
+	common.Register(
+		common.Component{"deploy", Exploud,
+			"{app} {env} {ami} Deploy the AMI {ami} for {app} to {env}"},
+        common.Component{"undo", Undo,
+            "{app} {env} Undo the steps of a broken deployment"},
+        common.Component{"rollback", Rollback,
+            "{app} {env} rolls the application back to the last successful deploy"},
+        common.Component{"list-apps", ListApps,
+            "Lists the applications that exist (via exploud)"},
+        common.Component{"create-app", CreateApp,
+            "{app} -E {email} -o {owner} -d {description} Creates a new application"},
+        common.Component{"boxes", Boxes,
+            "{app} {env} -f format [text|json] -S status [stopped|running|terminated]"})
+}
+
 type DeployRequest struct {
-	Ami         string `json:"ami"`
-	Message     string `json:"message"`
-	Username    string `json:"user"`
+	Ami      string `json:"ami"`
+	Message  string `json:"message"`
+	Username string `json:"user"`
 }
 
 type CreateAppRequest struct {
@@ -92,14 +108,14 @@ func Exploud(args common.Command) {
 // Undo the steps from a borked deployment
 // Must pass SecondPos and Ami arguments
 func Undo(args common.Command) {
-    // TODO - remove this hack! allows the common validation to pass
-    args.FourthPos = "ami-blah"
+	// TODO - remove this hack! allows the common validation to pass
+	args.FourthPos = "ami-blah"
 	validateDeploymentArgs(args)
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"),
-        args.SecondPos, args.ThirdPos)
+		args.SecondPos, args.ThirdPos)
 
-    // TODO - don't send fourthpos as not required for a rollback and is fake anyway
+	// TODO - don't send fourthpos as not required for a rollback and is fake anyway
 	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
 	deployRef := DeploymentReference{}
 
@@ -116,14 +132,14 @@ func Undo(args common.Command) {
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
 // Must pass SecondPos and Ami arguments
 func Rollback(args common.Command) {
-    // TODO - remove this hack! allows the common validation to pass
-    args.FourthPos = "ami-blah"
+	// TODO - remove this hack! allows the common validation to pass
+	args.FourthPos = "ami-blah"
 	validateDeploymentArgs(args)
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"),
-        args.SecondPos, args.ThirdPos)
+		args.SecondPos, args.ThirdPos)
 
-    // TODO - don't send fourthpos as not required for a rollback and is fake anyway
+	// TODO - don't send fourthpos as not required for a rollback and is fake anyway
 	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
 	deployRef := DeploymentReference{}
 
@@ -221,7 +237,7 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		// can't check == running as wont be set when we first call
 		for (task.Status != "completed") &&
 			(task.Status != "failed") &&
-            (task.Status != "skipped") &&
+			(task.Status != "skipped") &&
 			(task.Status != "teminated") &&
 			time.Now().Before(timeout) {
 
@@ -236,10 +252,10 @@ func PollDeployNew(deploymentId string, serviceName string) {
 			previousLength = len(task.Log)
 		}
 
-        // if we see something failed then kill everything - exploud doesn't recover
-        if task.Status == "failed" || task.Status == "terminated" {
-            console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
-        }
+		// if we see something failed then kill everything - exploud doesn't recover
+		if task.Status == "failed" || task.Status == "terminated" {
+			console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
+		}
 	}
 
 	console.Green()
@@ -272,7 +288,7 @@ func CreateApp(args common.Command) {
 }
 
 // List the apps known by exploud
-func ListApps() {
+func ListApps(args common.Command) {
 	fmt.Println(common.GetString(exploudUrl("/applications")))
 }
 
@@ -338,26 +354,26 @@ func DeregisterInterupt(c chan<- os.Signal) {
 }
 
 func Boxes(args common.Command) {
-    if args.SecondPos == "" {
-        console.Fail("You must supply a service as the second positional argument")
-    }
-    app := args.SecondPos
-    if args.ThirdPos == "" {
-        console.Fail("You must supply an environment as the third positional argument")
-    }
-    env := args.ThirdPos
+	if args.SecondPos == "" {
+		console.Fail("You must supply a service as the second positional argument")
+	}
+	app := args.SecondPos
+	if args.ThirdPos == "" {
+		console.Fail("You must supply an environment as the third positional argument")
+	}
+	env := args.ThirdPos
 
-    describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
-    if args.Status != "" {
-        describeUrl += "?state=" + args.Status
-    }
+	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+	if args.Status != "" {
+		describeUrl += "?state=" + args.Status
+	}
 
-    if args.Format == "text" {
-        fmt.Println(common.GetPlainString(describeUrl))
-    } else if args.Format == "" {
-        fmt.Println(common.GetString(describeUrl))
-    } else {
-        console.Fail("Unknown format: " + args.Format)
-    }
+	if args.Format == "text" {
+		fmt.Println(common.GetPlainString(describeUrl))
+	} else if args.Format == "" {
+		fmt.Println(common.GetString(describeUrl))
+	} else {
+		console.Fail("Unknown format: " + args.Format)
+	}
 
 }
