@@ -14,7 +14,6 @@ import (
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
-	tyr "nokia.com/klink/tyranitar"
 	update "nokia.com/klink/update"
 	"os"
 	"strings"
@@ -28,7 +27,6 @@ var cmd = `[command] [application] [options]
     clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env} to optionally only clone that env. Defaults to all
     clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env} to optionally only clone that env. Defaults to all
     doctor              Test that everything is setup for klink to function
-    list-apps-tyr       Lists the applications that exist (in tyranitar)
     register-app-tyr    {application} Creates a new application in tyranitar only
 `
 
@@ -164,10 +162,6 @@ func handleAction(args common.Command) {
     }
 
 	switch args.Action {
-	case "register-app-tyr":
-		tyr.CreateApp(args)
-	case "list-apps-tyr":
-		tyr.ListApps()
 	case "list-servers":
 		asgard.ListServers(args)
 	case "doctor":
