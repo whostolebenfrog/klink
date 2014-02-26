@@ -11,7 +11,7 @@ func Init() {
 	common.Register(common.Component{"speak", Speak, "Here be dragons"})
 }
 
-func doSpeak(message string, room string) int {
+func doSpeak(room string, message string) int {
 	resp, _ := http.PostForm("http://btmgsrvhubot001.brislabs.com/hubot/say",
 		url.Values{"room": {room}, "message": {message}})
     return resp.StatusCode
@@ -42,6 +42,8 @@ func Speak(args common.Command) {
 		room = "575611"
 	case "hack":
 		room = "582412"
+    default:
+        Fail("Unknown room")
 	}
     doSpeak(room, args.Message)
 }
