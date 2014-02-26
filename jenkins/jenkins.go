@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+func Init() {
+    common.Register(
+        common.Component{"build", Build,
+            "{app} builds the jenkins release job for an application"})
+}
+
 // Build a release job for the supplied application and poll the reponse
 func Build(args common.Command) {
 	app := args.SecondPos

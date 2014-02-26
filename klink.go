@@ -22,10 +22,8 @@ import (
 var cmd = `[command] [application] [options]
 
 [Commands]
-    build               {application} builds the jenkins release job for an application
     clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env} to optionally only clone that env. Defaults to all
     clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env} to optionally only clone that env. Defaults to all
-    doctor              Test that everything is setup for klink to function
     register-app-tyr    {application} Creates a new application in tyranitar only
 `
 
@@ -161,12 +159,8 @@ func handleAction(args common.Command) {
     }
 
 	switch args.Action {
-	case "doctor":
-		doctor.Doctor(args)
 	case "speak":
 		console.Speak(args)
-	case "build":
-		jenkins.Build(args)
     case "clone-tyr":
         git.CloneTyranitar(args)
     case "clone-shuppet":
@@ -183,8 +177,10 @@ func init() {
     // need to manually call the psuedo init methods, Init(), on each component
     // namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
     ditto.Init()
+    doctor.Init()
     exploud.Init()
     onix.Init()
+    jenkins.Init()
 }
 
 func main() {
