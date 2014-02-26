@@ -17,6 +17,7 @@ import (
 )
 
 func handleAction(args common.Command) {
+    // global error handling
 	defer func() {
 		if p := recover(); p != nil {
 			if args.Debug == true {
@@ -32,11 +33,13 @@ func handleAction(args common.Command) {
 		}
 	}()
 
+    // special case here as requires os.Args not common.Command
 	if args.Action == "update" {
 		update.Update(os.Args[0])
 		return
 	}
 
+    // everything else
 	for i := range common.Components {
 		component := common.Components[i]
 		if args.Action == component.Command {
@@ -45,6 +48,7 @@ func handleAction(args common.Command) {
 		}
 	}
 
+    // failed to find the command, print help
 	flags.PrintHelpAndExit()
 }
 
