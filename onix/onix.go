@@ -8,6 +8,22 @@ import (
 	console "nokia.com/klink/console"
 )
 
+func Init() {
+    common.Register(
+        common.Component{"register-app-onix", CreateApp,
+            "{app} Creates a new application in onix only"},
+        common.Component{"list-apps-onix", ListApps,
+            "Lists the applications that exist in onix"},
+        common.Component{"info", Info,
+            "{app} Return information about the application"},
+        common.Component{"add-onix-prop", AddProperty,
+            "{app} -N property name -V json value"},
+        common.Component{"get-onix-prop", GetPropertyFromArgs,
+            "{app} {property-name} get the property for the application"},
+        common.Component{"status", Status,
+            "{app} Checks the status of the app"})
+}
+
 type App struct {
 	Name string `json:"name"`
 }
@@ -31,7 +47,7 @@ func CreateApp(args common.Command) {
 }
 
 // List all apps that onix knows about
-func ListApps() {
+func ListApps(args common.Command) {
 	fmt.Println(common.GetString(onixUrl("/applications")))
 }
 

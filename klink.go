@@ -24,24 +24,13 @@ import (
 var cmd = `[command] [application] [options]
 
 [Commands]
-    add-onix-prop       {application} -N property name -V json value
     build               {application} builds the jenkins release job for an application
-    clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env}
-                        to optionally only clone that env. Defaults to all
-    clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env}
-                        to optionally only clone that env. Defaults to all
+    clone-tyr           {application} {env} clone the tyranitar properties for an app. Pass {env} to optionally only clone that env. Defaults to all
+    clone-shuppet       {application} {env} clone the shuppet properties for an app. Pass {env} to optionally only clone that env. Defaults to all
     doctor              Test that everything is setup for klink to function
-    get-onix-prop       {application} {property-name} get the property for the application
-    info                {application} Return information about the application
-    list-apps-onix      Lists the applications that exist (in onix)
     list-apps-tyr       Lists the applications that exist (in tyranitar)
-    register-app-onix   {application}
-                        Creates a new application in onix only, useful for services
-                        that won't be deployed using the cloud tooling
-    register-app-tyr    {application}
-                        Creates a new application in tyranitar only
-    status              {application} Checks the status of the app
-    update              Update to the current version of klink.`
+    register-app-tyr    {application} Creates a new application in tyranitar only
+`
 
 func printHelpAndExit() {
     // Top text
@@ -161,6 +150,11 @@ func handleAction(args common.Command) {
 		}
 	}()
 
+    if args.Action == "update" {
+		update.Update(os.Args[0])
+        return
+    }
+
     for i := range common.Components {
         component := common.Components[i]
         if args.Action == component.Command {
@@ -170,12 +164,6 @@ func handleAction(args common.Command) {
     }
 
 	switch args.Action {
-	case "update":
-		update.Update(os.Args[0])
-	case "register-app-onix":
-		onix.CreateApp(args)
-	case "list-apps-onix":
-		onix.ListApps()
 	case "register-app-tyr":
 		tyr.CreateApp(args)
 	case "list-apps-tyr":
@@ -184,14 +172,6 @@ func handleAction(args common.Command) {
 		asgard.ListServers(args)
 	case "doctor":
 		doctor.Doctor(args)
-	case "info":
-		onix.Info(args)
-	case "add-onix-prop":
-		onix.AddProperty(args)
-    case "get-onix-prop":
-        onix.GetPropertyFromArgs(args)
-	case "status":
-		onix.Status(args)
 	case "speak":
 		console.Speak(args)
 	case "build":
@@ -213,6 +193,7 @@ func init() {
     // namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
     ditto.Init()
     exploud.Init()
+    onix.Init()
 }
 
 func main() {

@@ -6,13 +6,13 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    props "nokia.com/klink/props"
+	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
-    "time"
+	"time"
 )
 
 func benkinsUrl(end string) string {
@@ -49,7 +49,7 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(argsPath string) {
-    props.SetLastUpdated(int32(time.Now().Unix()))
+	props.SetLastUpdated(int32(time.Now().Unix()))
 
 	path, pathErr := exec.LookPath("klink")
 	if pathErr != nil {
@@ -138,18 +138,18 @@ func deferCopy(nextVersionUrl string, path string) {
 
 // If we haven't tried to update recently then run an update first
 func EnsureUpdatedRecently(argsPath string) {
-    lastUpdated := props.GetLastUpdated()
-    if props.GetLastUpdated() == 0 {
-        props.SetLastUpdated(int32(time.Now().Unix()))
-        if LatestVersion() != Version {
-            Update(argsPath)
-        }
-    }
+	lastUpdated := props.GetLastUpdated()
+	if props.GetLastUpdated() == 0 {
+		props.SetLastUpdated(int32(time.Now().Unix()))
+		if LatestVersion() != Version {
+			Update(argsPath)
+		}
+	}
 
-    now := int32(time.Now().Unix())
-    if (now - lastUpdated) > (60 * 60 * 1) {
-        if LatestVersion() != Version {
-            Update(argsPath)
-        }
-    }
+	now := int32(time.Now().Unix())
+	if (now - lastUpdated) > (60 * 60 * 1) {
+		if LatestVersion() != Version {
+			Update(argsPath)
+		}
+	}
 }
