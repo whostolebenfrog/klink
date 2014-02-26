@@ -2,7 +2,7 @@ package exploud
 
 import (
 	"fmt"
-    "net/http"
+	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
@@ -17,16 +17,21 @@ func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
 			"{app} {env} {ami} Deploy the AMI {ami} for {app} to {env}"},
-        common.Component{"undo", Undo,
-            "{app} {env} Undo the steps of a broken deployment"},
-        common.Component{"rollback", Rollback,
-            "{app} {env} rolls the application back to the last successful deploy"},
-        common.Component{"list-apps", ListApps,
-            "Lists the applications that exist (via exploud)"},
-        common.Component{"create-app", CreateApp,
-            "{app} -E {email} -o {owner} -d {description} Creates a new application"},
-        common.Component{"boxes", Boxes,
-            "{app} {env} -f format [text|json] -S status [stopped|running|terminated]"})
+		common.Component{"undo", Undo,
+			"{app} {env} Undo the steps of a broken deployment"},
+		common.Component{"rollback", Rollback,
+			"{app} {env} rolls the application back to the last successful deploy"},
+		common.Component{"list-apps", ListApps,
+			"Lists the applications that exist (via exploud)"},
+		common.Component{"create-app", CreateApp,
+			"{app} -E {email} -o {owner} -d {description} Creates a new application"},
+		common.Component{"boxes", Boxes,
+			"{app} {env} -f format [text|json] -S status [stopped|running|terminated]"})
+}
+
+// Returns explouds url with the supplied string appended
+func exploudUrl(end string) string {
+	return "http://exploud.brislabs.com:8080/1.x" + end
 }
 
 // Return information about the servers running in the supplied environment
@@ -45,11 +50,11 @@ func Boxes(args common.Command) {
 		describeUrl += "?state=" + args.Status
 	}
 
-    fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
-        if args.Format == "text" {
-            req.Header.Add("accept", "text/plain")
-        }
-    }))
+	fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
+		if args.Format == "text" {
+			req.Header.Add("accept", "text/plain")
+		}
+	}))
 }
 
 // List the apps known by exploud
@@ -62,8 +67,19 @@ func AppExists(appName string) bool {
 	return common.Head(exploudUrl("/applications/" + appName))
 }
 
-type DeployRequest struct {
+// ************************************************
+// **                                            **
+// ** Deployment based code, undo, rollback etc  **
+// **                                            **
+// ************************************************
+
+type AmiDeployRequest struct {
 	Ami      string `json:"ami"`
+	Message  string `json:"message"`
+	Username string `json:"user"`
+}
+
+type DeployRequest struct {
 	Message  string `json:"message"`
 	Username string `json:"user"`
 }
@@ -74,42 +90,27 @@ type CreateAppRequest struct {
 	Owner       string `json:"owner"`
 }
 
-func exploudUrl(end string) string {
-	return "http://exploud.brislabs.com:8080/1.x" + end
-}
-
 type DeploymentReference struct {
 	Id string `json:"id"`
 }
 
+// Validate common deployment arguments
 func validateDeploymentArgs(args common.Command) {
-	if args.SecondPos == "" {
+	app := args.SecondPos
+	if app == "" {
 		console.Fail("Must supply an application name as the second positional argument.")
 	}
-	if !AppExists(args.SecondPos) {
-		console.Fail(fmt.Sprintf("Application \"%s\" does not exist. It's your word against exploud.",
-			args.SecondPos))
+	if !AppExists(app) {
+		console.Fail(
+			fmt.Sprintf("Application \"%s\" does not exist. It's your word against exploud.", app))
 	}
 
-	if args.ThirdPos == "" {
+    env := args.ThirdPos
+	if env == "" {
 		console.Fail("Must supply an environment as third postional argument.")
-	} else if !(args.ThirdPos == "poke" || args.ThirdPos == "prod") {
-		console.Fail(fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.",
-			args.ThirdPos))
-	}
-
-	if args.FourthPos == "" {
-		if args.Ami == "" {
-			console.Fail("Must supply an ami as the fourth argument or with --ami.")
-		}
-		args.FourthPos = args.Ami
-	}
-	matched, err := regexp.MatchString("^ami-.+$", args.FourthPos)
-	if err != nil {
-		panic(err)
-	}
-	if !matched {
-		console.Fail(fmt.Sprintf("%s Doesn't look like an ami", args.FourthPos))
+	} else if !(env == "poke" || env == "prod") {
+		console.Fail(
+            fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.", env))
 	}
 
 	if args.Message == "" {
@@ -117,74 +118,79 @@ func validateDeploymentArgs(args common.Command) {
 	}
 }
 
-// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
-// Must pass SecondPos and Ami arguments
-func Exploud(args common.Command) {
+// Validate all deployment arguments including ami as a forth pos argument
+func validateDeploymentArgsWithAmi(args common.Command) {
 	validateDeploymentArgs(args)
 
-	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), args.SecondPos, args.ThirdPos)
+    ami := args.FourthPos
+	if ami == "" {
+        console.Fail("Must supply an ami as the fourth argument or with --ami.")
+	}
+	matched, err := regexp.MatchString("^ami-.+$", ami)
+	if err != nil {
+		panic(err)
+	}
+	if !matched {
+		console.Fail(fmt.Sprintf("%s Doesn't look like an ami", ami))
+	}
+}
 
-	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
+// Execute a deployment
+func DoDeployment(url string, body interface{}, message string, args common.Command) {
 	deployRef := DeploymentReference{}
 
-	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
+	common.PostJsonUnmarshalResponse(url, &body, &deployRef)
 
-	// TODO: version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
-		props.GetUsername(), args.FourthPos, args.SecondPos, args.ThirdPos, args.Message)
-	console.Hubot(hubotMessage, args)
+	console.Hubot(message, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
 }
 
-// TODO - all these three deployment things need to be factored into one function
+// Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
+func Exploud(args common.Command) {
+	validateDeploymentArgsWithAmi(args)
+
+    app := args.SecondPos
+    env := args.ThirdPos
+    ami := args.FourthPos
+
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
+	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
+	message := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
+		props.GetUsername(), ami, app, env, args.Message)
+
+    DoDeployment(deployUrl, deployRequest, message, args)
+}
 
 // Undo the steps from a borked deployment
-// Must pass SecondPos and Ami arguments
 func Undo(args common.Command) {
-	// TODO - remove this hack! allows the common validation to pass
-	args.FourthPos = "ami-blah"
 	validateDeploymentArgs(args)
 
-	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"),
-		args.SecondPos, args.ThirdPos)
+    app := args.SecondPos
+    env := args.ThirdPos
 
-	// TODO - don't send fourthpos as not required for a rollback and is fake anyway
-	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
-	deployRef := DeploymentReference{}
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"), app, env)
+	deployRequest := DeployRequest{args.Message, props.GetUsername()}
+	message := fmt.Sprintf("%s is undoing deployment of service %s in %s. %s",
+		props.GetUsername(), app, env, args.Message)
 
-	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
-
-	// TODO: version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("%s is undoing deployment of service %s in %s. %s",
-		props.GetUsername(), args.SecondPos, args.ThirdPos, args.Message)
-	console.Hubot(hubotMessage, args)
-
-	PollDeployNew(deployRef.Id, args.SecondPos)
+    DoDeployment(deployUrl, deployRequest, message, args)
 }
 
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
 // Must pass SecondPos and Ami arguments
 func Rollback(args common.Command) {
-	// TODO - remove this hack! allows the common validation to pass
-	args.FourthPos = "ami-blah"
 	validateDeploymentArgs(args)
 
-	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"),
-		args.SecondPos, args.ThirdPos)
+    app := args.SecondPos
+    env := args.ThirdPos
 
-	// TODO - don't send fourthpos as not required for a rollback and is fake anyway
-	deployRequest := DeployRequest{args.FourthPos, args.Message, props.GetUsername()}
-	deployRef := DeploymentReference{}
+	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"), app, env)
+	deployRequest := DeployRequest{args.Message, props.GetUsername()}
+	message := fmt.Sprintf("%s is rollingback service %s in %s. %s",
+		props.GetUsername(), app, env, args.Message)
 
-	common.PostJsonUnmarshalResponse(deployUrl, &deployRequest, &deployRef)
-
-	// TODO: version (can be parsed from the ami name)
-	hubotMessage := fmt.Sprintf("%s is rollingback service %s in %s. %s",
-		props.GetUsername(), args.SecondPos, args.ThirdPos, args.Message)
-	console.Hubot(hubotMessage, args)
-
-	PollDeployNew(deployRef.Id, args.SecondPos)
+    DoDeployment(deployUrl, deployRequest, message, args)
 }
 
 // Exploud JSON task log message
@@ -376,4 +382,3 @@ func HandleDeployInterrupt() chan os.Signal {
 func DeregisterInterupt(c chan<- os.Signal) {
 	signal.Stop(c)
 }
-

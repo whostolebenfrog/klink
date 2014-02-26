@@ -13,7 +13,6 @@ func LoadFlags() common.Command {
 	optarg.Header("General Options")
 	optarg.Add("h", "help", "Displays this help message", false)
 	optarg.Header("Deployment based flags")
-	optarg.Add("a", "ami", "Sets the ami for commands that require it", "")
 	optarg.Add("d", "description", "Set the description for commands that require it", "")
 	optarg.Add("D", "debug", "Sets debug mode. Gives more info on fails.", "")
 	optarg.Add("e", "environment", "Sets the environment", "poke, prod")
@@ -29,8 +28,6 @@ func LoadFlags() common.Command {
 
 	for opt := range optarg.Parse() {
 		switch opt.ShortName {
-		case "a":
-			command.Ami = opt.String()
 		case "d":
 			command.Description = opt.String()
 		case "D":

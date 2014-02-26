@@ -8,7 +8,6 @@ import (
 
 type Command struct {
 	Action      string
-	Ami         string
 	Application string
 	Debug       bool
 	Description string
