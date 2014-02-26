@@ -7,6 +7,14 @@ import (
     "os/exec"
 )
 
+func Init() {
+    common.Register(
+        common.Component{"clone-tyr", CloneTyranitar,
+            "{app} {env - optional} clone the tyranitar properties for an app into pwd"},
+        common.Component{"clone-shuppet", CloneShuppet,
+            "{app} {env - optional} clone the shuppet properties for an app into pwd"})
+}
+
 func appName(args common.Command) string {
 	if args.SecondPos == "" {
 		console.Fail("Application must be provided as the second positional argument")
