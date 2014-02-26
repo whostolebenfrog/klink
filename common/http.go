@@ -99,35 +99,17 @@ func PutJson(url string, body interface{}) string {
 }
 
 // Performs an HTTP GET request on the supplied url and returns the result
-// as a string. Returns non nil err on non 200 response.
-func GetString(url string) string {
-	resp, err := http.Get(url)
-	if err != nil {
-		fmt.Println(fmt.Sprintf("Error calling URL: %s", url))
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(fmt.Sprintf("Failed to read body response from: %s", url))
-		panic(err)
-	}
-
-	if resp.StatusCode == 200 {
-		return string(body)
-	}
-	panic(fmt.Sprintf("Got %d response calling: %s. Response was:\n%s",
-		resp.StatusCode, url, string(body)))
-}
-
-func GetPlainString(url string) string {
+// as a string. Returns non nil err on non 200 response. Optionally takes
+// var args of func(*http.Request) that can be used to mute the headers
+func GetString(url string, muteRequest ...func(*http.Request)) string {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error creating GET request for url: %s", url))
 		panic(err)
 	}
-	req.Header.Add("accept", "text/plain")
+    for i := range muteRequest {
+        muteRequest[i](req)
+    }
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -2,6 +2,7 @@ package exploud
 
 import (
 	"fmt"
+    "net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
@@ -368,12 +369,9 @@ func Boxes(args common.Command) {
 		describeUrl += "?state=" + args.Status
 	}
 
-	if args.Format == "text" {
-		fmt.Println(common.GetPlainString(describeUrl))
-	} else if args.Format == "" {
-		fmt.Println(common.GetString(describeUrl))
-	} else {
-		console.Fail("Unknown format: " + args.Format)
-	}
-
+    fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
+        if args.Format == "text" {
+            req.Header.Add("accept", "text/plain")
+        }
+    }))
 }
