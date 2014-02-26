@@ -46,7 +46,7 @@ func BrislabsReachable() {
 
 	fmt.Println("Checking to see if aws resources in Brislabs are reachable...")
 
-	httpClient := common.NewTimeoutClient(2 * time.Second)
+	httpClient := common.NewTimeoutClient(2 * time.Second, 2 * time.Second)
 	req, err := http.NewRequest("HEAD", "http://ditto.brislabs.com:8080/1.x/status", nil)
 	if err != nil {
 		panic(err)

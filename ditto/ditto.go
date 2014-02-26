@@ -8,6 +8,7 @@ import (
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
 	"os"
+    "time"
 )
 
 func Init() {
@@ -50,7 +51,7 @@ func AllowProd(args common.Command) {
 }
 
 func DoBake(url string) {
-	httpClient := common.NewTimeoutClient()
+	httpClient := common.NewTimeoutClient(5 * time.Second, 1200 * time.Second)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		panic(err)

@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+// ******************
+// * POST FUNCTIONS *
+// ******************
+
 // Perform an HTTP PUT on the supplied url with the body of the supplied object reference
 func PostJson(url string, body interface{}) string {
 	b, err := json.Marshal(body)
@@ -52,6 +56,10 @@ func PostJsonUnmarshalResponse(url string, body interface{}, v interface{}) {
 		panic(err)
 	}
 }
+
+// *****************
+// * PUT FUNCTIONS *
+// *****************
 
 func PutByteArray(url string, data []byte) string {
 	req, err := http.NewRequest("PUT", url, bytes.NewReader(data))
@@ -98,6 +106,10 @@ func PutJson(url string, body interface{}) string {
 	return PutByteArray(url, b)
 }
 
+// *****************
+// * GET FUNCTIONS *
+// *****************
+
 // Performs an HTTP GET request on the supplied url and returns the result
 // as a string. Returns non nil err on non 200 response. Optionally takes
 // var args of func(*http.Request) that can be used to mute the headers
@@ -107,9 +119,9 @@ func GetString(url string, muteRequest ...func(*http.Request)) string {
 		fmt.Println(fmt.Sprintf("Error creating GET request for url: %s", url))
 		panic(err)
 	}
-    for i := range muteRequest {
-        muteRequest[i](req)
-    }
+	for i := range muteRequest {
+		muteRequest[i](req)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -135,10 +147,8 @@ func GetString(url string, muteRequest ...func(*http.Request)) string {
 
 // Returns the result of an http get request as a jsonq object
 func GetAsJsonq(url string) *jsonq.JsonQuery {
-	jsonstring := GetString(url)
-
 	data := map[string]interface{}{}
-	dec := json.NewDecoder(strings.NewReader(jsonstring))
+	dec := json.NewDecoder(strings.NewReader(GetString(url)))
 	dec.Decode(&data)
 	return jsonq.NewQuery(data)
 }
@@ -152,6 +162,10 @@ func GetJson(url string, v interface{}) {
 		panic(err)
 	}
 }
+
+// ******************
+// * HEAD FUNCTIONS *
+// ******************
 
 // Performs an HTTP HEAD call on the supplied URL. Returns true if
 // the response code is 200.
@@ -167,56 +181,32 @@ func Head(url string) bool {
 	case 404:
 		return false
 	default:
-		panic(fmt.Sprintf("Unknown response: %d from HEAD on URL: %s Is your proxy set correctly?",
+		panic(fmt.Sprintf("Unknown response: %d from HEAD on URL: %s",
 			resp.StatusCode, url))
 	}
 }
 
-// Config defines the configuration for a TimeoutDialer or TimeoutClient
-type Config struct {
-	ConnectTimeout   time.Duration
-	ReadWriteTimeout time.Duration
-}
-
-// Creates a new TimeoutDialer with supplied config object
-func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error) {
-	return func(netw, addr string) (net.Conn, error) {
-		conn, err := net.DialTimeout(netw, addr, config.ConnectTimeout)
-		if err != nil {
-			return nil, err
-		}
-
-		conn.SetDeadline(time.Now().Add(config.ReadWriteTimeout))
-		conn.SetReadDeadline(time.Now().Add(config.ReadWriteTimeout))
-		conn.SetWriteDeadline(time.Now().Add(config.ReadWriteTimeout))
-		return conn, nil
-	}
-}
+// *****************
+// * CUSTOM CLIENT *
+// *****************
 
 // Creates a new http.Client with a longer timeout, optionally accepts a Config object
-func NewTimeoutClient(args ...interface{}) *http.Client {
-	// Default configuration, lots of time for a streaming response to return
-	// Needs as long as our longest bake
-	config := &Config{
-		ConnectTimeout:   5 * time.Second,
-		ReadWriteTimeout: 1200 * time.Second,
-	}
-
-	// merge the default with user input if there is one
-	if len(args) == 1 {
-		timeout := args[0].(time.Duration)
-		config.ConnectTimeout = timeout
-		config.ReadWriteTimeout = timeout
-	}
-
-	if len(args) == 2 {
-		config.ConnectTimeout = args[0].(time.Duration)
-		config.ReadWriteTimeout = args[1].(time.Duration)
-	}
-
+func NewTimeoutClient(connect time.Duration, read time.Duration) *http.Client {
 	return &http.Client{
 		Transport: &http.Transport{
-			Dial:  TimeoutDialer(config),
+
+			Dial: func(netw, addr string) (net.Conn, error) {
+				conn, err := net.DialTimeout(netw, addr, connect)
+				if err != nil {
+					return nil, err
+				}
+
+				conn.SetDeadline(time.Now().Add(read))
+				conn.SetReadDeadline(time.Now().Add(read))
+				conn.SetWriteDeadline(time.Now().Add(read))
+				return conn, nil
+			},
+
 			Proxy: http.ProxyFromEnvironment,
 		},
 	}
