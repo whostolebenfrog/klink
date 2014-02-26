@@ -21,8 +21,7 @@ func handleAction(args common.Command) {
 		if p := recover(); p != nil {
 			if args.Debug == true {
 				console.Red()
-                fmt.Println("\n")
-				fmt.Println("This may print out a trace with bgriffit's home directory - don't worry that's just where it was built.")
+                fmt.Println("\nDon't worry about the paths in trace, that's just go.\n")
 				console.Reset()
 				panic(p)
 			}
