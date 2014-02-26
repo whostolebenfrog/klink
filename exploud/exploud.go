@@ -29,6 +29,39 @@ func Init() {
             "{app} {env} -f format [text|json] -S status [stopped|running|terminated]"})
 }
 
+// Return information about the servers running in the supplied environment
+func Boxes(args common.Command) {
+	if args.SecondPos == "" {
+		console.Fail("You must supply a service as the second positional argument")
+	}
+	app := args.SecondPos
+	if args.ThirdPos == "" {
+		console.Fail("You must supply an environment as the third positional argument")
+	}
+	env := args.ThirdPos
+
+	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+	if args.Status != "" {
+		describeUrl += "?state=" + args.Status
+	}
+
+    fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
+        if args.Format == "text" {
+            req.Header.Add("accept", "text/plain")
+        }
+    }))
+}
+
+// List the apps known by exploud
+func ListApps(args common.Command) {
+	fmt.Println(common.GetString(exploudUrl("/applications")))
+}
+
+// AppExists returns true if the application exists according to the exploud service
+func AppExists(appName string) bool {
+	return common.Head(exploudUrl("/applications/" + appName))
+}
+
 type DeployRequest struct {
 	Ami      string `json:"ami"`
 	Message  string `json:"message"`
@@ -288,16 +321,6 @@ func CreateApp(args common.Command) {
 	fmt.Println(response)
 }
 
-// List the apps known by exploud
-func ListApps(args common.Command) {
-	fmt.Println(common.GetString(exploudUrl("/applications")))
-}
-
-// AppExists returns true if the application exists according to the exploud service
-func AppExists(appName string) bool {
-	return common.Head(exploudUrl("/applications/" + appName))
-}
-
 // Interrupt constants
 const (
 	Yes = iota
@@ -354,24 +377,3 @@ func DeregisterInterupt(c chan<- os.Signal) {
 	signal.Stop(c)
 }
 
-func Boxes(args common.Command) {
-	if args.SecondPos == "" {
-		console.Fail("You must supply a service as the second positional argument")
-	}
-	app := args.SecondPos
-	if args.ThirdPos == "" {
-		console.Fail("You must supply an environment as the third positional argument")
-	}
-	env := args.ThirdPos
-
-	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
-	if args.Status != "" {
-		describeUrl += "?state=" + args.Status
-	}
-
-    fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
-        if args.Format == "text" {
-            req.Header.Add("accept", "text/plain")
-        }
-    }))
-}
