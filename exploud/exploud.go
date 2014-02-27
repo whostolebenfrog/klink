@@ -276,6 +276,7 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		previousLength := 0
 		// can't check == running as wont be set when we first call
 		for (task.Status != "completed") &&
+            (task.Status != "undone") &&
 			(task.Status != "failed") &&
 			(task.Status != "skipped") &&
 			(task.Status != "teminated") &&
