@@ -15,6 +15,12 @@ import (
 	"time"
 )
 
+func Init() {
+	common.Register(
+		common.Component{"update", Update,
+			"Update klink to the latest version"})
+}
+
 func benkinsUrl(end string) string {
 	return "http://benkins.brislabs.com/klink/" + end
 }
@@ -48,7 +54,9 @@ func errorWithHelper(nextVersionUrl string) {
 // Update if there is a later version available, takes the path that this
 // command was run from which is used as a backup if klink can't be
 // found on the path
-func Update(argsPath string) {
+func Update(_ common.Command) {
+    argsPath := os.Args[0]
+
 	props.SetLastUpdated(int32(time.Now().Unix()))
 
 	path, pathErr := exec.LookPath("klink")
@@ -142,14 +150,14 @@ func EnsureUpdatedRecently(argsPath string) {
 	if props.GetLastUpdated() == 0 {
 		props.SetLastUpdated(int32(time.Now().Unix()))
 		if LatestVersion() != Version {
-			Update(argsPath)
+			Update(common.Command{})
 		}
 	}
 
 	now := int32(time.Now().Unix())
 	if (now - lastUpdated) > (60 * 60 * 1) {
 		if LatestVersion() != Version {
-			Update(argsPath)
+			Update(common.Command{})
 		}
 	}
 }

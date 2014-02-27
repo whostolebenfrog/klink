@@ -33,12 +33,6 @@ func handleAction(args common.Command) {
 		}
 	}()
 
-    // special case here as requires os.Args not common.Command
-	if args.Action == "update" {
-		update.Update(os.Args[0])
-		return
-	}
-
     // everything else
 	for i := range common.Components {
 		component := common.Components[i]
@@ -63,8 +57,9 @@ func init() {
 	doctor.Init()
 	exploud.Init()
 	git.Init()
-	onix.Init()
 	jenkins.Init()
+	onix.Init()
+    update.Init()
 }
 
 func main() {
