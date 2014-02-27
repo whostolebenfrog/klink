@@ -99,14 +99,19 @@ func AddProperty(args common.Command) {
 }
 
 func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
-	obj, err := jq.String("metadata", name)
+	str, err := jq.String("metadata", name)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Application %s doesn't have a %s defined, add one with:\n",
-			app, name))
-		console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
-			app, name))
+        obj, err := jq.Interface("metadata", name)
+        if err != nil {
+            fmt.Println(fmt.Sprintf("Application %s doesn't have a %s defined, add one with:\n",
+                app, name))
+            console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
+                app, name))
+        }
+        // this is the only way to get a string from an arbitary type in go...
+        return fmt.Sprintf("%s", obj)
 	}
-	return obj
+	return str
 }
 
 func Status(args common.Command) {
