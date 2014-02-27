@@ -120,8 +120,8 @@ fi
 
 echo -n "Getting dependencies: "
 
-go get "github.com/jmoiron/jsonq"
-go get "github.com/jteeuwen/go-pkg-optarg"
+go get -u "github.com/jmoiron/jsonq"
+go get -u "github.com/jteeuwen/go-pkg-optarg"
 
 cyan "OK\n\n"
 green "Finished! You're ready to go\n\n"
