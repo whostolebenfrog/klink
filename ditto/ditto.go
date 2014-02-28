@@ -106,12 +106,14 @@ type Ami struct {
 // FindAmis using the service name for the second positional command line arg
 // Prints out a list of the most recent ami names and image ids
 func FindAmis(args common.Command) {
-	if args.SecondPos == "" {
+	application := args.SecondPos
+
+	if application == "" {
 		console.Fail("Application must be supplied as second positional argument")
 	}
 
 	amis := make([]Ami, 10)
-	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
+	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", application)), &amis)
 
 	for key := range amis {
 		fmt.Print(amis[key].Name, " : ")
@@ -124,12 +126,14 @@ func FindAmis(args common.Command) {
 }
 
 func LatestBake(args common.Command) {
-	if args.SecondPos == "" {
+	application := args.SecondPos
+
+	if application == "" {
 		console.Fail("Application must be supplied as second positional argument")
 	}
 
 	amis := make([]Ami, 10)
-	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
+	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", application)), &amis)
 
 	version := parseVersionFrom(amis[0])
 
@@ -140,7 +144,6 @@ func LatestBake(args common.Command) {
 }
 
 func parseVersionFrom(ami Ami) string {
-
 	versionRegexp := regexp.MustCompile("[0-9.]+")
 
 	return versionRegexp.FindString(ami.Name)
