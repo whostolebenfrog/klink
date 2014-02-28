@@ -20,7 +20,7 @@ func PrintHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("boxes, build, clone-tyr, clone-shuppet\n")
+	fmt.Print("boxes, build, clone-tyr, clone-shuppet, delete-onix-prop\n")
 	console.FReset()
 
 	// [commands]
