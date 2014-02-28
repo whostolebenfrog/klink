@@ -6,6 +6,7 @@ import (
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
+	ditto "nokia.com/klink/ditto"
 	"os"
 	"os/signal"
 	"regexp"
@@ -154,12 +155,41 @@ func Exploud(args common.Command) {
 	env := args.ThirdPos
 	ami := args.FourthPos
 
+	latestAmi := ditto.LatestAmiFor(app)
+
+	if (latestAmi.ImageId != ami) {
+		confirmNonLatestBake(latestAmi)
+	}
+
+	fmt.Println("Now I deploy...")
+
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
 	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
 	message := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
 		props.GetUsername(), ami, app, env, args.Message)
 
 	DoDeployment(deployUrl, deployRequest, message, args)
+}
+
+func confirmNonLatestBake(ami ditto.Ami) {
+
+	console.Red()
+	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (%s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
+	console.Reset()
+
+	var response string
+
+	fmt.Scan(&response)
+
+	switch response {
+	case "yes", "Yes", "YES", "y", "Y":
+		break
+	case "no", "No", "NO", "n", "N":
+		console.Fail("Deployment aborted.")
+	default:
+		fmt.Println("Type better.")
+		confirmNonLatestBake(ami)
+	}
 }
 
 // Undo the steps from a borked deployment

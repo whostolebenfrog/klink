@@ -101,6 +101,7 @@ func Bake(args common.Command) {
 type Ami struct {
 	Name    string
 	ImageId string
+	Version string
 }
 
 // FindAmis using the service name for the second positional command line arg
@@ -125,6 +126,16 @@ func FindAmis(args common.Command) {
 	console.Reset()
 }
 
+func LatestAmiFor(application string) Ami {
+	amis := make([]Ami, 10)
+	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", application)), &amis)
+
+	latestAmi := amis[0]
+	latestAmi.Version = parseVersionFrom(latestAmi)
+
+	return latestAmi
+}
+
 func LatestBake(args common.Command) {
 	application := args.SecondPos
 
@@ -132,12 +143,7 @@ func LatestBake(args common.Command) {
 		console.Fail("Application must be supplied as second positional argument")
 	}
 
-	amis := make([]Ami, 10)
-	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", application)), &amis)
-
-	version := parseVersionFrom(amis[0])
-
-	fmt.Print(version)
+	fmt.Print(LatestAmiFor(application).Version)
 	fmt.Println()
 
 	console.Reset()
