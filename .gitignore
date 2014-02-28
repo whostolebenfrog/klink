@@ -1,3 +1,5 @@
 *.swp
 klink
 builds/*
+.idea
+*.iml
