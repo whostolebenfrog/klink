@@ -9,6 +9,7 @@ import (
 	onix "nokia.com/klink/onix"
 	"os"
     "time"
+	"regexp"
 )
 
 func Init() {
@@ -20,7 +21,9 @@ func Init() {
         common.Component{"allow-prod", AllowProd,
             "{app} Allows the prod aws account access to the supplied application"},
         common.Component{"list-amis", FindAmis,
-            "{app} Lists the latest amis for the supplied application name"})
+            "{app} Lists the latest amis for the supplied application name"},
+		common.Component{"latest-bake", BakedLatest,
+			"{app} Outputs the most recently baked version of the specified application"})
 }
 
 func dittoUrl(end string) string {
@@ -118,6 +121,29 @@ func FindAmis(args common.Command) {
 		fmt.Println()
 	}
 	console.Reset()
+}
+
+func BakedLatest(args common.Command) {
+	if args.SecondPos == "" {
+		console.Fail("Application must be supplied as second positional argument")
+	}
+
+	amis := make([]Ami, 10)
+	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", args.SecondPos)), &amis)
+
+	version := parseVersionFrom(amis[0])
+
+	fmt.Print(version)
+	fmt.Println()
+
+	console.Reset()
+}
+
+func parseVersionFrom(ami Ami) string {
+
+	versionRegexp := regexp.MustCompile("[0-9.]+")
+
+	return versionRegexp.FindString(ami.Name)
 }
 
 // ditto helps to lock, unlock and clean amis
