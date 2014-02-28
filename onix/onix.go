@@ -21,7 +21,9 @@ func Init() {
 		common.Component{"get-onix-prop", GetPropertyFromArgs,
 			"{app} {property-name} get the property for the application"},
 		common.Component{"status", Status,
-			"{app} Checks the status of the app"})
+			"{app} Checks the status of the app"},
+		common.Component{"delete-onix-prop", DeleteProperty,
+			"{app} {property-name} Delete the property for the application"})
 }
 
 type App struct {
@@ -148,4 +150,22 @@ func GetPropertyFromArgs(args common.Command) {
 		console.Fail("You forgot to pass the property name")
 	}
 	fmt.Println(GetProperty(app, name))
+}
+
+func DeleteProperty(args common.Command) {
+	app := args.SecondPos
+	name := args.ThirdPos
+
+	if app == "" {
+		console.Fail("You forgot to pass the app name")
+	}
+	if name == "" {
+		console.Fail("You forgot to pass the property name")
+	}
+
+	common.Delete(onixUrl("/applications/" + app + "/" + name))
+
+	console.Green()
+	fmt.Println("Success!")
+	console.Reset()
 }

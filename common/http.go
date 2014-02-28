@@ -163,6 +163,37 @@ func GetJson(url string, v interface{}) {
 	}
 }
 
+// ********************
+// * DELETE FUNCTIONS *
+// ********************
+
+// Performs an HTTP DELETE call on the supplied URL. Panics if response is not
+// 204 no content
+func Delete(url string) {
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error making DELETE request to URL: %s", url))
+		panic(err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error trying to call URL: %s", url))
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != 204 {
+		panic(fmt.Sprintf("Got %d response calling: %s.\nResponse was: %s",
+			resp.StatusCode, url, string(responseBody)))
+	}
+}
+
 // ******************
 // * HEAD FUNCTIONS *
 // ******************
