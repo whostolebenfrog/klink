@@ -14,10 +14,12 @@ import (
 	"time"
 )
 
+const latestVersionString = "latest"
+
 func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
-			"{app} {env} {ami} Deploy the AMI {ami} for {app} to {env}"},
+			"{app} {env} {ami} Deploy the AMI {ami} for {app} to {env}. (Specify 'latest' as the ami to deploy the latest ami.)"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
 		common.Component{"rollback", Rollback,
@@ -124,15 +126,14 @@ func validateDeploymentArgsWithAmi(args common.Command) {
 	validateDeploymentArgs(args)
 
 	ami := args.FourthPos
-	if ami == "" {
-		console.Fail("Must supply an ami as the fourth argument or with --ami.")
-	}
-	matched, err := regexp.MatchString("^ami-.+$", ami)
-	if err != nil {
-		panic(err)
-	}
-	if !matched {
-		console.Fail(fmt.Sprintf("%s Doesn't look like an ami", ami))
+	if ami != latestVersionString {
+		matched, err := regexp.MatchString("^ami-.+$", ami)
+		if err != nil {
+			panic(err)
+		}
+		if !matched {
+			console.Fail(fmt.Sprintf("%s Doesn't look like an ami", ami))
+		}
 	}
 }
 
@@ -157,11 +158,12 @@ func Exploud(args common.Command) {
 
 	latestAmi := ditto.LatestAmiFor(app)
 
-	if (latestAmi.ImageId != ami) {
+	if (ami == latestVersionString) {
+		confirmDeployLatest(latestAmi)
+		ami = latestAmi.ImageId
+	} else if (latestAmi.ImageId != ami) {
 		confirmNonLatestBake(latestAmi)
 	}
-
-	fmt.Println("Now I deploy...")
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
 	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
@@ -185,10 +187,35 @@ func confirmNonLatestBake(ami ditto.Ami) {
 	case "yes", "Yes", "YES", "y", "Y":
 		break
 	case "no", "No", "NO", "n", "N":
+		console.Red()
 		console.Fail("Deployment aborted.")
+		console.Reset()
 	default:
 		fmt.Println("Type better.")
 		confirmNonLatestBake(ami)
+	}
+}
+
+func confirmDeployLatest(latestAmi ditto.Ami) {
+
+	console.Green()
+	fmt.Println(fmt.Sprintf("The latest ami %s (application version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
+	console.Reset()
+
+	var response string
+
+	fmt.Scan(&response)
+
+	switch response {
+	case "yes", "Yes", "YES", "y", "Y":
+		break
+	case "no", "No", "NO", "n", "N":
+		console.Red()
+		console.Fail("Deployment aborted.")
+		console.Reset()
+	default:
+		fmt.Println("Type better.")
+		confirmDeployLatest(latestAmi)
 	}
 }
 
