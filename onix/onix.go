@@ -9,19 +9,19 @@ import (
 )
 
 func Init() {
-    common.Register(
-        common.Component{"register-app-onix", CreateApp,
-            "{app} Creates a new application in onix only"},
-        common.Component{"list-apps-onix", ListApps,
-            "Lists the applications that exist in onix"},
-        common.Component{"info", Info,
-            "{app} Return information about the application"},
-        common.Component{"add-onix-prop", AddProperty,
-            "{app} -N property name -V json value"},
-        common.Component{"get-onix-prop", GetPropertyFromArgs,
-            "{app} {property-name} get the property for the application"},
-        common.Component{"status", Status,
-            "{app} Checks the status of the app"})
+	common.Register(
+		common.Component{"register-app-onix", CreateApp,
+			"{app} Creates a new application in onix only"},
+		common.Component{"list-apps-onix", ListApps,
+			"Lists the applications that exist in onix"},
+		common.Component{"info", Info,
+			"{app} Return information about the application"},
+		common.Component{"add-onix-prop", AddProperty,
+			"{app} -N property name -V json value"},
+		common.Component{"get-onix-prop", GetPropertyFromArgs,
+			"{app} {property-name} get the property for the application"},
+		common.Component{"status", Status,
+			"{app} Checks the status of the app"})
 }
 
 type App struct {
@@ -88,10 +88,10 @@ func AddProperty(args common.Command) {
 	valueString, err := ToJsonValue(value)
 	if err != nil {
 		valueString, err = ToJsonValue("\"" + value + "\"")
-        if err != nil {
-            fmt.Println("That doesn't look like json")
-            panic(err)
-        }
+		if err != nil {
+			fmt.Println("That doesn't look like json")
+			panic(err)
+		}
 	}
 
 	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name),
@@ -101,15 +101,18 @@ func AddProperty(args common.Command) {
 func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
 	str, err := jq.String("metadata", name)
 	if err != nil {
-        obj, err := jq.Interface("metadata", name)
-        if err != nil {
-            fmt.Println(fmt.Sprintf("Application %s doesn't have a %s defined, add one with:\n",
-                app, name))
-            console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
-                app, name))
-        }
-        // this is the only way to get a string from an arbitary type in go...
-        return fmt.Sprintf("%s", obj)
+		obj, err := jq.Interface("metadata", name)
+		if err != nil {
+			fmt.Printf(
+				"Application %s doesn't have a %s defined, add one with:\n",
+				app,
+				name,
+			)
+			console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
+				app, name))
+		}
+		// this is the only way to get a string from an arbitary type in go...
+		return fmt.Sprintf("%s", obj)
 	}
 	return str
 }
@@ -123,7 +126,7 @@ func Status(args common.Command) {
 	jq := common.GetAsJsonq(onixUrl("/applications/" + app))
 
 	statusUrl := EnsureProp(jq, app, "servicePathPoke") + EnsureProp(jq, app, "statusPath")
-	fmt.Println(fmt.Sprintf("Checking status at: %s", statusUrl))
+	fmt.Printf("Checking status at: %s\n", statusUrl)
 
 	console.Green()
 	fmt.Println(common.GetString(statusUrl))

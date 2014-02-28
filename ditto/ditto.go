@@ -8,7 +8,7 @@ import (
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
 	"os"
-    "time"
+	"time"
 )
 
 func Init() {
@@ -17,10 +17,10 @@ func Init() {
 			"Various helpers; lock, unlock, clean, build public and ent base amis"},
 		common.Component{"bake", Bake,
 			"{app} -v {version} Bakes an AMI for {app} with version {version}"},
-        common.Component{"allow-prod", AllowProd,
-            "{app} Allows the prod aws account access to the supplied application"},
-        common.Component{"list-amis", FindAmis,
-            "{app} Lists the latest amis for the supplied application name"})
+		common.Component{"allow-prod", AllowProd,
+			"{app} Allows the prod aws account access to the supplied application"},
+		common.Component{"list-amis", FindAmis,
+			"{app} Lists the latest amis for the supplied application name"})
 }
 
 func dittoUrl(end string) string {
@@ -51,7 +51,7 @@ func AllowProd(args common.Command) {
 }
 
 func DoBake(url string) {
-	httpClient := common.NewTimeoutClient(5 * time.Second, 1200 * time.Second)
+	httpClient := common.NewTimeoutClient(5*time.Second, 1200*time.Second)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		panic(err)
@@ -70,7 +70,7 @@ func DoBake(url string) {
 	} else if resp.StatusCode == 404 {
 		console.Fail("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
 	} else if resp.StatusCode != 200 {
-		fmt.Println(fmt.Sprintf("Got %d response calling ditto to bake ami.", resp.StatusCode))
+		fmt.Printf("Got %d response calling ditto to bake ami.\n", resp.StatusCode)
 		io.Copy(os.Stdout, resp.Body)
 		panic("\nFailed to bake ami.")
 	}

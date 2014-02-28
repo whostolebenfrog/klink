@@ -105,12 +105,12 @@ func validateDeploymentArgs(args common.Command) {
 			fmt.Sprintf("Application \"%s\" does not exist. It's your word against exploud.", app))
 	}
 
-    env := args.ThirdPos
+	env := args.ThirdPos
 	if env == "" {
 		console.Fail("Must supply an environment as third postional argument.")
 	} else if !(env == "poke" || env == "prod") {
 		console.Fail(
-            fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.", env))
+			fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.", env))
 	}
 
 	if args.Message == "" {
@@ -122,9 +122,9 @@ func validateDeploymentArgs(args common.Command) {
 func validateDeploymentArgsWithAmi(args common.Command) {
 	validateDeploymentArgs(args)
 
-    ami := args.FourthPos
+	ami := args.FourthPos
 	if ami == "" {
-        console.Fail("Must supply an ami as the fourth argument or with --ami.")
+		console.Fail("Must supply an ami as the fourth argument or with --ami.")
 	}
 	matched, err := regexp.MatchString("^ami-.+$", ami)
 	if err != nil {
@@ -150,31 +150,31 @@ func DoDeployment(url string, body interface{}, message string, args common.Comm
 func Exploud(args common.Command) {
 	validateDeploymentArgsWithAmi(args)
 
-    app := args.SecondPos
-    env := args.ThirdPos
-    ami := args.FourthPos
+	app := args.SecondPos
+	env := args.ThirdPos
+	ami := args.FourthPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
 	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
 	message := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
 		props.GetUsername(), ami, app, env, args.Message)
 
-    DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
 // Undo the steps from a borked deployment
 func Undo(args common.Command) {
 	validateDeploymentArgs(args)
 
-    app := args.SecondPos
-    env := args.ThirdPos
+	app := args.SecondPos
+	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"), app, env)
 	deployRequest := DeployRequest{args.Message, props.GetUsername()}
 	message := fmt.Sprintf("%s is undoing deployment of service %s in %s. %s",
 		props.GetUsername(), app, env, args.Message)
 
-    DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
@@ -182,15 +182,15 @@ func Undo(args common.Command) {
 func Rollback(args common.Command) {
 	validateDeploymentArgs(args)
 
-    app := args.SecondPos
-    env := args.ThirdPos
+	app := args.SecondPos
+	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"), app, env)
 	deployRequest := DeployRequest{args.Message, props.GetUsername()}
 	message := fmt.Sprintf("%s is rollingback service %s in %s. %s",
 		props.GetUsername(), app, env, args.Message)
 
-    DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
 // Exploud JSON task log message
@@ -270,13 +270,13 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		task := deployment.Tasks[i]
 
 		console.Green()
-		fmt.Println(fmt.Sprintf("Starting task: %s\n", task.Action))
+		fmt.Printf("Starting task: %s\n\n", task.Action)
 		console.Reset()
 
 		previousLength := 0
 		// can't check == running as wont be set when we first call
 		for (task.Status != "completed") &&
-            (task.Status != "undone") &&
+			(task.Status != "undone") &&
 			(task.Status != "failed") &&
 			(task.Status != "skipped") &&
 			(task.Status != "teminated") &&
@@ -316,9 +316,13 @@ func CreateApp(args common.Command) {
 		console.Fail("Don't be lazy! You must supply owner, email and description values")
 	}
 
-	fmt.Println(fmt.Sprintf(`Calling exploud to create application %s with description:
-        %s, email: %s, owner: %s`,
-		args.SecondPos, args.Description, args.Email, args.Owner))
+	fmt.Printf(
+		"Calling exploud to create application %s with description:\n%s, email: %s, owner: %s",
+		args.SecondPos,
+		args.Description,
+		args.Email,
+		args.Owner,
+	)
 
 	createBody := CreateAppRequest{args.Description, args.Email, args.Owner}
 

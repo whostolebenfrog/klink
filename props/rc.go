@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    "reflect"
 	"os"
+	"reflect"
 )
 
 type RCProps struct {
 	Username     string `json:"username"`
-    LastUpdated  int32  `json:"lastUpdated"`
+	LastUpdated  int32  `json:"lastUpdated"`
 	DoctorHasRun string `json:"doctorHasRun"`
 }
 
@@ -24,8 +24,8 @@ func GetUsername() string {
 
 // Creates a klinkrc file and prompts the user for a username
 func createRCFile() {
-    rcPath := RCFilePath()
-	fmt.Println(fmt.Sprintf("\nNo home file found at: %s Creating one for you.\n", rcPath))
+	rcPath := RCFilePath()
+	fmt.Printf("\nNo home file found at: %s Creating one for you.\n\n", rcPath)
 	console.Green()
 	fmt.Println("Please enter your brislabs username:\n")
 	console.Reset()
@@ -34,11 +34,11 @@ func createRCFile() {
 	fmt.Scan(&username)
 
 	rcProps := RCProps{}
-    rcProps.Username = username
+	rcProps.Username = username
 
-    writeRCProperties(rcProps)
+	writeRCProperties(rcProps)
 
-	fmt.Println(fmt.Sprintf("\nThanks %s, I've created a home file for you.", username))
+	fmt.Printf("\nThanks %s, I've created a home file for you.\n", username)
 }
 
 // Ensures that the user has a rc file. If it doesn't exist create it
@@ -58,10 +58,10 @@ func RCFilePath() string {
 
 // Updates the users rc file properties
 func UpdateRCProperties(name string, value string) {
-    rcProps := GetRCProperties()
-    reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
-    fmt.Println(rcProps)
-    writeRCProperties(rcProps)
+	rcProps := GetRCProperties()
+	reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
+	fmt.Println(rcProps)
+	writeRCProperties(rcProps)
 }
 
 // Returns the users RC properties
@@ -104,12 +104,12 @@ func Exists(name string) bool {
 }
 
 func GetLastUpdated() int32 {
-    return GetRCProperties().LastUpdated
+	return GetRCProperties().LastUpdated
 }
 
 // Write the last time we checked for an update
 func SetLastUpdated(t int32) {
-    props := GetRCProperties()
-    props.LastUpdated = t
-    writeRCProperties(props)
+	props := GetRCProperties()
+	props.LastUpdated = t
+	writeRCProperties(props)
 }
