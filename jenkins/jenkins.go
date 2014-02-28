@@ -13,7 +13,7 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"build", Build,
-			"{app} builds the jenkins release job for an application"})
+			"{app} builds the Jenkins release job for an application"})
 }
 
 // Build a release job for the supplied application and poll the reponse
@@ -30,10 +30,14 @@ func Build(args common.Command) {
 	job := GetJobFromQueue(location, 12)
 
 	console.Green()
-	fmt.Println("\nBuild started, polling jenkins for ouput...\n")
+	fmt.Println("\nBuild started, polling Jenkins for output...\n")
 	console.Reset()
 
-	PollBuild(job)
+	status := PollBuild(job)
+
+	if status != "SUCCESS" {
+		console.Fail(fmt.Sprintf("Jenkins job failed with status of %s", status))
+	}
 }
 
 // Returns the release path for the supplied app
@@ -68,7 +72,7 @@ func GetJobFromQueue(path string, retries int) string {
 			time.Sleep(5 * time.Second)
 			return GetJobFromQueue(path, retries-1)
 		} else {
-			fmt.Println("Unable to parse jenkins reponse, build may be in a queue")
+			fmt.Println("Unable to parse Jenkins reponse, build may be in a queue")
 			panic(err)
 		}
 	}
@@ -77,7 +81,7 @@ func GetJobFromQueue(path string, retries int) string {
 }
 
 // Poll a build and print the status
-func PollBuild(path string) {
+func PollBuild(path string) string {
 	status := GetJobStatus(path)
 	lines := GetJobOutput(path)
 	offset := 0
@@ -94,9 +98,8 @@ func PollBuild(path string) {
 		status = GetJobStatus(path)
 		lines = GetJobOutput(path)
 	}
-	console.Green()
 	fmt.Println(status)
-	console.Reset()
+	return status
 }
 
 // Return as jobs status
