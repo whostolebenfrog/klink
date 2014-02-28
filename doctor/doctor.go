@@ -5,20 +5,20 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    props "nokia.com/klink/props"
+	props "nokia.com/klink/props"
 	"os"
 	"strings"
 	"time"
 )
 
 func Init() {
-    common.Register(
-        common.Component{"doctor", Doctor, "Test that everything is setup for klink to function"})
+	common.Register(
+		common.Component{"doctor", Doctor, "Test that everything is setup for klink to function"})
 }
 
 // Perform some doctor'in
 func Doctor(args common.Command) {
-    SetDoctorRun()
+	SetDoctorRun()
 
 	console.Brown()
 	fmt.Println("\n\t...The Doctor is in the house...\n")
@@ -46,7 +46,7 @@ func BrislabsReachable() {
 
 	fmt.Println("Checking to see if aws resources in Brislabs are reachable...")
 
-	httpClient := common.NewTimeoutClient(2 * time.Second, 2 * time.Second)
+	httpClient := common.NewTimeoutClient(2*time.Second, 2*time.Second)
 	req, err := http.NewRequest("HEAD", "http://ditto.brislabs.com:8080/1.x/status", nil)
 	if err != nil {
 		panic(err)
@@ -65,17 +65,17 @@ func BrislabsReachable() {
 }
 
 func EnsureDoctorRun() {
-    if !HasDoctorRun() {
-        SetDoctorRun()
-    }
+	if !HasDoctorRun() {
+		SetDoctorRun()
+	}
 }
 
 func SetDoctorRun() {
-    props.UpdateRCProperties("DoctorHasRun", "true")
+	props.UpdateRCProperties("DoctorHasRun", "true")
 }
 
 func HasDoctorRun() bool {
-    return props.GetRCProperties().DoctorHasRun == "true"
+	return props.GetRCProperties().DoctorHasRun == "true"
 }
 
 // Fail with doctor run message
@@ -107,17 +107,17 @@ func CheckProxySettings() {
 		fmt.Println("It's likely that you have a proxy issue. Klink needs to connect directly")
 		fmt.Println("to aws brislabs without a proxy. There might also be windows firewall")
 		fmt.Println("issues. Talk to Ben Griffiths if you have these issues.")
-        doctorOut()
+		doctorOut()
 	}
 
 	proxy := os.Getenv("http_proxy") + os.Getenv("HTTP_PROXY")
 
 	if proxy != "" {
-		fmt.Println(fmt.Sprintf("\nLooks like you have a proxy set: %s", proxy))
+		fmt.Printf("\nLooks like you have a proxy set: %s\n", proxy)
 
 		noProxy := os.Getenv("no_proxy") + os.Getenv("NO_PROXY")
 		if !strings.Contains(noProxy, "brislabs") {
-			fmt.Println(fmt.Sprintf("\nYou don't have brislabs in your no proxy list: %s", noProxy))
+			fmt.Printf("\nYou don't have brislabs in your no proxy list: %s\n", noProxy)
 
 			BrislabsProxyWrong()
 		} else {
@@ -170,11 +170,11 @@ export no_proxy=$no_proxy,brislabs.com`
 		panic(err)
 	}
 
-    console.Green()
-    fmt.Println("\nOK - everything should be in order")
-    fmt.Println("Source you bash.rc 'source ~/.bashrc'")
-    fmt.Println("Then retry klink doctor")
-    console.Reset()
+	console.Green()
+	fmt.Println("\nOK - everything should be in order")
+	fmt.Println("Source you bash.rc 'source ~/.bashrc'")
+	fmt.Println("Then retry klink doctor")
+	console.Reset()
 
 	os.Exit(0)
 }
