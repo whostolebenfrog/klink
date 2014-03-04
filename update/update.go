@@ -104,7 +104,9 @@ func doUpdate(nextVersionUrl string, path string) {
 		errorWithHelper(nextVersionUrl)
 	}
 
+    console.Green()
 	fmt.Println("Klink has been updated to the latest version!")
+    console.Reset()
 	if common.IsWindows() {
 		deferCopyForWindows(nextVersionUrl, path)
 	} else {
