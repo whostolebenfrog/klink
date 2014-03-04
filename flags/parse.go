@@ -57,7 +57,7 @@ func LoadFlags() common.Command {
 	}
 
 	// positional arguments
-	if len(optarg.Remainder) < 2 {
+	if len(optarg.Remainder) < 1 {
 		PrintHelpAndExit()
 	}
 
