@@ -19,7 +19,7 @@ const latestVersionString = "latest"
 func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
-			"{app} {env} {ami} Deploy the AMI {ami} for {app} to {env}. (Specify 'latest' as the ami to deploy the latest ami.)"},
+			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
 		common.Component{"rollback", Rollback,
@@ -126,7 +126,7 @@ func validateDeploymentArgsWithAmi(args common.Command) {
 	validateDeploymentArgs(args)
 
 	ami := args.FourthPos
-	if ami != latestVersionString {
+	if ami != "" {
 		matched, err := regexp.MatchString("^ami-.+$", ami)
 		if err != nil {
 			panic(err)
@@ -158,7 +158,7 @@ func Exploud(args common.Command) {
 
 	latestAmi := ditto.LatestAmiFor(app)
 
-	if (ami == latestVersionString) {
+	if (ami == "") {
 		confirmDeployLatest(latestAmi)
 		ami = latestAmi.ImageId
 	} else if (latestAmi.ImageId != ami) {
@@ -176,7 +176,7 @@ func Exploud(args common.Command) {
 func confirmNonLatestBake(ami ditto.Ami) {
 
 	console.Red()
-	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (%s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
+	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (version %s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
 	console.Reset()
 
 	var response string
@@ -199,7 +199,7 @@ func confirmNonLatestBake(ami ditto.Ami) {
 func confirmDeployLatest(latestAmi ditto.Ami) {
 
 	console.Green()
-	fmt.Println(fmt.Sprintf("The latest ami %s (application version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
+	fmt.Println(fmt.Sprintf("The latest ami %s (version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
 	console.Reset()
 
 	var response string

@@ -3,7 +3,6 @@ package flags
 import (
 	optarg "github.com/jteeuwen/go-pkg-optarg"
 	common "nokia.com/klink/common"
-	"os"
 )
 
 func LoadFlags() common.Command {
@@ -58,20 +57,21 @@ func LoadFlags() common.Command {
 	}
 
 	// positional arguments
-	if len(os.Args) < 2 {
+	if len(optarg.Remainder) < 2 {
 		PrintHelpAndExit()
 	}
-	command.Action = os.Args[1]
+
+	command.Action = optarg.Remainder[0]
 	// some commands need a second positional argument
 	// let's do this better eh!?
-	if len(os.Args) > 2 {
-		command.SecondPos = os.Args[2]
+	if len(optarg.Remainder) > 1 {
+		command.SecondPos = optarg.Remainder[1]
 	}
-	if len(os.Args) > 3 {
-		command.ThirdPos = os.Args[3]
+	if len(optarg.Remainder) > 2 {
+		command.ThirdPos = optarg.Remainder[2]
 	}
-	if len(os.Args) > 4 {
-		command.FourthPos = os.Args[4]
+	if len(optarg.Remainder) > 3 {
+		command.FourthPos = optarg.Remainder[3]
 	}
 
 	return command
