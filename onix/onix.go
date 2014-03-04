@@ -12,8 +12,6 @@ func Init() {
 	common.Register(
 		common.Component{"register-app-onix", CreateApp,
 			"{app} Creates a new application in onix only"},
-		common.Component{"list-apps-onix", ListApps,
-			"Lists the applications that exist in onix"},
 		common.Component{"info", Info,
 			"{app} Return information about the application"},
 		common.Component{"add-onix-prop", AddProperty,
@@ -46,11 +44,6 @@ func CreateApp(args common.Command) {
 
 	fmt.Println("Onix has created our application for us!")
 	fmt.Println(response)
-}
-
-// List all apps that onix knows about
-func ListApps(args common.Command) {
-	fmt.Println(common.GetString(onixUrl("/applications")))
 }
 
 // Returns true if the app exists
