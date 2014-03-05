@@ -2,7 +2,9 @@ package update
 
 import (
 	"fmt"
+    "io"
 	"io/ioutil"
+    "log"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
@@ -18,7 +20,15 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"update", Update,
-			"Update klink to the latest version"})
+			"Update klink to the latest version"},
+		common.Component{"force-update", ForceUpdate,
+			"Force klink to update to the current version"})
+    /*
+	common.Register(
+		common.Component{"update", Update,
+			"Update klink to the latest version"},
+		common.Component{"force-update", ForceUpdate,
+			"Force klink to update to the current version"})*/
 }
 
 func benkinsUrl(end string) string {
@@ -85,6 +95,25 @@ func Update(_ common.Command) {
 	}
 }
 
+// For testing the update functionality
+func ForceUpdate(_ common.Command) {
+    argsPath := os.Args[0]
+
+	path, pathErr := exec.LookPath("klink")
+	if pathErr != nil {
+		path = argsPath
+	}
+
+	thisVersion := fmt.Sprintf("klink-%d-%s-%s", Version, runtime.GOOS, runtime.GOARCH)
+	thisVersionUrl := benkinsUrl(thisVersion)
+
+	if common.Head(thisVersionUrl) {
+		doUpdate(thisVersionUrl, path)
+	} else {
+		errorWithHelper(thisVersionUrl)
+	}
+}
+
 // Does the update
 func doUpdate(nextVersionUrl string, path string) {
 	resp, err := http.Get(nextVersionUrl)
@@ -133,16 +162,23 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 // Write and run a script to copy the new version over ourselves, avoids
 // file locks
 func deferCopy(nextVersionUrl string, path string) {
-	script := "sleep 1\n" + "mv " + path + ".update " + path + "\nrm -f updateklink.sh"
+	script := "\nsleep 1\n" + "mv " + path + ".update " + path
+    script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+    script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
 	cmd := exec.Command("sh", "updateklink.sh")
-	err := cmd.Start()
+
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fmt.Println(err)
-		errorWithHelper(nextVersionUrl)
+		log.Fatal(err)
 	}
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+    io.Copy(os.Stdout, stdout)
+
 	os.Exit(0)
 }
 
