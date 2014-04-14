@@ -20,7 +20,7 @@ func Init() {
 			"{app} -v {version} Bakes an AMI for {app} with version {version}"},
 		common.Component{"allow-prod", AllowProd,
 			"{app} Allows the prod aws account access to the supplied application"},
-		common.Component{"list-amis", FindAmis,
+		common.Component{"amis", FindAmis,
 			"{app} Lists the latest amis for the supplied application name"},
 		common.Component{"latest-bake", LatestBake,
 			"{app} Outputs the latest baked version of the specified application"})

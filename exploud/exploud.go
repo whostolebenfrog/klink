@@ -24,7 +24,7 @@ func Init() {
 			"{app} {env} Undo the steps of a broken deployment"},
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy"},
-		common.Component{"list-apps", ListApps,
+		common.Component{"apps", ListApps,
 			"Lists the applications that exist (via exploud)"},
 		common.Component{"create-app", CreateApp,
 			"{app} -E {email} -o {owner} -d {description} Creates a new application"},
