@@ -54,7 +54,7 @@ func Boxes(args common.Command) {
 	}
 
 	fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
-		if args.Format == "text" {
+		if args.Format == "" || args.Format == "text" {
 			req.Header.Add("accept", "text/plain")
 		}
 	}))
