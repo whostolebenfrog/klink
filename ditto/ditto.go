@@ -22,6 +22,8 @@ func Init() {
 			"{app} Allows the prod aws account access to the supplied application"},
 		common.Component{"amis", FindAmis,
 			"{app} Lists the latest amis for the supplied application name"},
+		common.Component{"images", FindAmis,
+			"{app} Lists the latest images for the supplied application name"},
 		common.Component{"latest-bake", LatestBake,
 			"{app} Outputs the latest baked version of the specified application"})
 }
