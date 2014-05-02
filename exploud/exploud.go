@@ -1,8 +1,10 @@
 package exploud
 
 import (
+	"encoding/json"
 	"fmt"
 	jsonq "github.com/jmoiron/jsonq"
+	"io/ioutil"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
@@ -268,12 +270,28 @@ func Rollback(args common.Command) {
 func GetDeploymentStatus(deploymentId string, retries int) string {
 	url := exploudUrl(fmt.Sprintf("/deployments/%s", deploymentId))
 
-    status, err := common.GetAsJsonq(url).String("status")
-    if err != nil {
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Error creating GET request for url: %s\n", url)
+		panic(err)
+	}
+    if resp.StatusCode == 404 {
         if retries > 0 {
             time.Sleep(1 * time.Second)
             return GetDeploymentStatus(deploymentId, retries-1)
         }
+    }
+
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	data := map[string]interface{}{}
+	dec := json.NewDecoder(strings.NewReader(string(responseBody)))
+	dec.Decode(&data)
+	responsejq := jsonq.NewQuery(data)
+
+    status, err := responsejq.String("status")
+    if err != nil {
         fmt.Println("Failed to parse deployment status")
         panic(err)
     }
