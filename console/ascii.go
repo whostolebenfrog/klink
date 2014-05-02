@@ -21,6 +21,6 @@ func Klink() {
 
 func Fail(message string) {
 	fmt.Println(message)
-	os.Exit(1)
     Reset()
+	os.Exit(1)
 }
