@@ -11,6 +11,7 @@ import (
 	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
+    "path"
 	"runtime"
 	"strconv"
 	"strings"
@@ -65,7 +66,12 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(_ common.Command) {
-    path := os.Args[0]
+    argsPath := os.Args[0]
+
+	path, pathErr := exec.LookPath(path.Base(argsPath))
+	if pathErr != nil {
+		path = argsPath
+	}
 
 	props.SetLastUpdated(int32(time.Now().Unix()))
 
@@ -92,13 +98,12 @@ func Update(_ common.Command) {
 
 // For testing the update functionality
 func ForceUpdate(_ common.Command) {
-    path := os.Args[0]
+    argsPath := os.Args[0]
 
-    /*
-	path, pathErr := exec.LookPath("klink")
+	path, pathErr := exec.LookPath(path.Base(argsPath))
 	if pathErr != nil {
 		path = argsPath
-	}*/
+	}
 
 	thisVersion := fmt.Sprintf("klink-%d-%s-%s", Version, runtime.GOOS, runtime.GOARCH)
 	thisVersionUrl := benkinsUrl(thisVersion)
