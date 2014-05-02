@@ -21,8 +21,8 @@ func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
 			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)"},
-        common.Component{"resume", Resume,
-            "{id} Resume the deployment with the supplied id"},
+        common.Component{"watch", Watch,
+            "{id} Resume watching the deployment with the supplied id"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
 		common.Component{"rollback", Rollback,
@@ -152,7 +152,7 @@ func DoDeployment(url string, body interface{}, message string, args common.Comm
 }
 
 // Resume an existing deployment, also pretty swish for testing
-func Resume(args common.Command) {
+func Watch(args common.Command) {
     id := args.SecondPos
 
     if id == "" {
@@ -264,31 +264,16 @@ func Rollback(args common.Command) {
 	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
-// Exploud JSON task log message
-type TaskLog struct {
-	Date    string `json:"Date"`
-	Message string `json:"message"`
-}
-
-// Exploud JSON task
-type Task struct {
-	Action         string    `json:"action"`
-	DurationString string    `json:"durationString"`
-	End            string    `json:"end"`
-	Id             string    `json:"_id"`
-	Log            []TaskLog `json:"log"`
-	Operation      string    `json:"operation"`
-	Start          string    `json:"start"`
-	Status         string    `json:"status"`
-	Url            string    `json:"url"`
-}
-
 // Returns the status of the deployment with the supplied id
-func GetDeploymentStatus(deploymentId string) string {
+func GetDeploymentStatus(deploymentId string, retries int) string {
 	url := exploudUrl(fmt.Sprintf("/deployments/%s", deploymentId))
 
     status, err := common.GetAsJsonq(url).String("status")
     if err != nil {
+        if retries > 0 {
+            time.Sleep(1 * time.Second)
+            return GetDeploymentStatus(deploymentId, retries-1)
+        }
         fmt.Println("Failed to parse deployment status")
         panic(err)
     }
@@ -296,7 +281,7 @@ func GetDeploymentStatus(deploymentId string) string {
 }
 
 // Prints out the status line for the deploy
-func Status(taskId string, serviceName string, status string) {
+func PrintStatus(taskId string, serviceName string, status string) {
 	// first line
 	fmt.Println("")
 	console.Red()
@@ -346,66 +331,30 @@ func PollDeployNew(deploymentId string, serviceName string) {
 	chnl := HandleDeployInterrupt()
 	defer DeregisterInterupt(chnl)
 
-	Status(deploymentId, serviceName, "pending")
+	PrintStatus(deploymentId, serviceName, "pending")
 
-	status := GetDeploymentStatus(deploymentId)
+	status := GetDeploymentStatus(deploymentId, 10)
 
-	timeout := time.Now().Add((20 * time.Minutes))
+	timeout := time.Now().Add((20 * time.Minute))
     lastTime := ""
     for time.Now().Before(timeout) {
-        // checked to see if we failed
-        if status == "failed" || status == "terminated" {
-            console.Fail("Deployment reached a failed or terminated status")
+        if status == "failed" {
+            console.Red()
+            console.Fail("Deployment reached a failed or terminated status :-(")
         }
 
         lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
-        // check to see if we are finished
         if status == "completed" {
             break
         }
         // continue
         time.Sleep(5 * time.Second)
-        status = GetDeploymentStatus(deploymentId)
+        status = GetDeploymentStatus(deploymentId, 1)
     }
 
-    /*
-
-	for i := 0; i < len(deployment.Tasks) && time.Now().Before(timeout); i++ {
-		task := deployment.Tasks[i]
-
-		console.Green()
-		fmt.Printf("Starting task: %s\n\n", task.Action)
-		console.Reset()
-
-		previousLength := 0
-		// can't check == running as wont be set when we first call
-		for (task.Status != "completed") &&
-			(task.Status != "undone") &&
-			(task.Status != "failed") &&
-			(task.Status != "skipped") &&
-			(task.Status != "teminated") &&
-			time.Now().Before(timeout) {
-
-			time.Sleep(5 * time.Second)
-			deployment = GetDeployment(deploymentId)
-			task = deployment.Tasks[i]
-
-			for i := previousLength; i < len(task.Log); i++ {
-				fmt.Println(task.Log[i])
-			}
-
-			previousLength = len(task.Log)
-		}
-
-		// if we see something failed then kill everything - exploud doesn't recover
-		if task.Status == "failed" || task.Status == "terminated" {
-			console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
-		}
-	} */
-
 	console.Green()
-	Status(deploymentId, serviceName, "Finished!")
+	PrintStatus(deploymentId, serviceName, "Finished!")
 	console.Reset()
 }
 
@@ -447,7 +396,11 @@ const (
 // Returns true if the user wants to cancel the deployment
 func cancelDeploymentPerchance() int {
 	console.Red()
+	fmt.Println("CURRENTLY THIS DOESN'T WORK. COMING SOON 2009!")
+	fmt.Println("If you kill the deployment here it will continue")
+	fmt.Println("You can start watching it again with klink watch {app} {env}")
 	fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
+	fmt.Println("CURRENTLY THIS DOESN'T WORK. COMING SOON 2009!")
 	console.Reset()
 	var response string
 
