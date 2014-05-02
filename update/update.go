@@ -69,10 +69,11 @@ func Update(_ common.Command) {
 
 	props.SetLastUpdated(int32(time.Now().Unix()))
 
+    /*
 	path, pathErr := exec.LookPath("klink")
 	if pathErr != nil {
 		path = argsPath
-	}
+	}*/
 
 	latestVersion := LatestVersion()
 
@@ -99,10 +100,11 @@ func Update(_ common.Command) {
 func ForceUpdate(_ common.Command) {
     argsPath := os.Args[0]
 
+    /*
 	path, pathErr := exec.LookPath("klink")
 	if pathErr != nil {
 		path = argsPath
-	}
+	}*/
 
 	thisVersion := fmt.Sprintf("klink-%d-%s-%s", Version, runtime.GOOS, runtime.GOARCH)
 	thisVersionUrl := benkinsUrl(thisVersion)
