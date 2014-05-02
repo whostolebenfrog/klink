@@ -33,7 +33,7 @@ done
 if [ $(whoami) == "jenkins" ]; then
     cp version /opt/klink-beta
 else
-    scp version benkins.brislabs.com:/opt/klink-beta/
+    scp version benkins.brislabs.com:/opt/klink-beta
 fi
 
 # Update git
