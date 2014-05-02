@@ -189,8 +189,9 @@ func Exploud(args common.Command) {
 	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
+// TODO - filthy code duplication. AL DUTTON YOU'RE ON MY LIST
+// TODO - doc strings
 func confirmNonLatestBake(ami ditto.Ami) {
-
 	console.Red()
 	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (version %s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
 	console.Reset()
@@ -213,7 +214,6 @@ func confirmNonLatestBake(ami ditto.Ami) {
 }
 
 func confirmDeployLatest(latestAmi ditto.Ami) {
-
 	console.Green()
 	fmt.Println(fmt.Sprintf("The latest ami %s (version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
 	console.Reset()
