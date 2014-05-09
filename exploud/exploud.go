@@ -27,6 +27,8 @@ func Init() {
             "{id} Resume watching the deployment with the supplied id"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
+        common.Component{"deployments", Deployments,
+            "[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy"},
 		common.Component{"apps", ListApps,
@@ -151,6 +153,22 @@ func DoDeployment(url string, body interface{}, message string, args common.Comm
 	console.Hubot(message, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
+}
+
+// List any currently active deployments or if an app param supplied
+// all deployments for that app
+func Deployments(args common.Command) {
+    app := args.SecondPos
+    if app == "" {
+        fmt.Println(common.GetString(exploudUrl("/in-progress")))
+    } else {
+        env := args.ThirdPos
+        if env == "" {
+            env = "poke"
+        }
+        url := exploudUrl("/deployments?application=" + app + "&env=" + env)
+        fmt.Println(common.GetString(url))
+    }
 }
 
 // Resume an existing deployment, also pretty swish for testing
