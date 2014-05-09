@@ -56,7 +56,7 @@ func AllowProd(args common.Command) {
 }
 
 func DoBake(url string) {
-	httpClient := common.NewTimeoutClient(5*time.Second, 1200*time.Second)
+	httpClient := common.NewTimeoutClient(10*time.Second, 2000*time.Second)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		panic(err)
