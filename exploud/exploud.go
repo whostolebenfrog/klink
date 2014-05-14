@@ -41,7 +41,7 @@ func Init() {
 
 // Returns explouds url with the supplied string appended
 func exploudUrl(end string) string {
-	return "http://internal-newexploud-1397524604.eu-west-1.elb.amazonaws.com/1.x" + end
+	return "http://exploud.brislabs.com/1.x" + end
 }
 
 // Return information about the servers running in the supplied environment
