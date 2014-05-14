@@ -1,0 +1,3 @@
+# A roundabout way to format the whole shebang
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+cd $SCRIPTPATH/../..; go fmt nokia.com/...
