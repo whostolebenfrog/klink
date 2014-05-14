@@ -29,6 +29,10 @@ func Init() {
 			"{app} {env} Undo the steps of a broken deployment"},
 		common.Component{"deployments", Deployments,
 			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
+		common.Component{"pause", Pause,
+			"{app} {env} attempts to pause a running deployment of {app} in {env}"},
+		common.Component{"resume", Resume,
+			"{app} {env} attempts to resume a paused deployment of {app} in {env}"},
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy"},
 		common.Component{"apps", ListApps,
@@ -122,6 +126,11 @@ func validateDeploymentArgs(args common.Command) {
 		console.Fail(
 			fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.", env))
 	}
+}
+
+// Validate common deployment arguments including a message
+func validateDeploymentArgsWithMessage(args common.Command) {
+	validateDeploymentArgs(args)
 
 	if args.Message == "" {
 		console.Fail("Must supply a deploy message using -m")
@@ -130,7 +139,7 @@ func validateDeploymentArgs(args common.Command) {
 
 // Validate all deployment arguments including ami as a forth pos argument
 func validateDeploymentArgsWithAmi(args common.Command) {
-	validateDeploymentArgs(args)
+	validateDeploymentArgsWithMessage(args)
 
 	ami := args.FourthPos
 	if ami != "" {
@@ -207,6 +216,34 @@ func Exploud(args common.Command) {
 	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
+// Pause a running deployment
+func Pause(args common.Command) {
+	validateDeploymentArgs(args)
+
+	app := args.SecondPos
+	env := args.ThirdPos
+
+	pauseUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/pause"), app, env)
+
+	fmt.Printf("Attempting to pause deployment of %s in %s\n", app, env)
+
+	common.PostJson(pauseUrl, "")
+}
+
+// Resume a paused deployment
+func Resume(args common.Command) {
+	validateDeploymentArgs(args)
+
+	app := args.SecondPos
+	env := args.ThirdPos
+
+	resumeUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/resume"), app, env)
+
+	fmt.Printf("Attempting to resume deployment of %s in %s\n", app, env)
+
+	common.PostJson(resumeUrl, "")
+}
+
 // TODO - filthy code duplication. AL DUTTON YOU'RE ON MY LIST
 // TODO - doc strings
 func confirmNonLatestBake(ami ditto.Ami) {
@@ -255,7 +292,7 @@ func confirmDeployLatest(latestAmi ditto.Ami) {
 
 // Undo the steps from a borked deployment
 func Undo(args common.Command) {
-	validateDeploymentArgs(args)
+	validateDeploymentArgsWithMessage(args)
 
 	app := args.SecondPos
 	env := args.ThirdPos
@@ -271,7 +308,7 @@ func Undo(args common.Command) {
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
 // Must pass SecondPos and Ami arguments
 func Rollback(args common.Command) {
-	validateDeploymentArgs(args)
+	validateDeploymentArgsWithMessage(args)
 
 	app := args.SecondPos
 	env := args.ThirdPos
