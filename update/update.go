@@ -33,7 +33,7 @@ func Init() {
 }
 
 func benkinsUrl(end string) string {
-	return "http://benkins.brislabs.com/klink-beta/" + end
+	return "http://benkins.brislabs.com/klink/" + end
 }
 
 // Prints the current version, os and architecture
@@ -48,7 +48,7 @@ func LatestVersion() int {
 	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
 	if err != nil {
 		fmt.Println(err)
-		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink-beta/")
+		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
 	}
 	return i
 }
