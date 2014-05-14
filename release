@@ -41,3 +41,6 @@ fi
 git add -A
 git commit -m "Bumped version number for release: $NEXT_VERSION"
 git push origin klink-beta
+
+git tag -a v$NEXT_VERSION -m "Version $NEXT_VERSION"
+git push --tags origin klink-beta
