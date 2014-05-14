@@ -70,7 +70,7 @@ func ToJsonValue(in string) (string, error) {
 
 func AddProperty(args common.Command) {
 	if args.SecondPos == "" {
-		console.Fail("Must supply service name as a second positional argument")
+		console.Fail("Must supply application name as a second positional argument")
 	}
 	if args.Name == "" {
 		console.Fail("Must supply property name using -N")
@@ -115,7 +115,7 @@ func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
 func Status(args common.Command) {
 	app := args.SecondPos
 	if app == "" {
-		console.Fail("Must supply service name as a second positional argument")
+		console.Fail("Must supply application name as a second positional argument")
 	}
 
 	jq := common.GetAsJsonq(onixUrl("/applications/" + app))

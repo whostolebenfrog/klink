@@ -106,7 +106,7 @@ type Ami struct {
 	Version string
 }
 
-// FindAmis using the service name for the second positional command line arg
+// FindAmis using the application name for the second positional command line arg
 // Prints out a list of the most recent ami names and image ids
 func FindAmis(args common.Command) {
 	application := args.SecondPos
