@@ -374,12 +374,12 @@ func PollDeployNew(deploymentId string, serviceName string) {
 	timeout := time.Now().Add((20 * time.Minute))
 	lastTime := ""
 	for time.Now().Before(timeout) {
+		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
+
 		if status == "failed" || status == "invalid" {
 			console.Red()
 			console.Fail("Deployment reached a failed or terminated status :-(")
 		}
-
-		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
 		if status == "completed" {
 			break
