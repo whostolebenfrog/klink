@@ -33,14 +33,14 @@ done
 if [ $(whoami) == "jenkins" ]; then
     cp version /opt/klink
 else
-    scp version benkins.brislabs.com:/opt/klink
+    scp version benkins.brislabs.com:/opt/klink/
 fi
 
 # Update git
 
 git add -A
 git commit -m "Bumped version number for release: $NEXT_VERSION"
-git push origin klink
+git push origin master
 
 git tag -a v$NEXT_VERSION -m "Version $NEXT_VERSION"
-git push --tags origin klink
+git push --tags origin master
