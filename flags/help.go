@@ -8,15 +8,15 @@ import (
 	console "nokia.com/klink/console"
 	update "nokia.com/klink/update"
 	"os"
-    "regexp"
+	"regexp"
 	"strings"
 	"text/tabwriter"
 )
 
 func WrapString(desc string) []string {
-    // heheheh - so much filth.
-    re := regexp.MustCompile(".{1,80}(?:\\W|$)")
-    return re.FindAllString(desc, -1)
+	// heheheh - so much filth.
+	re := regexp.MustCompile(".{1,80}(?:\\W|$)")
+	return re.FindAllString(desc, -1)
 }
 
 func PrintHelpAndExit() {
@@ -37,20 +37,20 @@ func PrintHelpAndExit() {
 	w.Init(output, 18, 8, 0, '\t', 0)
 	for i := range common.Components {
 		helpString := "\n    "
-        desc := common.Components[i].String()
+		desc := common.Components[i].String()
 
-        // wrap long lines at white space
-        if len(desc) > 80 {
-            lines := WrapString(desc)
-            for i := range(lines) {
-                helpString += lines[i]
-                if i < (len(lines) - 1) {
-                    helpString += "\n\t"
-                }
-            }
-        } else {
-            helpString += desc
-        }
+		// wrap long lines at white space
+		if len(desc) > 80 {
+			lines := WrapString(desc)
+			for i := range lines {
+				helpString += lines[i]
+				if i < (len(lines) - 1) {
+					helpString += "\n\t"
+				}
+			}
+		} else {
+			helpString += desc
+		}
 
 		fmt.Fprint(w, helpString)
 	}

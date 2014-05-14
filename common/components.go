@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-    "sort"
+	"sort"
 )
 
 var Components = []Component{}
@@ -19,6 +19,7 @@ func (c Component) String() string {
 
 // make Components sortable - sometimes go is a little primative...
 type ByCommand []Component
+
 func (a ByCommand) Len() int           { return len(a) }
 func (a ByCommand) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByCommand) Less(i, j int) bool { return a[i].Command < a[j].Command }
@@ -29,5 +30,5 @@ func Register(toReg ...Component) {
 	for i := range toReg {
 		Components = append(Components, toReg[i])
 	}
-    sort.Sort(ByCommand(Components))
+	sort.Sort(ByCommand(Components))
 }

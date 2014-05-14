@@ -2,16 +2,16 @@ package update
 
 import (
 	"fmt"
-    "io"
+	"io"
 	"io/ioutil"
-    "log"
+	"log"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
-    "path"
+	"path"
 	"runtime"
 	"strconv"
 	"strings"
@@ -24,12 +24,12 @@ func Init() {
 			"Update klink to the latest version"},
 		common.Component{"force-update", ForceUpdate,
 			"Force klink to update to the current version"})
-    /*
-	common.Register(
-		common.Component{"update", Update,
-			"Update klink to the latest version"},
-		common.Component{"force-update", ForceUpdate,
-			"Force klink to update to the current version"})*/
+	/*
+		common.Register(
+			common.Component{"update", Update,
+				"Update klink to the latest version"},
+			common.Component{"force-update", ForceUpdate,
+				"Force klink to update to the current version"})*/
 }
 
 func benkinsUrl(end string) string {
@@ -66,7 +66,7 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(_ common.Command) {
-    argsPath := os.Args[0]
+	argsPath := os.Args[0]
 
 	path, pathErr := exec.LookPath(path.Base(argsPath))
 	if pathErr != nil {
@@ -98,7 +98,7 @@ func Update(_ common.Command) {
 
 // For testing the update functionality
 func ForceUpdate(_ common.Command) {
-    argsPath := os.Args[0]
+	argsPath := os.Args[0]
 
 	path, pathErr := exec.LookPath(path.Base(argsPath))
 	if pathErr != nil {
@@ -134,9 +134,9 @@ func doUpdate(nextVersionUrl string, path string) {
 		errorWithHelper(nextVersionUrl)
 	}
 
-    console.Green()
+	console.Green()
 	fmt.Println("Klink has been updated to the latest version!")
-    console.Reset()
+	console.Reset()
 	if common.IsWindows() {
 		deferCopyForWindows(nextVersionUrl, path)
 	} else {
@@ -164,8 +164,8 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 // file locks
 func deferCopy(nextVersionUrl string, path string) {
 	script := "\nsleep 1\n" + "mv " + path + ".update " + path
-    script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
-    script += "\nrm -f updateklink.sh"
+	script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+	script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
@@ -178,7 +178,7 @@ func deferCopy(nextVersionUrl string, path string) {
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
-    io.Copy(os.Stdout, stdout)
+	io.Copy(os.Stdout, stdout)
 
 	os.Exit(0)
 }

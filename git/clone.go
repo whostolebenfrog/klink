@@ -2,20 +2,20 @@ package git
 
 import (
 	"fmt"
-    common "nokia.com/klink/common"
-    console "nokia.com/klink/console"
-    onix "nokia.com/klink/onix"
-    "os/exec"
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	onix "nokia.com/klink/onix"
+	"os/exec"
 )
 
 func Init() {
-    common.Register(
-        common.Component{"clone-tyr", CloneTyranitar,
-            "{app} {env - optional} clone the tyranitar properties for an app into pwd"},
-        common.Component{"clone-shuppet", CloneShuppet,
-            "{app} {env - optional} clone the shuppet properties for an app into pwd"},
-        common.Component{"clone", CloneService,
-            "{app} clone the service into pwd"})
+	common.Register(
+		common.Component{"clone-tyr", CloneTyranitar,
+			"{app} {env - optional} clone the tyranitar properties for an app into pwd"},
+		common.Component{"clone-shuppet", CloneShuppet,
+			"{app} {env - optional} clone the shuppet properties for an app into pwd"},
+		common.Component{"clone", CloneService,
+			"{app} clone the service into pwd"})
 }
 
 func appName(args common.Command) string {
@@ -42,10 +42,10 @@ func sncUrlShuppet(app string) string {
 
 func gitClone(path string) {
 	out, err := exec.Command("git", "clone", path).Output()
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println(string(out))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(out))
 }
 
 // Clone the tyranitar properties for the supplied app
@@ -64,12 +64,12 @@ func CloneTyranitar(args common.Command) {
 // Clone the shuppet properties for the supplied app
 func CloneShuppet(args common.Command) {
 	app := appName(args)
-    gitClone(sncUrlShuppet(app))
+	gitClone(sncUrlShuppet(app))
 }
 
 func CloneService(args common.Command) {
-    app := args.SecondPos
+	app := args.SecondPos
 
-    path := onix.GetProperty(app, "srcRepo")
-    gitClone(path)
+	path := onix.GetProperty(app, "srcRepo")
+	gitClone(path)
 }

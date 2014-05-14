@@ -8,8 +8,8 @@ import (
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	props "nokia.com/klink/props"
 	ditto "nokia.com/klink/ditto"
+	props "nokia.com/klink/props"
 	"os"
 	"os/signal"
 	"regexp"
@@ -23,12 +23,12 @@ func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
 			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)"},
-        common.Component{"watch", Watch,
-            "{id} Resume watching the deployment with the supplied id"},
+		common.Component{"watch", Watch,
+			"{id} Resume watching the deployment with the supplied id"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
-        common.Component{"deployments", Deployments,
-            "[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
+		common.Component{"deployments", Deployments,
+			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy"},
 		common.Component{"apps", ListApps,
@@ -158,28 +158,28 @@ func DoDeployment(url string, body interface{}, message string, args common.Comm
 // List any currently active deployments or if an app param supplied
 // all deployments for that app
 func Deployments(args common.Command) {
-    app := args.SecondPos
-    if app == "" {
-        fmt.Println(common.GetString(exploudUrl("/in-progress")))
-    } else {
-        env := args.ThirdPos
-        if env == "" {
-            env = "poke"
-        }
-        url := exploudUrl("/deployments?application=" + app + "&env=" + env)
-        fmt.Println(common.GetString(url))
-    }
+	app := args.SecondPos
+	if app == "" {
+		fmt.Println(common.GetString(exploudUrl("/in-progress")))
+	} else {
+		env := args.ThirdPos
+		if env == "" {
+			env = "poke"
+		}
+		url := exploudUrl("/deployments?application=" + app + "&env=" + env)
+		fmt.Println(common.GetString(url))
+	}
 }
 
 // Resume an existing deployment, also pretty swish for testing
 func Watch(args common.Command) {
-    id := args.SecondPos
+	id := args.SecondPos
 
-    if id == "" {
-        console.Fail("Must supply a deployment id as the second positional arg")
-    }
+	if id == "" {
+		console.Fail("Must supply a deployment id as the second positional arg")
+	}
 
-    PollDeployNew(id, "TODO: do this for a name instead of id")
+	PollDeployNew(id, "TODO: do this for a name instead of id")
 }
 
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
@@ -192,10 +192,10 @@ func Exploud(args common.Command) {
 
 	latestAmi := ditto.LatestAmiFor(app)
 
-	if (ami == "") {
+	if ami == "" {
 		confirmDeployLatest(latestAmi)
 		ami = latestAmi.ImageId
-	} else if (latestAmi.ImageId != ami) {
+	} else if latestAmi.ImageId != ami {
 		confirmNonLatestBake(latestAmi)
 	}
 
@@ -293,12 +293,12 @@ func GetDeploymentStatus(deploymentId string, retries int) string {
 		fmt.Printf("Error creating GET request for url: %s\n", url)
 		panic(err)
 	}
-    if resp.StatusCode == 404 {
-        if retries > 0 {
-            time.Sleep(1 * time.Second)
-            return GetDeploymentStatus(deploymentId, retries-1)
-        }
-    }
+	if resp.StatusCode == 404 {
+		if retries > 0 {
+			time.Sleep(1 * time.Second)
+			return GetDeploymentStatus(deploymentId, retries-1)
+		}
+	}
 
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -308,12 +308,12 @@ func GetDeploymentStatus(deploymentId string, retries int) string {
 	dec.Decode(&data)
 	responsejq := jsonq.NewQuery(data)
 
-    status, err := responsejq.String("status")
-    if err != nil {
-        fmt.Println("Failed to parse deployment status")
-        panic(err)
-    }
-    return status
+	status, err := responsejq.String("status")
+	if err != nil {
+		fmt.Println("Failed to parse deployment status")
+		panic(err)
+	}
+	return status
 }
 
 // Prints out the status line for the deploy
@@ -343,23 +343,23 @@ func PrintStatus(taskId string, serviceName string, status string) {
 // Returns the new lastTime
 func PrintNewDeploymentLogs(deploymentId string, lastTime string) string {
 	url := exploudUrl(fmt.Sprintf("/deployments/%s/logs", deploymentId))
-    if lastTime != "" {
-        url += "?since=" + lastTime
-    }
+	if lastTime != "" {
+		url += "?since=" + lastTime
+	}
 
-    logs, err := common.GetAsJsonq(url).ArrayOfObjects("logs")
-    if err != nil {
-        fmt.Println("Could not parse deployment logs from: " + url)
-        panic(err)
-    }
-    for _, log := range(logs) {
-        logjq := jsonq.NewQuery(log)
-        // naughty... TODO: put in some err handling
-        lastTime, _ = logjq.String("date")
-        message, _ := logjq.String("message")
-        fmt.Println(message)
-    }
-    return lastTime
+	logs, err := common.GetAsJsonq(url).ArrayOfObjects("logs")
+	if err != nil {
+		fmt.Println("Could not parse deployment logs from: " + url)
+		panic(err)
+	}
+	for _, log := range logs {
+		logjq := jsonq.NewQuery(log)
+		// naughty... TODO: put in some err handling
+		lastTime, _ = logjq.String("date")
+		message, _ := logjq.String("message")
+		fmt.Println(message)
+	}
+	return lastTime
 }
 
 // Poll the supplied deployment printing out the status to the console.
@@ -372,22 +372,22 @@ func PollDeployNew(deploymentId string, serviceName string) {
 	status := GetDeploymentStatus(deploymentId, 10)
 
 	timeout := time.Now().Add((20 * time.Minute))
-    lastTime := ""
-    for time.Now().Before(timeout) {
-        if status == "failed" || status == "invalid" {
-            console.Red()
-            console.Fail("Deployment reached a failed or terminated status :-(")
-        }
+	lastTime := ""
+	for time.Now().Before(timeout) {
+		if status == "failed" || status == "invalid" {
+			console.Red()
+			console.Fail("Deployment reached a failed or terminated status :-(")
+		}
 
-        lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
+		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
-        if status == "completed" {
-            break
-        }
-        // continue
-        time.Sleep(5 * time.Second)
-        status = GetDeploymentStatus(deploymentId, 1)
-    }
+		if status == "completed" {
+			break
+		}
+		// continue
+		time.Sleep(5 * time.Second)
+		status = GetDeploymentStatus(deploymentId, 1)
+	}
 
 	console.Green()
 	PrintStatus(deploymentId, serviceName, "Finished!")

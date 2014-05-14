@@ -7,7 +7,7 @@ import (
 
 func Klink() {
 	fmt.Println("\n")
-    fmt.Println("                        888      888 d8b          888")
+	fmt.Println("                        888      888 d8b          888")
 	fmt.Println("   _   _                888      888 Y8P          888")
 	fmt.Println("  ( \\_/ )  _   _        888      888              888")
 	fmt.Println(" __) _ (__( \\_/ )       888  888 888 888 88888b.  888  888")
@@ -21,6 +21,6 @@ func Klink() {
 
 func Fail(message string) {
 	fmt.Println(message)
-    Reset()
+	Reset()
 	os.Exit(1)
 }
