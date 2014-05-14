@@ -2,15 +2,16 @@ package update
 
 import (
 	"fmt"
-    "io"
+	"io"
 	"io/ioutil"
-    "log"
+	"log"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strconv"
 	"strings"
@@ -23,16 +24,16 @@ func Init() {
 			"Update klink to the latest version"},
 		common.Component{"force-update", ForceUpdate,
 			"Force klink to update to the current version"})
-    /*
-	common.Register(
-		common.Component{"update", Update,
-			"Update klink to the latest version"},
-		common.Component{"force-update", ForceUpdate,
-			"Force klink to update to the current version"})*/
+	/*
+		common.Register(
+			common.Component{"update", Update,
+				"Update klink to the latest version"},
+			common.Component{"force-update", ForceUpdate,
+				"Force klink to update to the current version"})*/
 }
 
 func benkinsUrl(end string) string {
-	return "http://benkins.brislabs.com/klink/" + end
+	return "http://benkins.brislabs.com/klink-beta/" + end
 }
 
 // Prints the current version, os and architecture
@@ -47,7 +48,7 @@ func LatestVersion() int {
 	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
 	if err != nil {
 		fmt.Println(err)
-		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
+		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink-beta/")
 	}
 	return i
 }
@@ -65,14 +66,14 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(_ common.Command) {
-    argsPath := os.Args[0]
+	argsPath := os.Args[0]
 
-	props.SetLastUpdated(int32(time.Now().Unix()))
-
-	path, pathErr := exec.LookPath("klink")
+	path, pathErr := exec.LookPath(path.Base(argsPath))
 	if pathErr != nil {
 		path = argsPath
 	}
+
+	props.SetLastUpdated(int32(time.Now().Unix()))
 
 	latestVersion := LatestVersion()
 
@@ -97,9 +98,9 @@ func Update(_ common.Command) {
 
 // For testing the update functionality
 func ForceUpdate(_ common.Command) {
-    argsPath := os.Args[0]
+	argsPath := os.Args[0]
 
-	path, pathErr := exec.LookPath("klink")
+	path, pathErr := exec.LookPath(path.Base(argsPath))
 	if pathErr != nil {
 		path = argsPath
 	}
@@ -133,9 +134,9 @@ func doUpdate(nextVersionUrl string, path string) {
 		errorWithHelper(nextVersionUrl)
 	}
 
-    console.Green()
+	console.Green()
 	fmt.Println("Klink has been updated to the latest version!")
-    console.Reset()
+	console.Reset()
 	if common.IsWindows() {
 		deferCopyForWindows(nextVersionUrl, path)
 	} else {
@@ -163,8 +164,8 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 // file locks
 func deferCopy(nextVersionUrl string, path string) {
 	script := "\nsleep 1\n" + "mv " + path + ".update " + path
-    script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
-    script += "\nrm -f updateklink.sh"
+	script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+	script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
@@ -177,7 +178,7 @@ func deferCopy(nextVersionUrl string, path string) {
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
-    io.Copy(os.Stdout, stdout)
+	io.Copy(os.Stdout, stdout)
 
 	os.Exit(0)
 }

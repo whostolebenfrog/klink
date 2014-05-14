@@ -7,7 +7,7 @@ import (
 
 func Klink() {
 	fmt.Println("\n")
-    fmt.Println("                        888      888 d8b          888")
+	fmt.Println("                        888      888 d8b          888")
 	fmt.Println("   _   _                888      888 Y8P          888")
 	fmt.Println("  ( \\_/ )  _   _        888      888              888")
 	fmt.Println(" __) _ (__( \\_/ )       888  888 888 888 88888b.  888  888")
@@ -19,29 +19,8 @@ func Klink() {
 	fmt.Println("\n")
 }
 
-func FailWhale(message string) {
-	fmt.Println("\t     FAIL WHALE!")
-	fmt.Println("\t")
-	fmt.Println("\tW     W      W        ")
-	fmt.Println("\tW        W  W     W    ")
-	fmt.Println("\t              '.  W      ")
-	fmt.Println("\t  .-\"\"-._     \\ \\.--|  ")
-	fmt.Println("\t /       \"-..__) .-'   ")
-	fmt.Println("\t|     _         /      ")
-	fmt.Println("\t\\'-.__,   .__.,'       ")
-	fmt.Println("\t `'----'._\\--'      ")
-	fmt.Println("\tVVVVVVVVVVVVVVVVVVVVV")
-	fmt.Println("\n")
-	fmt.Println(message)
-	fmt.Println("\n")
-}
-
 func Fail(message string) {
 	fmt.Println(message)
-	os.Exit(1)
-}
-
-func BigFail(message string) {
-	FailWhale(message)
+	Reset()
 	os.Exit(1)
 }

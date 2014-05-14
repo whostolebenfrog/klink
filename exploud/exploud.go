@@ -1,12 +1,15 @@
 package exploud
 
 import (
+	"encoding/json"
 	"fmt"
+	jsonq "github.com/jmoiron/jsonq"
+	"io/ioutil"
 	"net/http"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	props "nokia.com/klink/props"
 	ditto "nokia.com/klink/ditto"
+	props "nokia.com/klink/props"
 	"os"
 	"os/signal"
 	"regexp"
@@ -20,8 +23,12 @@ func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
 			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)"},
+		common.Component{"watch", Watch,
+			"{id} Resume watching the deployment with the supplied id"},
 		common.Component{"undo", Undo,
 			"{app} {env} Undo the steps of a broken deployment"},
+		common.Component{"deployments", Deployments,
+			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy"},
 		common.Component{"apps", ListApps,
@@ -34,7 +41,7 @@ func Init() {
 
 // Returns explouds url with the supplied string appended
 func exploudUrl(end string) string {
-	return "http://exploud.brislabs.com:8080/1.x" + end
+	return "http://exploud.brislabs.com/1.x" + end
 }
 
 // Return information about the servers running in the supplied environment
@@ -148,6 +155,33 @@ func DoDeployment(url string, body interface{}, message string, args common.Comm
 	PollDeployNew(deployRef.Id, args.SecondPos)
 }
 
+// List any currently active deployments or if an app param supplied
+// all deployments for that app
+func Deployments(args common.Command) {
+	app := args.SecondPos
+	if app == "" {
+		fmt.Println(common.GetString(exploudUrl("/in-progress")))
+	} else {
+		env := args.ThirdPos
+		if env == "" {
+			env = "poke"
+		}
+		url := exploudUrl("/deployments?application=" + app + "&env=" + env)
+		fmt.Println(common.GetString(url))
+	}
+}
+
+// Resume an existing deployment, also pretty swish for testing
+func Watch(args common.Command) {
+	id := args.SecondPos
+
+	if id == "" {
+		console.Fail("Must supply a deployment id as the second positional arg")
+	}
+
+	PollDeployNew(id, "TODO: do this for a name instead of id")
+}
+
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
 func Exploud(args common.Command) {
 	validateDeploymentArgsWithAmi(args)
@@ -158,10 +192,10 @@ func Exploud(args common.Command) {
 
 	latestAmi := ditto.LatestAmiFor(app)
 
-	if (ami == "") {
+	if ami == "" {
 		confirmDeployLatest(latestAmi)
 		ami = latestAmi.ImageId
-	} else if (latestAmi.ImageId != ami) {
+	} else if latestAmi.ImageId != ami {
 		confirmNonLatestBake(latestAmi)
 	}
 
@@ -173,8 +207,9 @@ func Exploud(args common.Command) {
 	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
+// TODO - filthy code duplication. AL DUTTON YOU'RE ON MY LIST
+// TODO - doc strings
 func confirmNonLatestBake(ami ditto.Ami) {
-
 	console.Red()
 	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (version %s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
 	console.Reset()
@@ -197,7 +232,6 @@ func confirmNonLatestBake(ami ditto.Ami) {
 }
 
 func confirmDeployLatest(latestAmi ditto.Ami) {
-
 	console.Green()
 	fmt.Println(fmt.Sprintf("The latest ami %s (version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
 	console.Reset()
@@ -250,50 +284,40 @@ func Rollback(args common.Command) {
 	DoDeployment(deployUrl, deployRequest, message, args)
 }
 
-// Exploud JSON task log message
-type TaskLog struct {
-	Date    string `json:"Date"`
-	Message string `json:"message"`
-}
-
-// Exploud JSON task
-type Task struct {
-	Action         string    `json:"action"`
-	DurationString string    `json:"durationString"`
-	End            string    `json:"end"`
-	Id             string    `json:"_id"`
-	Log            []TaskLog `json:"log"`
-	Operation      string    `json:"operation"`
-	Start          string    `json:"start"`
-	Status         string    `json:"status"`
-	Url            string    `json:"url"`
-}
-
-// Exploud JSON deployment
-type Deployment struct {
-	Ami         string `json:"ami"`
-	Application string `json:"application"`
-	Created     string `json:"created"`
-	End         string `json:"end"`
-	Environment string `json:"environment"`
-	Hash        string `json:"hash"`
-	Id          string `json:"id"`
-	Region      string `json:"region"`
-	Start       string `json:"start"`
-	Tasks       []Task `json:"tasks"`
-	User        string `json:"user"`
-}
-
-func GetDeployment(deploymentId string) Deployment {
+// Returns the status of the deployment with the supplied id
+func GetDeploymentStatus(deploymentId string, retries int) string {
 	url := exploudUrl(fmt.Sprintf("/deployments/%s", deploymentId))
 
-	deployment := Deployment{}
-	common.GetJson(url, &deployment)
-	return deployment
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Error creating GET request for url: %s\n", url)
+		panic(err)
+	}
+	if resp.StatusCode == 404 {
+		if retries > 0 {
+			time.Sleep(1 * time.Second)
+			return GetDeploymentStatus(deploymentId, retries-1)
+		}
+	}
+
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	data := map[string]interface{}{}
+	dec := json.NewDecoder(strings.NewReader(string(responseBody)))
+	dec.Decode(&data)
+	responsejq := jsonq.NewQuery(data)
+
+	status, err := responsejq.String("status")
+	if err != nil {
+		fmt.Println("Failed to parse deployment status")
+		panic(err)
+	}
+	return status
 }
 
 // Prints out the status line for the deploy
-func Status(taskId string, serviceName string, status string) {
+func PrintStatus(taskId string, serviceName string, status string) {
 	// first line
 	fmt.Println("")
 	console.Red()
@@ -314,50 +338,59 @@ func Status(taskId string, serviceName string, status string) {
 	console.FReset()
 }
 
+// Prints any new logs since the previous lastTime
+// if lastTime is blank then return all logs
+// Returns the new lastTime
+func PrintNewDeploymentLogs(deploymentId string, lastTime string) string {
+	url := exploudUrl(fmt.Sprintf("/deployments/%s/logs", deploymentId))
+	if lastTime != "" {
+		url += "?since=" + lastTime
+	}
+
+	logs, err := common.GetAsJsonq(url).ArrayOfObjects("logs")
+	if err != nil {
+		fmt.Println("Could not parse deployment logs from: " + url)
+		panic(err)
+	}
+	for _, log := range logs {
+		logjq := jsonq.NewQuery(log)
+		// naughty... TODO: put in some err handling
+		lastTime, _ = logjq.String("date")
+		message, _ := logjq.String("message")
+		fmt.Println(message)
+	}
+	return lastTime
+}
+
 // Poll the supplied deployment printing out the status to the console.
 func PollDeployNew(deploymentId string, serviceName string) {
 	chnl := HandleDeployInterrupt()
 	defer DeregisterInterupt(chnl)
 
-	Status(deploymentId, serviceName, "pending")
-	deployment := GetDeployment(deploymentId)
+	PrintStatus(deploymentId, serviceName, "pending")
+
+	status := GetDeploymentStatus(deploymentId, 10)
 
 	timeout := time.Now().Add((20 * time.Minute))
-	for i := 0; i < len(deployment.Tasks) && time.Now().Before(timeout); i++ {
-		task := deployment.Tasks[i]
+	lastTime := ""
+	for time.Now().Before(timeout) {
+		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
-		console.Green()
-		fmt.Printf("Starting task: %s\n\n", task.Action)
-		console.Reset()
-
-		previousLength := 0
-		// can't check == running as wont be set when we first call
-		for (task.Status != "completed") &&
-			(task.Status != "undone") &&
-			(task.Status != "failed") &&
-			(task.Status != "skipped") &&
-			(task.Status != "teminated") &&
-			time.Now().Before(timeout) {
-
-			time.Sleep(5 * time.Second)
-			deployment = GetDeployment(deploymentId)
-			task = deployment.Tasks[i]
-
-			for i := previousLength; i < len(task.Log); i++ {
-				fmt.Println(task.Log[i])
-			}
-
-			previousLength = len(task.Log)
+		if status == "failed" || status == "invalid" {
+			console.Red()
+			console.Fail("Deployment reached a failed or terminated status :-(")
 		}
 
-		// if we see something failed then kill everything - exploud doesn't recover
-		if task.Status == "failed" || task.Status == "terminated" {
-			console.Fail(fmt.Sprintf("Deployment reached a failed or terminated task: %s", task))
+		if status == "completed" {
+			break
 		}
+		// continue
+		time.Sleep(5 * time.Second)
+		status = GetDeploymentStatus(deploymentId, 1)
 	}
 
 	console.Green()
-	Status(deploymentId, serviceName, "Finished!")
+	PrintStatus(deploymentId, serviceName, "Finished!")
 	console.Reset()
 }
 
@@ -399,7 +432,11 @@ const (
 // Returns true if the user wants to cancel the deployment
 func cancelDeploymentPerchance() int {
 	console.Red()
+	fmt.Println("CURRENTLY THIS DOESN'T WORK. COMING SOON 2009!")
+	fmt.Println("If you kill the deployment here it will continue")
+	fmt.Println("You can start watching it again with klink watch {app} {env}")
 	fmt.Println("Do you want to rollback the deployment? [Yes, No, Continue]")
+	fmt.Println("CURRENTLY THIS DOESN'T WORK. COMING SOON 2009!")
 	console.Reset()
 	var response string
 

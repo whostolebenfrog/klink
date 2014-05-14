@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	flags "nokia.com/klink/flags"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	doctor "nokia.com/klink/doctor"
 	exploud "nokia.com/klink/exploud"
+	flags "nokia.com/klink/flags"
 	git "nokia.com/klink/git"
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
@@ -17,12 +17,12 @@ import (
 )
 
 func handleAction(args common.Command) {
-    // global error handling
+	// global error handling
 	defer func() {
 		if p := recover(); p != nil {
 			if args.Debug == true {
 				console.Red()
-                fmt.Println("\nDon't worry about the paths in trace, that's just go.\n")
+				fmt.Println("\nDon't worry about the paths in trace, that's just go.\n")
 				console.Reset()
 				panic(p)
 			}
@@ -33,7 +33,7 @@ func handleAction(args common.Command) {
 		}
 	}()
 
-    // everything else
+	// everything else
 	for i := range common.Components {
 		component := common.Components[i]
 		if args.Action == component.Command {
@@ -42,7 +42,7 @@ func handleAction(args common.Command) {
 		}
 	}
 
-    // failed to find the command, print help
+	// failed to find the command, print help
 	flags.PrintHelpAndExit()
 }
 
@@ -59,7 +59,7 @@ func init() {
 	git.Init()
 	jenkins.Init()
 	onix.Init()
-    update.Init()
+	update.Init()
 }
 
 func main() {

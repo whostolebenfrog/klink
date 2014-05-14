@@ -8,8 +8,8 @@ import (
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
 	"os"
-    "time"
 	"regexp"
+	"time"
 )
 
 func Init() {

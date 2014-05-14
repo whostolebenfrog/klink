@@ -22,25 +22,22 @@ for build in $BUILDS
 do
     # if this is wrong I don't want to know what right is.
     if [ $(whoami) == "jenkins" ]; then
-        cp $build /opt/klink/
+        cp $build /opt/klink-beta/
     else
-        scp $build benkins.brislabs.com:/opt/klink/
+        scp $build benkins.brislabs.com:/opt/klink-beta/
     fi
 done
 
 # Update the version file on the remote server to provide the latest version
 
 if [ $(whoami) == "jenkins" ]; then
-    cp version /opt/klink
+    cp version /opt/klink-beta
 else
-    scp version benkins.brislabs.com:/opt/klink/
+    scp version benkins.brislabs.com:/opt/klink-beta
 fi
 
 # Update git
 
 git add -A
 git commit -m "Bumped version number for release: $NEXT_VERSION"
-git push origin master
-
-git tag -a v$NEXT_VERSION -m "Version $NEXT_VERSION"
-git push --tags origin master
+git push origin klink-beta
