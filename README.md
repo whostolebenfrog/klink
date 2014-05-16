@@ -1,6 +1,6 @@
 # KLINK
 
-Klink is the front end to our cloud tooling. It makes calls to the various orchestrating services that allow you to use bake images and deploy services into aws.
+Klink is the frontend to our cloud tooling. It makes calls to the various orchestrating applications that allow you to use bake images and deploy applications into aws.
 
 ## Installation
 
@@ -14,7 +14,7 @@ Move this file to somewhere on your `$PATH` that doesn't require root privileges
     cd !$
     chmod +x klink
 
-Double check that you don't have appgate connected to live (blocks you from being able to talk to services in aws brislabs) then run klink
+Double check that you don't have appgate connected to live (blocks you from being able to talk to applications in aws brislabs) then run klink
 
     klink
     

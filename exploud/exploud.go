@@ -83,7 +83,7 @@ func ListApps(args common.Command) {
 	fmt.Println(common.GetString(exploudUrl("/applications")))
 }
 
-// AppExists returns true if the application exists according to the exploud service
+// AppExists returns true if the application exists according to exploud
 func AppExists(appName string) bool {
 	return common.Head(exploudUrl("/applications/" + appName))
 }
@@ -217,7 +217,7 @@ func Exploud(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
 	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is deploying %s for service %s to %s. %s",
+	message := fmt.Sprintf("%s is deploying %s for application %s to %s. %s",
 		props.GetUsername(), ami, app, env, args.Message)
 
 	DoDeployment(deployUrl, deployRequest, message, args)
@@ -306,7 +306,7 @@ func Undo(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"), app, env)
 	deployRequest := DeployRequest{args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is undoing deployment of service %s in %s. %s",
+	message := fmt.Sprintf("%s is undoing deployment of application %s in %s. %s",
 		props.GetUsername(), app, env, args.Message)
 
 	DoDeployment(deployUrl, deployRequest, message, args)
@@ -322,7 +322,7 @@ func Rollback(args common.Command) {
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"), app, env)
 	deployRequest := DeployRequest{args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is rollingback service %s in %s. %s",
+	message := fmt.Sprintf("%s is rolling back application %s in %s. %s",
 		props.GetUsername(), app, env, args.Message)
 
 	DoDeployment(deployUrl, deployRequest, message, args)
@@ -415,9 +415,8 @@ func PollDeployNew(deploymentId string, serviceName string) {
 
 	status := GetDeploymentStatus(deploymentId, 10)
 
-	timeout := time.Now().Add((20 * time.Minute))
 	lastTime := ""
-	for time.Now().Before(timeout) {
+	for true {
 		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
 		if status == "failed" || status == "invalid" {
@@ -428,6 +427,7 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		if status == "completed" {
 			break
 		}
+
 		// continue
 		time.Sleep(5 * time.Second)
 		status = GetDeploymentStatus(deploymentId, 1)
@@ -439,7 +439,7 @@ func PollDeployNew(deploymentId string, serviceName string) {
 }
 
 // Register a new application with exploud, should have the knock on effect
-// of registering with the other services that exploud depends upon e.g.
+// of registering with the other applications that exploud depends upon e.g.
 // onix and tyranitar
 func CreateApp(args common.Command) {
 	if args.SecondPos == "" || strings.Index(args.SecondPos, "-") == 0 {
