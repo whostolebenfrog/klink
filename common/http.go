@@ -147,7 +147,7 @@ func GetString(url string, muteRequest ...func(*http.Request)) string {
 // Returns the result of an http get request as a jsonq object
 func GetAsJsonq(url string) *jsonq.JsonQuery {
 	data := map[string]interface{}{}
-	dec := json.NewDecoder(strings.NewReader(GetString(url)))
+	dec := json.NewDecoder(strings.NewReader("{\"x\":" + GetString(url) + "}"))
 	dec.Decode(&data)
 	return jsonq.NewQuery(data)
 }

@@ -48,10 +48,17 @@ func exploudUrl(end string) string {
 	return "http://exploud.brislabs.com/1.x" + end
 }
 
+// Returns a jsonq object with information about the boxes running
+// for the supplied application and environment
+func JsonBoxes(app string, env string, i []interface{}) {
+    describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+    common.GetJson(describeUrl, &i)
+}
+
 // Return information about the servers running in the supplied environment
 func Boxes(args common.Command) {
 	if args.SecondPos == "" {
-		console.Fail("You must supply a service as the second positional argument")
+		console.Fail("You must supply an app as the second positional argument")
 	}
 	app := args.SecondPos
 	if args.ThirdPos == "" {

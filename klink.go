@@ -12,6 +12,7 @@ import (
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
+	ssh "nokia.com/klink/ssh"
 	update "nokia.com/klink/update"
 	"os"
 )
@@ -60,6 +61,7 @@ func init() {
 	jenkins.Init()
 	onix.Init()
 	update.Init()
+	ssh.Init()
 }
 
 func main() {
