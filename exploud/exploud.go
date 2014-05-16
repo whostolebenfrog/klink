@@ -408,9 +408,8 @@ func PollDeployNew(deploymentId string, serviceName string) {
 
 	status := GetDeploymentStatus(deploymentId, 10)
 
-	timeout := time.Now().Add((20 * time.Minute))
 	lastTime := ""
-	for time.Now().Before(timeout) {
+	for true {
 		lastTime = PrintNewDeploymentLogs(deploymentId, lastTime)
 
 		if status == "failed" || status == "invalid" {
@@ -421,6 +420,7 @@ func PollDeployNew(deploymentId string, serviceName string) {
 		if status == "completed" {
 			break
 		}
+
 		// continue
 		time.Sleep(5 * time.Second)
 		status = GetDeploymentStatus(deploymentId, 1)
