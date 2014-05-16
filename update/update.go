@@ -163,8 +163,11 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 // Write and run a script to copy the new version over ourselves, avoids
 // file locks
 func deferCopy(nextVersionUrl string, path string) {
-	script := "\nsleep 1\n" + "mv " + path + ".update " + path
-	script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+	script := "sleep 1"
+    script += "\nmv " + path + ".update " + path
+    if os.Args[1] != "update" {
+        script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+    }
 	script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
