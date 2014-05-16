@@ -2,8 +2,6 @@ package ssh
 
 import (
 	"fmt"
-    //"io/ioutil"
-    //"io"
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
@@ -14,7 +12,7 @@ import (
 
 func Init() {
 	common.Register(
-		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server"})
+		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server [-v true]"})
 }
 
 func SSH(args common.Command) {
