@@ -14,12 +14,17 @@ type RCProps struct {
 	Username     string `json:"username"`
 	LastUpdated  int32  `json:"lastUpdated"`
 	DoctorHasRun string `json:"doctorHasRun"`
+    SSHUsername string `json:"sshUsername"`
 }
 
 // Returns the current username
 func GetUsername() string {
 	EnsureRCFile()
 	return GetRCProperties().Username
+}
+
+func GetSSHUsername() string {
+    return GetRCProperties().SSHUsername
 }
 
 // Creates a klinkrc file and prompts the user for a username

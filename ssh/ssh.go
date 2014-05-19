@@ -6,13 +6,14 @@ import (
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	exploud "nokia.com/klink/exploud"
+    props "nokia.com/klink/props"
     "os"
     "os/exec"
 )
 
 func Init() {
 	common.Register(
-		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server [-v true]"})
+		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server [-v true]. Uses SSHUsername from klink.rc if set"})
 }
 
 func SSH(args common.Command) {
@@ -63,12 +64,16 @@ func writeSSHScript(ip string, verbose bool) {
         console.Fail("Can't ssh on windows. Well, klink can't anyway :-/ Talk to Ben if you really want this")
     }
 
-    var cmd *exec.Cmd
+    var sshargs []string
     if verbose {
-        cmd = exec.Command("ssh", ip, "-v")
-    } else {
-        cmd = exec.Command("ssh", ip)
+        sshargs = append(sshargs, "-v")
     }
+    if props.GetSSHUsername() != "" {
+        sshargs = append(sshargs, "-l", props.GetSSHUsername())
+    }
+    sshargs = append(sshargs, ip)
+
+    cmd := exec.Command("ssh", sshargs...)
     cmd.Stdout = os.Stdout
     cmd.Stdin = os.Stdin
     cmd.Stderr = os.Stderr
