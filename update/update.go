@@ -38,7 +38,7 @@ func benkinsUrl(end string) string {
 
 // Prints the current version, os and architecture
 func PrintVersion() {
-	fmt.Printf("klink-0.%d-%s-%s", Version, runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("klink-0.%d-%s-%s\n", Version, runtime.GOOS, runtime.GOARCH)
 }
 
 // Return the latest released version of klink
