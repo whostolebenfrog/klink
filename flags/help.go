@@ -27,7 +27,7 @@ func PrintHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("boxes\n")
+	fmt.Print("ssh, bake accepts version as third arg\n")
 	console.FReset()
 
 	// [commands]
