@@ -84,9 +84,9 @@ func DoBake(url string, retries int) {
 		fmt.Printf("Got %d response calling ditto to bake ami.\n", resp.StatusCode)
 		io.Copy(os.Stdout, resp.Body)
 		panic("\nFailed to bake ami.")
+	} else {
+		io.Copy(os.Stdout, resp.Body)
 	}
-
-	io.Copy(os.Stdout, resp.Body)
 }
 
 // Bake the ami
