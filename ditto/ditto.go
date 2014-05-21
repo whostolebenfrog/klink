@@ -55,7 +55,7 @@ func AllowProd(args common.Command) {
 	}
 }
 
-func DoBake(url string) {
+func DoBake(url string, retries int) {
 	httpClient := common.NewTimeoutClient(10*time.Second, 2000*time.Second)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -73,7 +73,13 @@ func DoBake(url string) {
 	if resp.StatusCode == 503 {
 		console.Fail("Ditto is currently not available. This is most likely due it being redeployed. If it's not back in 10 minutes ask in Campfire or speak to Ben Griffiths.")
 	} else if resp.StatusCode == 404 {
-		console.Fail("Sorry, the RPM for this application is not yet available. Wait a few minutes and then try again.")
+		if retries > 0 {
+			fmt.Println("RPM isn't yet available, retrying in 5 seconds")
+			time.Sleep(5 * time.Second)
+			DoBake(url, retries-1)
+		} else {
+			console.Fail("RPM doesn't appear to be available after retrying. Wait a bit longer or check your version is correct / yum repo has it available")
+		}
 	} else if resp.StatusCode != 200 {
 		fmt.Printf("Got %d response calling ditto to bake ami.\n", resp.StatusCode)
 		io.Copy(os.Stdout, resp.Body)
@@ -85,7 +91,7 @@ func DoBake(url string) {
 
 // Bake the ami
 func Bake(args common.Command) {
-    app := args.SecondPos
+	app := args.SecondPos
 	if app == "" {
 		console.Fail("Application must be supplied as the second argument")
 	}
@@ -100,13 +106,13 @@ func Bake(args common.Command) {
 		console.Fail("Version must be supplied as the third argument or using --version")
 	}
 
-	if !onix.AppExists(args.SecondPos) {
+	if !onix.AppExists(app) {
 		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against onix!",
-			args.SecondPos))
+			app))
 	}
 
 	url := bakeUrl(app, version)
-	DoBake(url)
+	DoBake(url, 120)
 }
 
 type Ami struct {
@@ -186,10 +192,10 @@ func Helpers(args common.Command) {
 		fmt.Println(common.PostJson(cleanUrl, nil))
 	case "entertainment":
 		bakeUrl := dittoUrl("/bake/entertainment-ami")
-		DoBake(bakeUrl)
+		DoBake(bakeUrl, 120)
 	case "public":
 		bakeUrl := dittoUrl("/bake/public-ami")
-		DoBake(bakeUrl)
+		DoBake(bakeUrl, 120)
 	case "inprogress":
 		progUrl := dittoUrl("/inprogress")
 		fmt.Println(common.GetString(progUrl))
