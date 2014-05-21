@@ -17,7 +17,7 @@ func Init() {
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis"},
 		common.Component{"bake", Bake,
-			"{app} -v {version} Bakes an AMI for {app} with version {version}"},
+			"{app} [{version}] [-v {version}] Bakes an AMI for {app} with version {version}"},
 		common.Component{"allow-prod", AllowProd,
 			"{app} Allows the prod aws account access to the supplied application"},
 		common.Component{"amis", FindAmis,
@@ -85,18 +85,27 @@ func DoBake(url string) {
 
 // Bake the ami
 func Bake(args common.Command) {
-	if args.SecondPos == "" {
-		console.Fail("Application must be supplied as second positional argument")
+    app := args.SecondPos
+	if app == "" {
+		console.Fail("Application must be supplied as the second argument")
 	}
-	if args.Version == "" {
-		console.Fail("Version must be supplied using --version")
+
+	var version string
+	if args.ThirdPos != "" {
+		version = args.ThirdPos
+	} else {
+		version = args.Version
 	}
+	if version == "" {
+		console.Fail("Version must be supplied as the third argument or using --version")
+	}
+
 	if !onix.AppExists(args.SecondPos) {
 		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against onix!",
 			args.SecondPos))
 	}
 
-	url := bakeUrl(args.SecondPos, args.Version)
+	url := bakeUrl(app, version)
 	DoBake(url)
 }
 
