@@ -90,7 +90,7 @@ func Update(_ common.Command) {
 	nextVersionUrl := benkinsUrl(nextVersion)
 
 	if common.Head(nextVersionUrl) {
-		doUpdate(nextVersionUrl, path)
+		doUpdate(nextVersionUrl, path, latestVersion)
 	} else {
 		errorWithHelper(nextVersionUrl)
 	}
@@ -109,14 +109,14 @@ func ForceUpdate(_ common.Command) {
 	thisVersionUrl := benkinsUrl(thisVersion)
 
 	if common.Head(thisVersionUrl) {
-		doUpdate(thisVersionUrl, path)
+		doUpdate(thisVersionUrl, path, LatestVersion())
 	} else {
 		errorWithHelper(thisVersionUrl)
 	}
 }
 
 // Does the update
-func doUpdate(nextVersionUrl string, path string) {
+func doUpdate(nextVersionUrl string, path string, latestVersion int) {
 	resp, err := http.Get(nextVersionUrl)
 	if err != nil {
 		errorWithHelper(nextVersionUrl)
@@ -135,7 +135,7 @@ func doUpdate(nextVersionUrl string, path string) {
 	}
 
 	console.Green()
-	fmt.Println("Klink has been updated to the latest version!")
+	fmt.Println(fmt.Sprintf("Klink has been updated to the latest version! %s to %s", Version, latestVersion))
 	console.Reset()
 	if common.IsWindows() {
 		deferCopyForWindows(nextVersionUrl, path)
