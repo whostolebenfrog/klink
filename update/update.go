@@ -135,7 +135,7 @@ func doUpdate(nextVersionUrl string, path string, latestVersion int) {
 	}
 
 	console.Green()
-	fmt.Println(fmt.Sprintf("Klink has been updated to the latest version! %s to %s", Version, latestVersion))
+	fmt.Println(fmt.Sprintf("Klink has been updated to the latest version! %d to %d", Version, latestVersion))
 	console.Reset()
 	if common.IsWindows() {
 		deferCopyForWindows(nextVersionUrl, path)
