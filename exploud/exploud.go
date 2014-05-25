@@ -51,8 +51,8 @@ func exploudUrl(end string) string {
 // Returns a jsonq object with information about the boxes running
 // for the supplied application and environment
 func JsonBoxes(app string, env string, i []interface{}) {
-    describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
-    common.GetJson(describeUrl, &i)
+	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+	common.GetJson(describeUrl, &i)
 }
 
 // Return information about the servers running in the supplied environment
@@ -97,11 +97,13 @@ func AppExists(appName string) bool {
 type AmiDeployRequest struct {
 	Ami      string `json:"ami"`
 	Message  string `json:"message"`
+	Silent   bool   `json:"silent"`
 	Username string `json:"user"`
 }
 
 type DeployRequest struct {
 	Message  string `json:"message"`
+	Silent   bool   `json:"silent"`
 	Username string `json:"user"`
 }
 
@@ -161,12 +163,10 @@ func validateDeploymentArgsWithAmi(args common.Command) {
 }
 
 // Execute a deployment
-func DoDeployment(url string, body interface{}, message string, args common.Command) {
+func DoDeployment(url string, body interface{}, args common.Command) {
 	deployRef := DeploymentReference{}
 
 	common.PostJsonUnmarshalResponse(url, &body, &deployRef)
-
-	console.Hubot(message, args)
 
 	PollDeployNew(deployRef.Id, args.SecondPos)
 }
@@ -216,11 +216,9 @@ func Exploud(args common.Command) {
 	}
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
-	deployRequest := AmiDeployRequest{ami, args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is deploying %s for application %s to %s. %s",
-		props.GetUsername(), ami, app, env, args.Message)
+	deployRequest := AmiDeployRequest{ami, args.Message, args.Silent, props.GetUsername()}
 
-	DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, args)
 }
 
 // Pause a running deployment
@@ -305,11 +303,9 @@ func Undo(args common.Command) {
 	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"), app, env)
-	deployRequest := DeployRequest{args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is undoing deployment of application %s in %s. %s",
-		props.GetUsername(), app, env, args.Message)
+	deployRequest := DeployRequest{args.Message, args.Silent, props.GetUsername()}
 
-	DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, args)
 }
 
 // Exploud -> Expload the app to the cloud. AKA deploy the app named in the args SecondPos
@@ -321,11 +317,9 @@ func Rollback(args common.Command) {
 	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"), app, env)
-	deployRequest := DeployRequest{args.Message, props.GetUsername()}
-	message := fmt.Sprintf("%s is rolling back application %s in %s. %s",
-		props.GetUsername(), app, env, args.Message)
+	deployRequest := DeployRequest{args.Message, args.Silent, props.GetUsername()}
 
-	DoDeployment(deployUrl, deployRequest, message, args)
+	DoDeployment(deployUrl, deployRequest, args)
 }
 
 // Returns the status of the deployment with the supplied id
