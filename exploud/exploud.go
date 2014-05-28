@@ -31,6 +31,8 @@ func Init() {
 			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed"},
 		common.Component{"pause", Pause,
 			"{app} {env} attempts to pause a running deployment of {app} in {env}"},
+		common.Component{"cancel-pause", CancelPause,
+			"{app} {env} cancels any existing pause for {app} in {env}"},
 		common.Component{"resume", Resume,
 			"{app} {env} attempts to resume a paused deployment of {app} in {env}"},
 		common.Component{"rollback", Rollback,
@@ -233,6 +235,20 @@ func Pause(args common.Command) {
 	fmt.Printf("Attempting to pause deployment of %s in %s\n", app, env)
 
 	common.PostJson(pauseUrl, "")
+}
+
+// Cancel a submitted pause
+func CancelPause(args common.Command) {
+	validateDeploymentArgs(args)
+
+	app := args.SecondPos
+	env := args.ThirdPos
+
+	pauseUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/pause"), app, env)
+
+	fmt.Printf("Attempting to cancel pause of %s in %s\n", app, env)
+
+	common.Delete(pauseUrl)
 }
 
 // Resume a paused deployment
