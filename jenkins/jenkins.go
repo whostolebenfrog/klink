@@ -102,22 +102,26 @@ func GetJobFromQueue(path string, retries int) string {
 func PollBuild(path string) string {
 	status := GetJobStatus(path)
 	lines := GetJobOutput(path)
-	offset := 0
+	offset := PrintOutput(0, lines);
 	timeout := time.Now().Add((20 * time.Minute))
 
 	for (status == "in progress...") && time.Now().Before(timeout) {
-
-		for i := offset; i < len(lines); i++ {
-			fmt.Println(lines[i])
-		}
-		offset = len(lines)
-
-		time.Sleep(1 * time.Second)
 		status = GetJobStatus(path)
 		lines = GetJobOutput(path)
+		offset = PrintOutput(offset, lines);
+
+		time.Sleep(1 * time.Second)
 	}
+
 	fmt.Println(status)
 	return status
+}
+
+func PrintOutput(offset int, lines []string) int {
+	for i := offset; i < len(lines); i++ {
+		fmt.Println(lines[i])
+	}
+	return len(lines)
 }
 
 // Return as jobs status
