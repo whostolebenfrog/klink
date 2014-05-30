@@ -165,7 +165,7 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 func deferCopy(nextVersionUrl string, path string) {
 	script := "sleep 1"
 	script += "\nmv " + path + ".update " + path
-	if os.Args[1] != "update" {
+	if len(os.Args) > 0 && os.Args[1] != "update" {
 		script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
 	}
 	script += "\nrm -f updateklink.sh"
