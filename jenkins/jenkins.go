@@ -13,7 +13,9 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"build", Build,
-			"{app} builds the Jenkins release job for an application"})
+			"{app} runs the Jenkins release job for an application"},
+		common.Component{"test", Test,
+			"{app} runs the Jenkins test job for an application"})
 }
 
 // Build a release job for the supplied application and poll the reponse
@@ -23,9 +25,23 @@ func Build(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to build...")
 	}
 
-	path := BuildPath(app)
-	fmt.Println("Calling release job at URL: " + path)
+	path := JobPath(app, "releasePath") + "build"
+	CreateBuild(path)
+}
 
+// Build a test job for the supplied application and poll the reponse
+func Test(args common.Command) {
+	app := args.SecondPos
+	if app == "" {
+		console.Fail("Yeah, you're gonna have to tell me what to test...")
+	}
+
+	path := JobPath(app, "testPath") + "buildWithParameters"
+	CreateBuild(path)
+}
+
+// Create a new build for the given job and poll the reponse
+func CreateBuild(path string) {
 	location := PostBuild(path) + "api/json"
 	job := GetJobFromQueue(location, 12)
 
@@ -41,12 +57,14 @@ func Build(args common.Command) {
 }
 
 // Returns the release path for the supplied app
-func BuildPath(app string) string {
-	releasePath := onix.GetProperty(app, "releasePath")
-	if !strings.HasSuffix(releasePath, "/") {
-		releasePath += "/"
+func JobPath(app string, property string) string {
+	jobPath := onix.GetProperty(app, property)
+	if !strings.HasSuffix(jobPath, "/") {
+		jobPath += "/"
 	}
-	return releasePath + "build/api/json"
+	fmt.Println("Job URL: " + jobPath)
+
+	return jobPath
 }
 
 // Post a build and return the jobs location in the queue
