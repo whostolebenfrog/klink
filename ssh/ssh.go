@@ -6,6 +6,7 @@ import (
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	exploud "nokia.com/klink/exploud"
+	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
@@ -25,8 +26,9 @@ func SSH(args common.Command) {
 	if app == "" {
 		console.Fail("You must supply an app as the second positional argument")
 	}
-	if env != "poke" && env != "prod" {
-		fmt.Println("env not supplied or incorrect, setting to poke. poke and prod allowed")
+	if !onix.KnownEnvironment(env) {
+		fmt.Println(fmt.Sprintf("env not supplied or incorrect, setting to poke. %s",
+			props.GetEnvironments()))
 		env = "poke"
 	}
 	if id == "" {

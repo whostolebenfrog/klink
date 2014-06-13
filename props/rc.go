@@ -10,11 +10,11 @@ import (
 )
 
 type RCProps struct {
-	Username     string `json:"username"`
-	LastUpdated  int32  `json:"lastUpdated"`
-	DoctorHasRun string `json:"doctorHasRun"`
-	SSHUsername  string `json:"sshUsername"`
-	Environments string `json:"environments"`
+	Username     string   `json:"username"`
+	LastUpdated  int32    `json:"lastUpdated"`
+	DoctorHasRun string   `json:"doctorHasRun"`
+	SSHUsername  string   `json:"sshUsername"`
+	Environments []string `json:"environments"`
 }
 
 //////////////////////
@@ -91,7 +91,6 @@ func GetRCProperties() RCProps {
 
 // Set the property key / value pair in the users rc file
 func Set(name string, value string) {
-	EnsureRCFile()
 	rcProps := GetRCProperties()
 	reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
 	writeRCProperties(rcProps)
@@ -99,15 +98,13 @@ func Set(name string, value string) {
 
 // Get a property by name
 func Get(name string) string {
-	EnsureRCFile()
-    rcProps := GetRCProperties()
-    return reflect.ValueOf(rcProps).FieldByName(name).String()
+	rcProps := GetRCProperties()
+	return reflect.ValueOf(rcProps).FieldByName(name).String()
 }
 
 // Return the last time we checked for an update
 func GetLastUpdated() int32 {
-    EnsureRCFile()
-    return GetRCProperties().LastUpdated
+	return GetRCProperties().LastUpdated
 }
 
 // Write the last time we checked for an update
@@ -115,4 +112,16 @@ func SetLastUpdated(t int32) {
 	props := GetRCProperties()
 	props.LastUpdated = t
 	writeRCProperties(props)
+}
+
+// Returns the list of known environments
+func GetEnvironments() []string{
+    return GetRCProperties().Environments
+}
+
+// Updates the list of known environments
+func SetEnvironments(environments []string) {
+    props := GetRCProperties()
+    props.Environments = environments
+    writeRCProperties(props)
 }

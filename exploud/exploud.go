@@ -9,6 +9,7 @@ import (
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
+	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
 	"os"
 	"os/signal"
@@ -133,9 +134,10 @@ func validateDeploymentArgs(args common.Command) {
 	env := args.ThirdPos
 	if env == "" {
 		console.Fail("Must supply an environment as third postional argument.")
-	} else if !(env == "poke" || env == "prod") {
+	} else if !onix.KnownEnvironment(env) {
 		console.Fail(
-			fmt.Sprintf("Third argument \"%s\" must be an environment. poke or prod.", env))
+			fmt.Sprintf("Third argument \"%s\" must be a known environment. %s.",
+				env, onix.GetEnvironments(env)))
 	}
 }
 
@@ -177,10 +179,10 @@ func DoDeployment(url string, body interface{}, args common.Command) {
 // all deployments for that app
 func Deployments(args common.Command) {
 	app := args.SecondPos
+    env := args.ThirdPos
 	if app == "" {
 		fmt.Println(common.GetString(exploudUrl("/in-progress")))
 	} else {
-		env := args.ThirdPos
 		if env == "" {
 			env = "poke"
 		}
