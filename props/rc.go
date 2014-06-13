@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	"os"
 	"reflect"
 )
 
@@ -15,21 +14,34 @@ type RCProps struct {
 	LastUpdated  int32  `json:"lastUpdated"`
 	DoctorHasRun string `json:"doctorHasRun"`
 	SSHUsername  string `json:"sshUsername"`
+	Environments string `json:"environments"`
 }
 
-// Returns the current username
-func GetUsername() string {
-	EnsureRCFile()
-	return GetRCProperties().Username
+//////////////////////
+// Helper functions //
+//////////////////////
+
+// Returns the path of the klink rc file
+func rcFilePath() string {
+	return common.UserHomeDir() + "/.klinkrc"
 }
 
-func GetSSHUsername() string {
-	return GetRCProperties().SSHUsername
+// write the properties to disk
+func writeRCProperties(rcProps RCProps) {
+	rcBytes, err := json.Marshal(rcProps)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ioutil.WriteFile(rcFilePath(), rcBytes, 0755)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Creates a klinkrc file and prompts the user for a username
 func createRCFile() {
-	rcPath := RCFilePath()
+	rcPath := rcFilePath()
 	fmt.Printf("\nNo home file found at: %s Creating one for you.\n\n", rcPath)
 	console.Green()
 	fmt.Println("Please enter your brislabs username:\n")
@@ -46,32 +58,23 @@ func createRCFile() {
 	fmt.Printf("\nThanks %s, I've created a home file for you.\n", username)
 }
 
+//////////////////////
+// public functions //
+//////////////////////
+
 // Ensures that the user has a rc file. If it doesn't exist create it
 // after prompting for a username
 func EnsureRCFile() {
-	if Exists(RCFilePath()) {
+	if common.Exists(rcFilePath()) {
 		return
 	} else {
 		createRCFile()
 	}
 }
 
-// Returns the path of the klink rc file
-func RCFilePath() string {
-	return common.UserHomeDir() + "/.klinkrc"
-}
-
-// Updates the users rc file properties
-func UpdateRCProperties(name string, value string) {
-	rcProps := GetRCProperties()
-	reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
-	fmt.Println(rcProps)
-	writeRCProperties(rcProps)
-}
-
 // Returns the users RC properties
 func GetRCProperties() RCProps {
-	rcBytes, err := ioutil.ReadFile(RCFilePath())
+	rcBytes, err := ioutil.ReadFile(rcFilePath())
 
 	if err != nil {
 		panic(err)
@@ -86,30 +89,25 @@ func GetRCProperties() RCProps {
 	return rcProps
 }
 
-func writeRCProperties(rcProps RCProps) {
-	rcBytes, err := json.Marshal(rcProps)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ioutil.WriteFile(RCFilePath(), rcBytes, 0755)
-	if err != nil {
-		panic(err)
-	}
+// Set the property key / value pair in the users rc file
+func Set(name string, value string) {
+	EnsureRCFile()
+	rcProps := GetRCProperties()
+	reflect.ValueOf(&rcProps).Elem().FieldByName(name).SetString(value)
+	writeRCProperties(rcProps)
 }
 
-// Exists reports whether the named file or directory exists.
-func Exists(name string) bool {
-	if _, err := os.Stat(name); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
+// Get a property by name
+func Get(name string) string {
+	EnsureRCFile()
+    rcProps := GetRCProperties()
+    return reflect.ValueOf(rcProps).FieldByName(name).String()
 }
 
+// Return the last time we checked for an update
 func GetLastUpdated() int32 {
-	return GetRCProperties().LastUpdated
+    EnsureRCFile()
+    return GetRCProperties().LastUpdated
 }
 
 // Write the last time we checked for an update

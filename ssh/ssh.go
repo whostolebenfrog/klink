@@ -68,8 +68,8 @@ func writeSSHScript(ip string, verbose bool) {
 	if verbose {
 		sshargs = append(sshargs, "-v")
 	}
-	if props.GetSSHUsername() != "" {
-		sshargs = append(sshargs, "-l", props.GetSSHUsername())
+	if props.Get("SSHUsername") != "" {
+		sshargs = append(sshargs, "-l", props.Get("SSHUsername"))
 	}
 	sshargs = append(sshargs, ip)
 

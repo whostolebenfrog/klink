@@ -189,7 +189,7 @@ func deferCopy(nextVersionUrl string, path string) {
 // If we haven't tried to update recently then run an update first
 func EnsureUpdatedRecently(argsPath string) {
 	lastUpdated := props.GetLastUpdated()
-	if props.GetLastUpdated() == 0 {
+	if lastUpdated == 0 {
 		props.SetLastUpdated(int32(time.Now().Unix()))
 		if LatestVersion() != Version {
 			Update(common.Command{})

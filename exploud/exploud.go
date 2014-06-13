@@ -218,7 +218,7 @@ func Exploud(args common.Command) {
 	}
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
-	deployRequest := AmiDeployRequest{ami, args.Message, args.Silent, props.GetUsername()}
+	deployRequest := AmiDeployRequest{ami, args.Message, args.Silent, props.Get("Username")}
 
 	DoDeployment(deployUrl, deployRequest, args)
 }
@@ -319,7 +319,7 @@ func Undo(args common.Command) {
 	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/undo"), app, env)
-	deployRequest := DeployRequest{args.Message, args.Silent, props.GetUsername()}
+	deployRequest := DeployRequest{args.Message, args.Silent, props.Get("Username")}
 
 	DoDeployment(deployUrl, deployRequest, args)
 }
@@ -333,7 +333,7 @@ func Rollback(args common.Command) {
 	env := args.ThirdPos
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/rollback"), app, env)
-	deployRequest := DeployRequest{args.Message, args.Silent, props.GetUsername()}
+	deployRequest := DeployRequest{args.Message, args.Silent, props.Get("Username")}
 
 	DoDeployment(deployUrl, deployRequest, args)
 }

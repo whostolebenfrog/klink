@@ -71,7 +71,7 @@ func EnsureDoctorRun() {
 }
 
 func SetDoctorRun() {
-	props.UpdateRCProperties("DoctorHasRun", "true")
+	props.Set("DoctorHasRun", "true")
 }
 
 func HasDoctorRun() bool {

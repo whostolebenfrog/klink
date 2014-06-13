@@ -162,3 +162,10 @@ func DeleteProperty(args common.Command) {
 	fmt.Println("Success!")
 	console.Reset()
 }
+
+// Returns a list of available environments, accepts an environment
+// if that environment isn't known then go and ge the list from
+// onix
+func GetEnvironments(env string) []string {
+    return []string{"poke", "prod", "limpet"}
+}
