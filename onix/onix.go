@@ -166,7 +166,11 @@ func DeleteProperty(args common.Command) {
 
 // Get the list of environments from onix
 func EnvironmentsFromOnix() []string {
-    return []string{"poke", "prod", "limpet"}
+    envs, err := common.GetAsJsonq(onixUrl("/environments")).ArrayOfStrings("environments");
+    if err != nil {
+        panic("Unable to parse response getting environments :-(")
+    }
+    return envs;
 }
 
 // Returns a list of available environments, accepts an environment
