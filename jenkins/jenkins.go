@@ -29,6 +29,16 @@ func Build(args common.Command) {
 	CreateBuild(path)
 }
 
+// A unparameterised build has no actions, return true if the build
+// is parameterised
+func isBuildWithParams(path string) bool {
+    pds, err := common.GetAsJsonq(path + "/api/json") .Array("actions", "0", "parameterDefinitions")
+    if err != nil {
+        return false;
+    }
+    return pds != nil;
+}
+
 // Build a test job for the supplied application and poll the reponse
 func Test(args common.Command) {
 	app := args.SecondPos
@@ -36,7 +46,12 @@ func Test(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to test...")
 	}
 
-	path := JobPath(app, "testPath") + "buildWithParameters"
+	path := JobPath(app, "testPath")
+    if isBuildWithParams(path) {
+        path += "buildWithParameters"
+    } else {
+        path += "build"
+    }
 	CreateBuild(path)
 }
 
