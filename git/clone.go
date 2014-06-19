@@ -43,7 +43,7 @@ func sncUrlShuppet(app string) string {
 func gitClone(path string) {
 	out, err := exec.Command("git", "clone", path).Output()
 	if err != nil {
-		panic(err)
+        fmt.Println(fmt.Sprintf("Error cloning repo, %s, does it already exist? %s", path, err))
 	}
 	fmt.Println(string(out))
 }
