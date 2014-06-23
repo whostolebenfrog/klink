@@ -15,7 +15,9 @@ func Init() {
 		common.Component{"clone-shuppet", CloneShuppet,
 			"{app} {env - optional} clone the shuppet properties for an app into pwd"},
 		common.Component{"clone", CloneService,
-			"{app} clone the application into pwd"})
+			"{app} clone the application into pwd"},
+        common.Component{"gist", Gist,
+            "send stdin to a github gist"})
 }
 
 func appName(args common.Command) string {
