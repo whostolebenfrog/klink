@@ -17,14 +17,28 @@ import (
 // ******************
 
 // Perform an HTTP PUT on the supplied url with the body of the supplied object reference
-func PostJson(url string, body interface{}) string {
+// optionally takes a function of type *HttpRequest that can be used to mute to http.Request
+// object
+func PostJson(url string, body interface{}, doToReq ...func(*http.Request)) string {
 	b, err := json.Marshal(body)
 	if err != nil {
 		fmt.Printf("Can't marshall body attempting to call %si\n", url)
 		panic(err)
 	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewReader(b))
+    req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+    if err != nil {
+        fmt.Printf("Error creating POST object for url: %s\n", url)
+        panic(err)
+    }
+    req.Header.Add("Content-Type", "application/json")
+	for i := range doToReq {
+		doToReq[i](req)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
 	if err != nil {
 		fmt.Printf("Error trying to call URL: %s\n", url)
 		panic(err)
