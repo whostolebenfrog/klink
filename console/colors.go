@@ -68,6 +68,13 @@ func Cyan() {
 	}
 }
 
+// Sets color yellow
+func Yellow() {
+	if !common.IsWindows() {
+		print("\033[33m")
+	}
+}
+
 // Sets color grey
 func Grey() {
 	if !common.IsWindows() {

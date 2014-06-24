@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
@@ -16,7 +17,8 @@ func Init() {
 		common.Component{"build", Build,
 			"{app} runs the Jenkins release job for an application"},
 		common.Component{"test", Test,
-			"{app} runs the Jenkins test job for an application"})
+			"{app} runs the Jenkins test job for an application"},
+		common.Component{"jobs", Jobs, "{app} lists the set of jenkins jobs for an application with their current state"})
 }
 
 // Build a release job for the supplied application and poll the reponse
@@ -78,7 +80,7 @@ func JobPath(app string, property string) string {
 	if !strings.HasSuffix(jobPath, "/") {
 		jobPath += "/"
 	}
-	fmt.Println("Job URL: " + jobPath)
+	fmt.Println("URL: " + jobPath)
 
 	return jobPath
 }
@@ -162,4 +164,45 @@ func GetJobStatus(path string) string {
 func GetJobOutput(path string) []string {
 	path += "logText/progressiveText?start=0"
 	return strings.Split(common.GetString(path), "\n")
+}
+
+func Jobs(args common.Command) {
+	app := args.SecondPos
+	if app == "" {
+		console.Fail("You didn't supply an app.")
+	}
+
+	url := JobPath(app, "jobsPath") + "api/json"
+	jq := common.GetAsJsonq(url)
+	jobs, err := jq.ArrayOfObjects("jobs")
+
+	if err != nil {
+		fmt.Println("Couldn't parse the jobs response from: " + url)
+		panic(err)
+	} else {
+		for _, job := range jobs {
+			PrintJob(job)
+		}
+	}
+}
+
+func PrintJob(job map[string]interface{}) {
+	jobJq := jsonq.NewQuery(job)
+	name, _ := jobJq.String("name")
+	color, _ := jobJq.String("color")
+
+	if strings.HasPrefix(color, "blue") {
+		console.Blue()
+		fmt.Println(name)
+	} else if strings.HasPrefix(color, "yellow") {
+		console.Yellow()
+		fmt.Println(name)
+	} else if strings.HasPrefix(color, "red") {
+		console.Red()
+		fmt.Println(name)
+	} else {
+		console.Grey()
+		fmt.Println(name)
+	}
+	console.Reset()
 }
