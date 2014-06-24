@@ -115,13 +115,13 @@ func SetLastUpdated(t int32) {
 }
 
 // Returns the list of known environments
-func GetEnvironments() []string{
-    return GetRCProperties().Environments
+func GetEnvironments() []string {
+	return GetRCProperties().Environments
 }
 
 // Updates the list of known environments
 func SetEnvironments(environments []string) {
-    props := GetRCProperties()
-    props.Environments = environments
-    writeRCProperties(props)
+	props := GetRCProperties()
+	props.Environments = environments
+	writeRCProperties(props)
 }

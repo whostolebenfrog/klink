@@ -173,7 +173,7 @@ func parseVersionFrom(ami Ami) string {
 }
 
 type Lock struct {
-    Message string `json:"message"`
+	Message string `json:"message"`
 }
 
 // ditto helps to lock, unlock and clean amis
@@ -181,18 +181,18 @@ type Lock struct {
 func Helpers(args common.Command) {
 	switch args.SecondPos {
 	case "lock":
-        if args.ThirdPos == "" {
-            console.Fail("Pass a message you fool.")
-        }
-        lock := Lock{args.ThirdPos}
+		if args.ThirdPos == "" {
+			console.Fail("Pass a message you fool.")
+		}
+		lock := Lock{args.ThirdPos}
 		lockUrl := dittoUrl("/lock")
 		fmt.Println(common.PostJson(lockUrl, lock))
 	case "unlock":
 		unlockUrl := dittoUrl("/unlock")
-        common.Delete(unlockUrl)
-        console.Green()
+		common.Delete(unlockUrl)
+		console.Green()
 		fmt.Println("unlock")
-        console.Reset()
+		console.Reset()
 	case "clean":
 		cleanUrl := dittoUrl("/clean/")
 		if args.ThirdPos == "" {

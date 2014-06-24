@@ -26,12 +26,12 @@ func PostJson(url string, body interface{}, doToReq ...func(*http.Request)) stri
 		panic(err)
 	}
 
-    req, err := http.NewRequest("POST", url, bytes.NewReader(b))
-    if err != nil {
-        fmt.Printf("Error creating POST object for url: %s\n", url)
-        panic(err)
-    }
-    req.Header.Add("Content-Type", "application/json")
+	req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+	if err != nil {
+		fmt.Printf("Error creating POST object for url: %s\n", url)
+		panic(err)
+	}
+	req.Header.Add("Content-Type", "application/json")
 	for i := range doToReq {
 		doToReq[i](req)
 	}

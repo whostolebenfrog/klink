@@ -6,7 +6,7 @@ import (
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    props "nokia.com/klink/props"
+	props "nokia.com/klink/props"
 )
 
 func Init() {
@@ -166,26 +166,26 @@ func DeleteProperty(args common.Command) {
 
 // Get the list of environments from onix
 func EnvironmentsFromOnix() []string {
-    envs, err := common.GetAsJsonq(onixUrl("/environments")).ArrayOfStrings("environments");
-    if err != nil {
-        panic("Unable to parse response getting environments :-(")
-    }
-    return envs;
+	envs, err := common.GetAsJsonq(onixUrl("/environments")).ArrayOfStrings("environments")
+	if err != nil {
+		panic("Unable to parse response getting environments :-(")
+	}
+	return envs
 }
 
 // Returns a list of available environments, accepts an environment
 // if that environment isn't known then go and ge the list from
 // onix
 func GetEnvironments(env string) []string {
-    environments := props.GetEnvironments()
-    if !common.Contains(environments, env) {
-        environments = EnvironmentsFromOnix()
-        props.SetEnvironments(environments)
-    }
-    return environments
+	environments := props.GetEnvironments()
+	if !common.Contains(environments, env) {
+		environments = EnvironmentsFromOnix()
+		props.SetEnvironments(environments)
+	}
+	return environments
 }
 
 // Returns true if the environment is known by onix
 func KnownEnvironment(env string) bool {
-    return common.Contains(GetEnvironments(env), env)
+	return common.Contains(GetEnvironments(env), env)
 }

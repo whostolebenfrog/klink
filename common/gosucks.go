@@ -4,6 +4,10 @@ package common
 
 // returns true if the slice contains the string
 func Contains(s []string, e string) bool {
-    for _, a := range s { if a == e { return true } }
-    return false
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

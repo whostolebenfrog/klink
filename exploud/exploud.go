@@ -179,7 +179,7 @@ func DoDeployment(url string, body interface{}, args common.Command) {
 // all deployments for that app
 func Deployments(args common.Command) {
 	app := args.SecondPos
-    env := args.ThirdPos
+	env := args.ThirdPos
 	if app == "" {
 		fmt.Println(common.GetString(exploudUrl("/in-progress")))
 	} else {

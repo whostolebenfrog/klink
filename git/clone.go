@@ -16,8 +16,8 @@ func Init() {
 			"{app} {env - optional} clone the shuppet properties for an app into pwd"},
 		common.Component{"clone", CloneService,
 			"{app} clone the application into pwd"},
-        common.Component{"gist", Gist,
-            "send stdin to a github gist"})
+		common.Component{"gist", Gist,
+			"send stdin to a github gist"})
 }
 
 func appName(args common.Command) string {
@@ -45,7 +45,7 @@ func sncUrlShuppet(app string) string {
 func gitClone(path string) {
 	out, err := exec.Command("git", "clone", path).Output()
 	if err != nil {
-        fmt.Println(fmt.Sprintf("Error cloning repo, %s, does it already exist? %s", path, err))
+		fmt.Println(fmt.Sprintf("Error cloning repo, %s, does it already exist? %s", path, err))
 	}
 	fmt.Println(string(out))
 }

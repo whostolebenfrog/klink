@@ -32,11 +32,11 @@ func Build(args common.Command) {
 // A unparameterised build has no actions, return true if the build
 // is parameterised
 func isBuildWithParams(path string) bool {
-    pds, err := common.GetAsJsonq(path + "/api/json") .Array("actions", "0", "parameterDefinitions")
-    if err != nil {
-        return false;
-    }
-    return pds != nil;
+	pds, err := common.GetAsJsonq(path+"/api/json").Array("actions", "0", "parameterDefinitions")
+	if err != nil {
+		return false
+	}
+	return pds != nil
 }
 
 // Build a test job for the supplied application and poll the reponse
@@ -47,11 +47,11 @@ func Test(args common.Command) {
 	}
 
 	path := JobPath(app, "testPath")
-    if isBuildWithParams(path) {
-        path += "buildWithParameters"
-    } else {
-        path += "build"
-    }
+	if isBuildWithParams(path) {
+		path += "buildWithParameters"
+	} else {
+		path += "build"
+	}
 	CreateBuild(path)
 }
 
@@ -117,13 +117,13 @@ func GetJobFromQueue(path string, retries int) string {
 func PollBuild(path string) string {
 	status := GetJobStatus(path)
 	lines := GetJobOutput(path)
-	offset := PrintOutput(0, lines);
+	offset := PrintOutput(0, lines)
 	timeout := time.Now().Add((20 * time.Minute))
 
 	for (status == "in progress...") && time.Now().Before(timeout) {
 		status = GetJobStatus(path)
 		lines = GetJobOutput(path)
-		offset = PrintOutput(offset, lines);
+		offset = PrintOutput(offset, lines)
 
 		time.Sleep(1 * time.Second)
 	}
