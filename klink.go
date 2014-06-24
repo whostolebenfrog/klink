@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
@@ -14,7 +16,6 @@ import (
 	props "nokia.com/klink/props"
 	ssh "nokia.com/klink/ssh"
 	update "nokia.com/klink/update"
-	"os"
 )
 
 func handleAction(args common.Command) {

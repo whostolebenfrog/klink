@@ -3,12 +3,13 @@ package doctor
 import (
 	"fmt"
 	"net/http"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	props "nokia.com/klink/props"
 	"os"
 	"strings"
 	"time"
+
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	props "nokia.com/klink/props"
 )
 
 func Init() {

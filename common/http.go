@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	jsonq "github.com/jmoiron/jsonq"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	jsonq "github.com/jmoiron/jsonq"
 )
 
 // ******************

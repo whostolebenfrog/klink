@@ -3,11 +3,12 @@ package jenkins
 import (
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
+
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
-	"strings"
-	"time"
 )
 
 func Init() {

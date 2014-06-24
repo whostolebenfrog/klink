@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+
 	common "nokia.com/klink/common"
 )
 

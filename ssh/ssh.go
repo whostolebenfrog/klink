@@ -2,14 +2,15 @@ package ssh
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	exploud "nokia.com/klink/exploud"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
-	"os"
-	"os/exec"
 )
 
 func Init() {

@@ -2,10 +2,11 @@ package git
 
 import (
 	"fmt"
+	"os/exec"
+
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	onix "nokia.com/klink/onix"
-	"os/exec"
 )
 
 func Init() {

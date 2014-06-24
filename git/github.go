@@ -3,8 +3,9 @@ package git
 import (
 	"fmt"
 	"io/ioutil"
-	common "nokia.com/klink/common"
 	"os"
+
+	common "nokia.com/klink/common"
 )
 
 type File struct {

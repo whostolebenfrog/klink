@@ -6,9 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	props "nokia.com/klink/props"
 	"os"
 	"os/exec"
 	"path"
@@ -16,6 +13,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	props "nokia.com/klink/props"
 )
 
 func Init() {

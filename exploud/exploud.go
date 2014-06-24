@@ -3,19 +3,20 @@ package exploud
 import (
 	"encoding/json"
 	"fmt"
-	jsonq "github.com/jmoiron/jsonq"
 	"io/ioutil"
 	"net/http"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	ditto "nokia.com/klink/ditto"
-	onix "nokia.com/klink/onix"
-	props "nokia.com/klink/props"
 	"os"
 	"os/signal"
 	"regexp"
 	"strings"
 	"time"
+
+	jsonq "github.com/jmoiron/jsonq"
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	ditto "nokia.com/klink/ditto"
+	onix "nokia.com/klink/onix"
+	props "nokia.com/klink/props"
 )
 
 const latestVersionString = "latest"

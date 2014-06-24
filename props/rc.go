@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"reflect"
+
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-	"reflect"
 )
 
 type RCProps struct {

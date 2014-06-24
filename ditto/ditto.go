@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	onix "nokia.com/klink/onix"
 	"os"
 	"regexp"
 	"time"
+
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	onix "nokia.com/klink/onix"
 )
 
 func Init() {

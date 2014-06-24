@@ -3,14 +3,15 @@ package flags
 import (
 	"bytes"
 	"fmt"
-	optarg "github.com/jteeuwen/go-pkg-optarg"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	update "nokia.com/klink/update"
 	"os"
 	"regexp"
 	"strings"
 	"text/tabwriter"
+
+	optarg "github.com/jteeuwen/go-pkg-optarg"
+	common "nokia.com/klink/common"
+	console "nokia.com/klink/console"
+	update "nokia.com/klink/update"
 )
 
 func WrapString(desc string) []string {
