@@ -191,6 +191,10 @@ func PrintJob(job map[string]interface{}) {
 	name, _ := jobJq.String("name")
 	color, _ := jobJq.String("color")
 
+	if strings.HasSuffix(color, "_anime") {
+		console.Bold()
+	}
+
 	if strings.HasPrefix(color, "blue") {
 		console.Blue()
 		fmt.Println(name)
