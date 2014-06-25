@@ -187,7 +187,7 @@ func Deployments(args common.Command) {
 		if env == "" {
 			env = "poke"
 		}
-		url := exploudUrl("/deployments?application=" + app + "&env=" + env)
+		url := exploudUrl("/deployments?application=" + app + "&environment=" + env)
 		fmt.Println(common.GetString(url))
 	}
 }
