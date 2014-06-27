@@ -18,7 +18,7 @@ func Init() {
 		common.Component{"clone", CloneService,
 			"{app} clone the application into pwd"},
 		common.Component{"gist", Gist,
-			"send stdin to a github gist"})
+			"{file-name} [{description}] send stdin to a github gist, use extension to set type"})
 }
 
 func appName(args common.Command) string {
