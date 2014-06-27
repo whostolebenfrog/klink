@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	campfire "nokia.com/klink/campfire"
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
@@ -54,7 +55,6 @@ func init() {
 	// called. We can't reference the namespace without using it so we basically
 	// need to manually call the psuedo init methods, Init(), on each component
 	// namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
-	console.Init()
 	ditto.Init()
 	doctor.Init()
 	exploud.Init()
@@ -63,6 +63,7 @@ func init() {
 	onix.Init()
 	update.Init()
 	ssh.Init()
+	campfire.Init()
 }
 
 func main() {

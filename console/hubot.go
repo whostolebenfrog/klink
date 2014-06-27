@@ -4,13 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	common "nokia.com/klink/common"
 )
-
-func Init() {
-	common.Register(common.Component{"speak", Speak, "Here be dragons"})
-}
 
 func doSpeak(room string, message string) int {
 	resp, _ := http.PostForm("http://btmgsrvhubot001.brislabs.com/hubot/say",
@@ -18,33 +12,37 @@ func doSpeak(room string, message string) int {
 	return resp.StatusCode
 }
 
-func Hubot(message string, args common.Command) int {
-	if args.Silent {
-		return 0
+var rooms = map[string]string{
+	"general":   "503594",
+	"clojure":   "529176",
+	"cloud":     "574028",
+	"asimov":    "551265",
+	"fusion":    "551264",
+	"reportlog": "594551",
+	"kafka":     "575611",
+	"hack":      "582412",
+	"testing":   "568845",
+	"github":    "597627"}
+
+// speak in the supplied room with the supplied message
+func Speak(room string, message string) {
+
+	roomNumber := rooms[room]
+	if roomNumber == "" {
+		FailWithValidRooms(room)
 	}
-	return doSpeak("503594", message)
+	doSpeak(roomNumber, message)
 }
 
-func Speak(args common.Command) {
-	if args.Message == "" {
-		fmt.Println("You fail. DRAGONS I SAID.")
+// fail and list valid rooms
+func FailWithValidRooms(room string) {
+	fmt.Println(fmt.Sprintf("Room: %s is not known\n", room))
+	allRooms := make([]string, len(rooms))
+
+	i := 0
+	for key, _ := range rooms {
+		allRooms[i] = key
+		i++
 	}
-	room := ""
-	switch args.SecondPos {
-	case "general":
-		room = "503594"
-	case "clojure":
-		room = "529176"
-	case "cloud":
-		room = "574028"
-	case "asimov":
-		room = "551265"
-	case "kafka":
-		room = "575611"
-	case "hack":
-		room = "582412"
-	default:
-		Fail("Unknown room")
-	}
-	doSpeak(room, args.Message)
+	Fail(fmt.Sprintf("Known rooms are: %s", allRooms))
 }
