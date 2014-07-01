@@ -2,6 +2,7 @@ package jenkins
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -172,7 +173,7 @@ func Jobs(args common.Command) {
 		console.Fail("You didn't supply an app.")
 	}
 
-	url := JobPath(app, "jobsPath") + "api/json"
+	url := JobPath(app, "jobsPath") + "api/json?depth=2"
 	jq := common.GetAsJsonq(url)
 	jobs, err := jq.ArrayOfObjects("jobs")
 
@@ -190,23 +191,49 @@ func PrintJob(job map[string]interface{}) {
 	jobJq := jsonq.NewQuery(job)
 	name, _ := jobJq.String("name")
 	color, _ := jobJq.String("color")
+	lastBuildMs, _ := jobJq.Int("lastBuild", "timestamp")
 
 	if strings.HasSuffix(color, "_anime") {
 		console.Bold()
 	}
 
 	if strings.HasPrefix(color, "blue") {
-		console.Blue()
-		fmt.Println(name)
+		console.Cyan()
+		fmt.Print(name)
 	} else if strings.HasPrefix(color, "yellow") {
 		console.Yellow()
-		fmt.Println(name)
+		fmt.Print(name)
 	} else if strings.HasPrefix(color, "red") {
 		console.Red()
-		fmt.Println(name)
+		fmt.Print(name)
 	} else {
 		console.Grey()
-		fmt.Println(name)
+		fmt.Print(name)
 	}
 	console.Reset()
+	fmt.Print(" (last build: " + LastBuildText(lastBuildMs) + ")")
+	fmt.Println()
+}
+
+func LastBuildText(lastBuildMs int) string {
+	if lastBuildMs == 0 {
+		return "N/A"
+	}
+
+	buildTime := time.Unix(int64(lastBuildMs)/1000, 0)
+	now := time.Now()
+	diff := now.Sub(buildTime)
+	hours := math.Floor(diff.Hours())
+	minutes := math.Floor(diff.Minutes())
+
+	if hours >= 48 {
+		days := math.Floor(hours / 24)
+		hours = hours - (24 * days)
+		return fmt.Sprintf("%d days %d hr", int(days), int(hours))
+	} else if hours >= 24 {
+		return fmt.Sprintf("1 day %d hr", int(hours))
+	} else {
+		minutes = minutes - (60 * hours)
+		return fmt.Sprintf("%d hr %d min", int(hours), int(minutes))
+	}
 }
