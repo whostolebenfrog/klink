@@ -27,8 +27,8 @@ func Init() {
 			"{app} Lists the latest images for the supplied application name"},
 		common.Component{"latest-bake", LatestBake,
 			"{app} Outputs the latest baked version of the specified application"},
-        common.Component{"delete-ami", DeleteAmi,
-            "{service} {ami} Removes the supplied ami, makes it undeployable."})
+		common.Component{"delete-ami", DeleteAmi,
+			"{service} {ami} Removes the supplied ami, makes it undeployable."})
 }
 
 func dittoUrl(end string) string {
@@ -220,19 +220,19 @@ func Helpers(args common.Command) {
 
 // Remove the supplied ami
 func DeleteAmi(args common.Command) {
-    service := args.SecondPos
-    ami := args.ThirdPos
+	service := args.SecondPos
+	ami := args.ThirdPos
 
-    if service == "" {
-        console.Fail("You must supply a service or klink... well you don't want to know.")
-    }
-    if ami == "" {
-        console.Fail("This isn't going to work without an ami now is it?")
-    }
-    common.FailIfNotAmi(ami)
+	if service == "" {
+		console.Fail("You must supply a service or klink... well you don't want to know.")
+	}
+	if ami == "" {
+		console.Fail("This isn't going to work without an ami now is it?")
+	}
+	common.FailIfNotAmi(ami)
 
-    common.Delete(dittoUrl(fmt.Sprintf("/%s/amis/%s", service, ami)))
-    console.Green()
-    fmt.Println("That appears to have worked, the ami will disspear in a few mins")
-    console.Reset()
+	common.Delete(dittoUrl(fmt.Sprintf("/%s/amis/%s", service, ami)))
+	console.Green()
+	fmt.Println("That appears to have worked, the ami will disspear in a few mins")
+	console.Reset()
 }
