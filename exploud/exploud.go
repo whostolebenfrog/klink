@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"regexp"
 	"strings"
 	"time"
 
@@ -156,15 +155,7 @@ func validateDeploymentArgsWithAmi(args common.Command) {
 	validateDeploymentArgsWithMessage(args)
 
 	ami := args.FourthPos
-	if ami != "" {
-		matched, err := regexp.MatchString("^ami-.+$", ami)
-		if err != nil {
-			panic(err)
-		}
-		if !matched {
-			console.Fail(fmt.Sprintf("%s Doesn't look like an ami", ami))
-		}
-	}
+	common.FailIfNotAmi(ami)
 }
 
 // Execute a deployment
