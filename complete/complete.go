@@ -76,7 +76,13 @@ func generateScript() {
 
 kpath="$HOME/.klink.d"
 
-declare -A command_ac_formats
+
+if [ $(uname -s) == "Darwin" ]
+then
+    declare -a command_ac_formats
+else
+    declare -A command_ac_formats
+fi
 source $kpath/command_ac_formats
 
 function get_complete {
