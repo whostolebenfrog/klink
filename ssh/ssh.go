@@ -15,7 +15,7 @@ import (
 
 func Init() {
 	common.Register(
-		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server [-v true]. Uses SSHUsername from klink.rc if set"})
+		common.Component{"ssh", SSH, "{app} {env} [{numel-id}] SSH onto a server [-v true]. Uses SSHUsername from klink.rc if set", "APPS:ENVS"})
 }
 
 func SSH(args common.Command) {

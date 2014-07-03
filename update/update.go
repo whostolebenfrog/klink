@@ -15,6 +15,7 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
+    complete "nokia.com/klink/complete"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -22,9 +23,9 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"update", Update,
-			"Update klink to the latest version"},
+			"Update klink to the latest version", ""},
 		common.Component{"force-update", ForceUpdate,
-			"Force klink to update to the current version"})
+			"Force klink to update to the current version", ""})
 	/*
 		common.Register(
 			common.Component{"update", Update,
@@ -66,7 +67,9 @@ func errorWithHelper(nextVersionUrl string) {
 // Update if there is a later version available, takes the path that this
 // command was run from which is used as a backup if klink can't be
 // found on the path
-func Update(_ common.Command) {
+func Update(args common.Command) {
+    complete.GenComplete(args)
+
 	argsPath := os.Args[0]
 
 	path, pathErr := exec.LookPath(path.Base(argsPath))

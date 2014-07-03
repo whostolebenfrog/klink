@@ -8,9 +8,10 @@ import (
 var Components = []Component{}
 
 type Component struct {
-	Command     string
-	Callback    func(Command)
-	Description string
+	Command      string
+	Callback     func(Command)
+	Description  string
+	AutoComplete string
 }
 
 func (c Component) String() string {
@@ -31,4 +32,13 @@ func Register(toReg ...Component) {
 		Components = append(Components, toReg[i])
 	}
 	sort.Sort(ByCommand(Components))
+}
+
+// Returns a list of component names
+func ComponentNames() []string {
+	var names []string
+	for _, component := range Components {
+		names = append(names, component.Command)
+	}
+	return names
 }

@@ -14,7 +14,7 @@ import (
 
 func Init() {
 	common.Register(
-		common.Component{"doctor", Doctor, "Test that everything is setup for klink to function"})
+		common.Component{"doctor", Doctor, "Test that everything is setup for klink to function", ""})
 }
 
 // Perform some doctor'in

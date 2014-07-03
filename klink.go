@@ -6,6 +6,7 @@ import (
 
 	campfire "nokia.com/klink/campfire"
 	common "nokia.com/klink/common"
+	complete "nokia.com/klink/complete"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	doctor "nokia.com/klink/doctor"
@@ -55,15 +56,16 @@ func init() {
 	// called. We can't reference the namespace without using it so we basically
 	// need to manually call the psuedo init methods, Init(), on each component
 	// namesapce. Go doesn't allow, or encourage, this kind of aspecty metaprogramming
+	campfire.Init()
+	complete.Init()
 	ditto.Init()
 	doctor.Init()
 	exploud.Init()
 	git.Init()
 	jenkins.Init()
 	onix.Init()
-	update.Init()
 	ssh.Init()
-	campfire.Init()
+	update.Init()
 }
 
 func main() {

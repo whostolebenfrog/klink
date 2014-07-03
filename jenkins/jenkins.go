@@ -16,10 +16,10 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"build", Build,
-			"{app} runs the Jenkins release job for an application"},
+			"{app} runs the Jenkins release job for an application", "APPS"},
 		common.Component{"test", Test,
-			"{app} runs the Jenkins test job for an application"},
-		common.Component{"jobs", Jobs, "{app} lists the set of jenkins jobs for an application with their current state"})
+			"{app} runs the Jenkins test job for an application", "APPS"},
+		common.Component{"jobs", Jobs, "{app} lists the set of jenkins jobs for an application with their current state", "APPS"})
 }
 
 // Build a release job for the supplied application and poll the reponse

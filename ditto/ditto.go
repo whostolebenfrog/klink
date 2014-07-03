@@ -14,21 +14,23 @@ import (
 )
 
 func Init() {
+    // TODO  --- helpers file! the first one
+    // TODO  --- remove non positional version
 	common.Register(
 		common.Component{"ditto", Helpers,
-			"Various helpers; lock, unlock, clean, build public and ent base amis"},
+			"Various helpers; lock, unlock, clean, build public and ent base amis", ""},
 		common.Component{"bake", Bake,
-			"{app} [{version}] [-v {version}] Bakes an AMI for {app} with version {version}"},
+			"{app} [{version}] [-v {version}] Bakes an AMI for {app} with version {version}", "APPS"},
 		common.Component{"allow-prod", AllowProd,
-			"{app} Allows the prod aws account access to the supplied application"},
+			"{app} Allows the prod aws account access to the supplied application", "APPS"},
 		common.Component{"amis", FindAmis,
-			"{app} Lists the latest amis for the supplied application name"},
+			"{app} Lists the latest amis for the supplied application name", "APPS"},
 		common.Component{"images", FindAmis,
-			"{app} Lists the latest images for the supplied application name"},
+			"{app} Lists the latest images for the supplied application name", "APPS"},
 		common.Component{"latest-bake", LatestBake,
-			"{app} Outputs the latest baked version of the specified application"},
+			"{app} Outputs the latest baked version of the specified application", "APPS"},
 		common.Component{"delete-ami", DeleteAmi,
-			"{service} {ami} Removes the supplied ami, makes it undeployable."})
+			"{app} {ami} Removes the supplied ami, makes it undeployable.", "APPS"})
 }
 
 func dittoUrl(end string) string {

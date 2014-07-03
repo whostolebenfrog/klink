@@ -3,6 +3,7 @@ package onix
 import (
 	"encoding/json"
 	"fmt"
+    "strings"
 
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
@@ -13,17 +14,19 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"register-app-onix", CreateApp,
-			"{app} Creates a new application in onix only"},
+			"{app} Creates a new application in onix only", "APPS"},
 		common.Component{"info", Info,
-			"{app} Return information about the application"},
+			"{app} Return information about the application", "APPS"},
 		common.Component{"add-onix-prop", AddProperty,
-			"{app} -N property name -V json value"},
+			"{app} -N property name -V json value", "APPS"},
 		common.Component{"get-onix-prop", GetPropertyFromArgs,
-			"{app} {property-name} get the property for the application"},
+			"{app} {property-name} get the property for the application", "APPS"},
 		common.Component{"status", Status,
-			"{app} Checks the status of the app"},
+			"{app} Checks the status of the app", "APPS"},
+		common.Component{"apps", ListApps,
+			"Lists the applications that exist (via exploud)", "APPS"},
 		common.Component{"delete-onix-prop", DeleteProperty,
-			"{app} {property-name} Delete the property for the application"})
+			"{app} {property-name} Delete the property for the application", "APPS"})
 }
 
 type App struct {
@@ -32,6 +35,20 @@ type App struct {
 
 func onixUrl(end string) string {
 	return "http://onix.brislabs.com:8080/1.x" + end
+}
+
+// Return the list of apps that are known about by onix
+func GetApps() []string {
+	apps, err := common.GetAsJsonq(onixUrl("/applications")).ArrayOfStrings("applications")
+	if err != nil {
+		panic(err)
+	}
+	return apps
+}
+
+// List the apps known about by onix
+func ListApps(args common.Command) {
+	fmt.Println(strings.Join(GetApps(), "\n"))
 }
 
 // Create a new application in onix

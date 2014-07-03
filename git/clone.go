@@ -12,13 +12,13 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"clone-tyr", CloneTyranitar,
-			"{app} {env - optional} clone the tyranitar properties for an app into pwd"},
+			"{app} {env - optional} clone the tyranitar properties for an app into pwd", "APPS"},
 		common.Component{"clone-shuppet", CloneShuppet,
-			"{app} {env - optional} clone the shuppet properties for an app into pwd"},
+			"{app} {env - optional} clone the shuppet properties for an app into pwd", "APPS:ENVS"},
 		common.Component{"clone", CloneService,
-			"{app} clone the application into pwd"},
+			"{app} clone the application into pwd", "APPS"},
 		common.Component{"gist", Gist,
-			"{file-name} [{description}] send stdin to a github gist, use extension to set type"})
+			"{file-name} [{description}] send stdin to a github gist, use extension to set type", ""})
 }
 
 func appName(args common.Command) string {

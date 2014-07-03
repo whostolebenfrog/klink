@@ -26,7 +26,6 @@ var rooms = map[string]string{
 
 // speak in the supplied room with the supplied message
 func Speak(room string, message string) {
-
 	roomNumber := rooms[room]
 	if roomNumber == "" {
 		FailWithValidRooms(room)
@@ -37,6 +36,11 @@ func Speak(room string, message string) {
 // fail and list valid rooms
 func FailWithValidRooms(room string) {
 	fmt.Println(fmt.Sprintf("Room: %s is not known\n", room))
+	Fail(fmt.Sprintf("Known rooms are: %s", Rooms()))
+}
+
+// Returns a list of strings of room names
+func Rooms() []string {
 	allRooms := make([]string, len(rooms))
 
 	i := 0
@@ -44,5 +48,5 @@ func FailWithValidRooms(room string) {
 		allRooms[i] = key
 		i++
 	}
-	Fail(fmt.Sprintf("Known rooms are: %s", allRooms))
+    return allRooms
 }

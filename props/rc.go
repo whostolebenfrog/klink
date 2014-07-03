@@ -16,6 +16,7 @@ type RCProps struct {
 	DoctorHasRun string   `json:"doctorHasRun"`
 	SSHUsername  string   `json:"sshUsername"`
 	Environments []string `json:"environments"`
+	AutoComplete bool     `json:"autoComplete"`
 }
 
 //////////////////////
@@ -118,6 +119,18 @@ func SetLastUpdated(t int32) {
 // Returns the list of known environments
 func GetEnvironments() []string {
 	return GetRCProperties().Environments
+}
+
+// Has autocomplete run before
+func HasAutoCompleteRun() bool {
+    return GetRCProperties().AutoComplete
+}
+
+// Set that autocomplete has run
+func SetAutoCompleteHasRun() {
+    props := GetRCProperties()
+    props.AutoComplete = true
+    writeRCProperties(props)
 }
 
 // Updates the list of known environments

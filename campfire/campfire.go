@@ -11,7 +11,7 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"campfire", Campfire,
-			"{room} pipe stdin to a campfire room"})
+			"{room} pipe stdin to a campfire room", "ROOMS"})
 }
 
 // writes stdin to the supplied campfire room
