@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+    "os"
 	"strings"
 	"time"
 
@@ -120,27 +121,20 @@ func GetJobFromQueue(path string, retries int) string {
 // Poll a build and print the status
 func PollBuild(path string) string {
 	status := GetJobStatus(path)
-	lines := GetJobOutput(path)
-	offset := PrintOutput(0, lines)
+    offset := 0
 	timeout := time.Now().Add((20 * time.Minute))
 
 	for (status == "in progress...") && time.Now().Before(timeout) {
 		status = GetJobStatus(path)
-		lines = GetJobOutput(path)
-		offset = PrintOutput(offset, lines)
+        output, outputBytes := GetJobOutput(path, offset)
+        os.Stdout.Write(output)
+        offset = outputBytes
 
 		time.Sleep(1 * time.Second)
 	}
 
 	fmt.Println(status)
 	return status
-}
-
-func PrintOutput(offset int, lines []string) int {
-	for i := offset; i < len(lines); i++ {
-		fmt.Println(lines[i])
-	}
-	return len(lines)
 }
 
 // Return as jobs status
@@ -162,9 +156,9 @@ func GetJobStatus(path string) string {
 	return status
 }
 
-func GetJobOutput(path string) []string {
-	path += "logText/progressiveText?start=0"
-	return strings.Split(common.GetString(path), "\n")
+func GetJobOutput(path string, offset int) ([]byte, int) {
+	path += fmt.Sprintf("logText/progressiveText?start=%d", offset)
+	return common.GetBytes(path)
 }
 
 func Jobs(args common.Command) {
