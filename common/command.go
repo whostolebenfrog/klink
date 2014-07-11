@@ -22,6 +22,7 @@ type Command struct {
 	Silent      bool
 	Status      string
 	ThirdPos    string
+	Type        string
 	Value       string
 	Version     string
 }

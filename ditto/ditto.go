@@ -15,12 +15,11 @@ import (
 
 func Init() {
     // TODO  --- helpers file! the first one
-    // TODO  --- remove non positional version
 	common.Register(
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis", ""},
 		common.Component{"bake", Bake,
-			"{app} [{version}] [-v {version}] Bakes an AMI for {app} with version {version}", "APPS"},
+			"{app} {version} [-t {hvm,para}] Bakes an AMI for {app} with version {version}", "APPS"},
 		common.Component{"allow-prod", AllowProd,
 			"{app} Allows the prod aws account access to the supplied application", "APPS"},
 		common.Component{"amis", FindAmis,
@@ -97,15 +96,11 @@ func DoBake(url string, retries int) {
 // Bake the ami
 func Bake(args common.Command) {
 	app := args.SecondPos
+    version := args.ThirdPos
+    virtType := args.Type
+
 	if app == "" {
 		console.Fail("Application must be supplied as the second argument")
-	}
-
-	var version string
-	if args.ThirdPos != "" {
-		version = args.ThirdPos
-	} else {
-		version = args.Version
 	}
 	if version == "" {
 		console.Fail("Version must be supplied as the third argument or using --version")
@@ -117,6 +112,9 @@ func Bake(args common.Command) {
 	}
 
 	url := bakeUrl(app, version)
+    if args.Type != "" {
+        url += "?virt-type=" + virtType
+    }
 	DoBake(url, 120)
 }
 

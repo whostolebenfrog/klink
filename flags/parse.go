@@ -22,6 +22,7 @@ func LoadFlags() common.Command {
 	optarg.Add("o", "owner", "Sets the owner name for commands that require it", "")
 	optarg.Add("s", "silent", "Sets silent mode, don't report to hubot", "")
 	optarg.Add("S", "status", "Sets the status property value", "")
+    optarg.Add("t", "type", "Sets the property type", "")
 	optarg.Add("v", "version", "Sets the version", "")
 	optarg.Add("V", "value", "Sets the property value", "")
 
@@ -47,6 +48,8 @@ func LoadFlags() common.Command {
 			command.Owner = opt.String()
 		case "s":
 			command.Silent = opt.Bool()
+        case "t":
+            command.Type = opt.String()
 		case "S":
 			command.Status = opt.String()
 		case "v":
