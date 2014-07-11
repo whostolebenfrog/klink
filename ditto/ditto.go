@@ -193,10 +193,10 @@ func Helpers(args common.Command) {
 		lockUrl := dittoUrl("/lock")
 		fmt.Println(common.PostJson(lockUrl, lock))
 	case "unlock":
-		unlockUrl := dittoUrl("/unlock")
+		unlockUrl := dittoUrl("/lock")
 		common.Delete(unlockUrl)
 		console.Green()
-		fmt.Println("unlock")
+		fmt.Println("unlocked")
 		console.Reset()
 	case "clean":
 		cleanUrl := dittoUrl("/clean/")
