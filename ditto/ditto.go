@@ -17,7 +17,7 @@ func Init() {
     // TODO  --- helpers file! the first one
 	common.Register(
 		common.Component{"ditto", Helpers,
-			"Various helpers; lock, unlock, clean, build public and ent base amis", ""},
+			"Various helpers; lock, unlock, clean, build public and ent base amis", "DITTOS"},
 		common.Component{"bake", Bake,
 			"{app} {version} [-t {hvm,para}] Bakes an AMI for {app} with version {version}", "APPS"},
 		common.Component{"allow-prod", AllowProd,
@@ -177,6 +177,12 @@ func parseVersionFrom(ami Ami) string {
 
 type Lock struct {
 	Message string `json:"message"`
+}
+
+// list of helper names for autocomplete, could tie these to functions and combine with
+// this list below but might just make it more complex for little need.
+func HelperNames() []string {
+    return []string{"lock", "unlock", "clean", "entertainment", "public", "inprogress"}
 }
 
 // ditto helps to lock, unlock and clean amis

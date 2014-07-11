@@ -8,6 +8,7 @@ import (
 
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+    ditto "nokia.com/klink/ditto"
 	onix "nokia.com/klink/onix"
     props "nokia.com/klink/props"
 )
@@ -48,6 +49,12 @@ func generateApps() {
 func generateRooms() {
 	fmt.Println("Generating rooms file")
 	stringsToFile("/rooms", console.Rooms())
+}
+
+// autocomplete options just for klink ditto. what fun!
+func generateDittoHelpers() {
+    fmt.Println("Generating ditto helpers")
+    stringsToFile("/dittos", ditto.HelperNames())
 }
 
 // generate the list of all klink commands
@@ -95,6 +102,9 @@ function get_complete {
             ;;
         "ROOMS")
             COMPREPLY=($(compgen -W "$(cat $kpath/rooms)" -- $cur))
+            ;;
+        "DITTOS")
+            COMPREPLY=($(compgen -W "$(cat $kpath/dittos)" -- $cur))
             ;;
         "_")
             COMPREPLY=()
@@ -158,6 +168,7 @@ func GenComplete(_ common.Command) {
 	generateEnvs()
 	generateApps()
 	generateRooms()
+    generateDittoHelpers()
 	generateCommands()
 	generateCommandArgs()
 	generateScript()
