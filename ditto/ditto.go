@@ -239,6 +239,6 @@ func DeleteAmi(args common.Command) {
 
 	common.Delete(dittoUrl(fmt.Sprintf("/%s/amis/%s", service, ami)))
 	console.Green()
-	fmt.Println("That appears to have worked, the ami will disspear in a few mins")
+	fmt.Println("That appears to have worked, the ami will disappear in a few minutes")
 	console.Reset()
 }
