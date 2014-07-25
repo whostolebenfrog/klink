@@ -3,14 +3,14 @@ package complete
 import (
 	"fmt"
 	"io/ioutil"
-    "os"
+	"os"
 	"strings"
 
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
-    ditto "nokia.com/klink/ditto"
+	ditto "nokia.com/klink/ditto"
 	onix "nokia.com/klink/onix"
-    props "nokia.com/klink/props"
+	props "nokia.com/klink/props"
 )
 
 // register our public command with klink
@@ -21,10 +21,10 @@ func Init() {
 
 // returns a path to the file in klink's directory
 func filePath(path string) string {
-    klinkDir := common.UserHomeDir() + "/.klink.d/"
-    if !common.Exists(klinkDir) {
-        os.MkdirAll(klinkDir, 0755)
-    }
+	klinkDir := common.UserHomeDir() + "/.klink.d/"
+	if !common.Exists(klinkDir) {
+		os.MkdirAll(klinkDir, 0755)
+	}
 	return klinkDir + path
 }
 
@@ -53,8 +53,8 @@ func generateRooms() {
 
 // autocomplete options just for klink ditto. what fun!
 func generateDittoHelpers() {
-    fmt.Println("Generating ditto helpers")
-    stringsToFile("/dittos", ditto.HelperNames())
+	fmt.Println("Generating ditto helpers")
+	stringsToFile("/dittos", ditto.HelperNames())
 }
 
 // generate the list of all klink commands
@@ -79,7 +79,7 @@ func generateCommandArgs() {
 func generateScript() {
 	fmt.Println("Generating the auto complete script")
 
-    script := `#!/bin/bash
+	script := `#!/bin/bash
 
 kpath="$HOME/.klink.d"
 
@@ -134,33 +134,33 @@ _klink()
 complete -F _klink klink`
 
 	ioutil.WriteFile(filePath("/klink_autocomplete.bash"),
-        []byte(script), 0644)
+		[]byte(script), 0644)
 }
 
 // ensure that a command to source the autocomplete script is written to bash
 func addSourceToBash() {
-    if !props.HasAutoCompleteRun() {
-        console.Green()
-        fmt.Println("Adding the source command to your .bashrc")
-        console.Reset()
+	if !props.HasAutoCompleteRun() {
+		console.Green()
+		fmt.Println("Adding the source command to your .bashrc")
+		console.Reset()
 
-        bashRc := common.UserHomeDir() + "/.bashrc"
-        f, err := os.OpenFile(bashRc, os.O_APPEND|os.O_WRONLY, 0644)
-        if err != nil {
-            panic(err)
-        }
-        defer f.Close()
+		bashRc := common.UserHomeDir() + "/.bashrc"
+		f, err := os.OpenFile(bashRc, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
 
-        sourceScript := `
+		sourceScript := `
 # Added by klink, sets up autocomplete
 source $HOME/.klink.d/klink_autocomplete.bash
 `
-        if _, err = f.WriteString(sourceScript); err != nil {
-            panic(err)
-        }
+		if _, err = f.WriteString(sourceScript); err != nil {
+			panic(err)
+		}
 
-        props.SetAutoCompleteHasRun()
-    }
+		props.SetAutoCompleteHasRun()
+	}
 }
 
 // generate everything required for klink autocomplete to work
@@ -168,7 +168,7 @@ func GenComplete(_ common.Command) {
 	generateEnvs()
 	generateApps()
 	generateRooms()
-    generateDittoHelpers()
+	generateDittoHelpers()
 	generateCommands()
 	generateCommandArgs()
 	generateScript()

@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-    "strconv"
+	"strconv"
 	"strings"
 	"time"
 
@@ -163,11 +163,11 @@ func GetString(url string, muteRequest ...func(*http.Request)) string {
 // Returns the byte array for an http get on the supplied url
 // returns a second arg of X-Text-Size header
 func GetBytes(url string) ([]byte, int) {
-    resp, err := http.Get(url)
-    if err != nil {
-        fmt.Printf("Error try to call url: %s\n", url)
-    }
-    defer resp.Body.Close()
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("Error try to call url: %s\n", url)
+	}
+	defer resp.Body.Close()
 
 	responseBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -175,12 +175,12 @@ func GetBytes(url string) ([]byte, int) {
 		panic(err)
 	}
 
-    size, err := strconv.Atoi(resp.Header.Get("X-Text-Size"))
-    if err != nil {
-        panic(err)
-    }
+	size, err := strconv.Atoi(resp.Header.Get("X-Text-Size"))
+	if err != nil {
+		panic(err)
+	}
 
-    return responseBytes, size
+	return responseBytes, size
 }
 
 // Returns the result of an http get request as a jsonq object

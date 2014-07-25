@@ -48,5 +48,5 @@ func Rooms() []string {
 		allRooms[i] = key
 		i++
 	}
-    return allRooms
+	return allRooms
 }

@@ -3,7 +3,7 @@ package onix
 import (
 	"encoding/json"
 	"fmt"
-    "strings"
+	"strings"
 
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"

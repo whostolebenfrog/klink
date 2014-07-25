@@ -14,7 +14,7 @@ import (
 )
 
 func Init() {
-    // TODO  --- helpers file! the first one
+	// TODO  --- helpers file! the first one
 	common.Register(
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis", "DITTOS"},
@@ -96,8 +96,8 @@ func DoBake(url string, retries int) {
 // Bake the ami
 func Bake(args common.Command) {
 	app := args.SecondPos
-    version := args.ThirdPos
-    virtType := args.Type
+	version := args.ThirdPos
+	virtType := args.Type
 
 	if app == "" {
 		console.Fail("Application must be supplied as the second argument")
@@ -112,9 +112,9 @@ func Bake(args common.Command) {
 	}
 
 	url := bakeUrl(app, version)
-    if args.Type != "" {
-        url += "?virt-type=" + virtType
-    }
+	if args.Type != "" {
+		url += "?virt-type=" + virtType
+	}
 	DoBake(url, 120)
 }
 
@@ -182,7 +182,7 @@ type Lock struct {
 // list of helper names for autocomplete, could tie these to functions and combine with
 // this list below but might just make it more complex for little need.
 func HelperNames() []string {
-    return []string{"lock", "unlock", "clean", "entertainment", "public", "inprogress"}
+	return []string{"lock", "unlock", "clean", "entertainment", "public", "inprogress"}
 }
 
 // ditto helps to lock, unlock and clean amis

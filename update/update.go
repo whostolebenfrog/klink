@@ -15,7 +15,7 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
-    complete "nokia.com/klink/complete"
+	complete "nokia.com/klink/complete"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -68,7 +68,7 @@ func errorWithHelper(nextVersionUrl string) {
 // command was run from which is used as a backup if klink can't be
 // found on the path
 func Update(args common.Command) {
-    complete.GenComplete(args)
+	complete.GenComplete(args)
 
 	argsPath := os.Args[0]
 

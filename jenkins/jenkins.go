@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-    "os"
+	"os"
 	"strings"
 	"time"
 
@@ -121,14 +121,14 @@ func GetJobFromQueue(path string, retries int) string {
 // Poll a build and print the status
 func PollBuild(path string) string {
 	status := GetJobStatus(path)
-    offset := 0
+	offset := 0
 	timeout := time.Now().Add((20 * time.Minute))
 
 	for (status == "in progress...") && time.Now().Before(timeout) {
 		status = GetJobStatus(path)
-        output, outputBytes := GetJobOutput(path, offset)
-        os.Stdout.Write(output)
-        offset = outputBytes
+		output, outputBytes := GetJobOutput(path, offset)
+		os.Stdout.Write(output)
+		offset = outputBytes
 
 		time.Sleep(1 * time.Second)
 	}

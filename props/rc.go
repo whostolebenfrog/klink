@@ -123,14 +123,14 @@ func GetEnvironments() []string {
 
 // Has autocomplete run before
 func HasAutoCompleteRun() bool {
-    return GetRCProperties().AutoComplete
+	return GetRCProperties().AutoComplete
 }
 
 // Set that autocomplete has run
 func SetAutoCompleteHasRun() {
-    props := GetRCProperties()
-    props.AutoComplete = true
-    writeRCProperties(props)
+	props := GetRCProperties()
+	props.AutoComplete = true
+	writeRCProperties(props)
 }
 
 // Updates the list of known environments
