@@ -152,11 +152,25 @@ func GetProperty(app string, name string) string {
 	return EnsureProp(jq, app, name)
 }
 
+func GetOptionalProperty(app string, name string) string {
+	jq := common.GetAsJsonq(onixUrl("/applications/" + app))
+	str, err := jq.String("metadata", name)
+	if err != nil {
+		obj, err := jq.Interface("metadata", name)
+		if err != nil {
+			return ""
+		}
+		// this is the only way to get a string from an arbitary type in go...
+		return fmt.Sprintf("%s", obj)
+	}
+	return str
+}
+
 func GetPropertyFromArgs(args common.Command) {
 	app := args.SecondPos
 	name := args.ThirdPos
 	if app == "" {
-		console.Fail("Don't forget to bring a towel ^H^H^H^H pass a application name")
+		console.Fail("Don't forget to bring a towel^H^H^H^H^H^H pass a application name")
 	}
 	if name == "" {
 		console.Fail("You forgot to pass the property name")

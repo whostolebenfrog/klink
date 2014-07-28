@@ -60,6 +60,7 @@ func AllowProd(args common.Command) {
 }
 
 func DoBake(url string, retries int) {
+
 	httpClient := common.NewTimeoutClient(10*time.Second, 2000*time.Second)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -114,6 +115,11 @@ func Bake(args common.Command) {
 	url := bakeUrl(app, version)
 	if args.Type != "" {
 		url += "?virt-type=" + virtType
+	} else {
+		bakeType := onix.GetOptionalProperty(app, "bakeType")
+		if bakeType != "" {
+			url += "?virt-type=" + bakeType
+		}
 	}
 	DoBake(url, 120)
 }
