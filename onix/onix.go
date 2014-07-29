@@ -72,7 +72,7 @@ func AppExists(appName string) bool {
 
 // Returns all information stored in onix about the supplied application
 func Info(args common.Command) {
-	fmt.Println(common.GetString(onixUrl("/applications/" + args.SecondPos)))
+	console.MaybeJQS(common.GetString(onixUrl("/applications/" + args.SecondPos)))
 }
 
 func ToJsonValue(in string) (string, error) {
