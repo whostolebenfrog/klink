@@ -33,7 +33,11 @@ func Init() {
 }
 
 func dittoUrl(end string) string {
-	return "http://ditto.brislabs.com:8080/1.x" + end
+    base := os.Getenv("DITTO_URL")
+    if base == "" {
+        base = "http://ditto.brislabs.com:8080"
+    }
+	return base + "/1.x" + end
 }
 
 func bakeUrl(app string, version string) string {
