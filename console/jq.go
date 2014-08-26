@@ -2,7 +2,7 @@ package console
 
 import (
 	"fmt"
-    "os"
+	"os"
 	"os/exec"
 )
 
@@ -19,17 +19,17 @@ func MaybeJQS(output string) {
 		if err != nil {
 			panic(err)
 		}
-        cmd.Stdout = os.Stdout
+		cmd.Stdout = os.Stdout
 
-        err = cmd.Start()
+		err = cmd.Start()
 		if err != nil {
 			panic(err)
 		}
-        stdin.Write([]byte(output))
-        stdin.Close()
+		stdin.Write([]byte(output))
+		stdin.Close()
 
-        if err != nil {
-            panic(err)
-        }
+		if err != nil {
+			panic(err)
+		}
 	}
 }

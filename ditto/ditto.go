@@ -33,10 +33,10 @@ func Init() {
 }
 
 func dittoUrl(end string) string {
-    base := os.Getenv("DITTO_URL")
-    if base == "" {
-        base = "http://ditto.brislabs.com:8080"
-    }
+	base := os.Getenv("DITTO_URL")
+	if base == "" {
+		base = "http://ditto.brislabs.com:8080"
+	}
 	return base + "/1.x" + end
 }
 
