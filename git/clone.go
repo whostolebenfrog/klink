@@ -36,7 +36,7 @@ func envName(args common.Command) string {
 }
 
 func sncUrlTyranitar(app string, env string) string {
-	return fmt.Sprintf("ssh://snc@source.nokia.com/tyranitar/git/%s-%s", app, env)
+	return fmt.Sprintf("git@github.brislabs.com:tyranitar/%s-%s.git", app, env)
 }
 
 func sncUrlShuppet(app string) string {
