@@ -35,12 +35,12 @@ func envName(args common.Command) string {
 	return args.ThirdPos
 }
 
-func sncUrlTyranitar(app string, env string) string {
+func gitUrlTyranitar(app string, env string) string {
 	return fmt.Sprintf("git@github.brislabs.com:tyranitar/%s-%s.git", app, env)
 }
 
-func sncUrlShuppet(app string) string {
-	return fmt.Sprintf("ssh://snc@source.nokia.com/shuppet/git/%s", app)
+func gitUrlShuppet(app string) string {
+	return fmt.Sprintf("git@github.brislabs.com:shuppet/%s.git", app)
 }
 
 func gitClone(path string) {
@@ -57,17 +57,17 @@ func CloneTyranitar(args common.Command) {
 	env := envName(args)
 
 	if env == "all" {
-		gitClone(sncUrlTyranitar(app, "poke"))
-		gitClone(sncUrlTyranitar(app, "prod"))
+		gitClone(gitUrlTyranitar(app, "poke"))
+		gitClone(gitUrlTyranitar(app, "prod"))
 	} else {
-		gitClone(sncUrlTyranitar(app, env))
+		gitClone(gitUrlTyranitar(app, env))
 	}
 }
 
 // Clone the shuppet properties for the supplied app
 func CloneShuppet(args common.Command) {
 	app := appName(args)
-	gitClone(sncUrlShuppet(app))
+	gitClone(gitUrlShuppet(app))
 }
 
 func CloneService(args common.Command) {
