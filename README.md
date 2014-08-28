@@ -69,7 +69,7 @@ Source code needs to be checked into the **correct package structure** inside yo
     cd $GOPATH
     mkdir src/nokia.com/
     cd !$
-    git clone ssh://snc@source.nokia.com/altostratus/git/klink
+    git clone git@github.brislabs.com:cloud-tooling/klink.git
     
 Note that klink requires that it be in src/nokia.com/klink **NOTHING ELSE WILL DO**
 
