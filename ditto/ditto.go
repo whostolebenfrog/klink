@@ -18,8 +18,10 @@ func Init() {
 	common.Register(
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis", "DITTOS"},
-		common.Component{"bake", Bake,
+		common.Component{"bake", LiveBake,
 			"{app} {version} [-t {hvm,para}] Bakes an AMI for {app} with version {version}", "APPS"},
+		common.Component{"betabake", BetaBake,
+			"{app} {version} [-t {hvm,para}] Bakes an Amazon Linux AMI for {app} with version {version}", "APPS"},
 		common.Component{"allow-prod", AllowProd,
 			"{app} Allows the prod aws account access to the supplied application", "APPS"},
 		common.Component{"amis", FindAmis,
@@ -40,8 +42,16 @@ func dittoUrl(end string) string {
 	return base + "/1.x" + end
 }
 
+func betaDittoUrl(end string) string {
+	return "http://internal-betaditto-2028158683.eu-west-1.elb.amazonaws.com:8080/1.x" + end
+}
+
 func bakeUrl(app string, version string) string {
 	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
+}
+
+func betaBakeUrl(app string, version string) string {
+	return fmt.Sprintf(betaDittoUrl("/bake/%s/%s"), app, version)
 }
 
 func AllowProd(args common.Command) {
@@ -98,8 +108,10 @@ func DoBake(url string, retries int) {
 	}
 }
 
-// Bake the ami
-func Bake(args common.Command) {
+type bakeUrlFn func(string, string) string
+
+// Do the bake with the supplied url lookup function
+func Bake(args common.Command, bUrl bakeUrlFn) {
 	app := args.SecondPos
 	version := args.ThirdPos
 	virtType := args.Type
@@ -116,7 +128,7 @@ func Bake(args common.Command) {
 			app))
 	}
 
-	url := bakeUrl(app, version)
+	url := bUrl(app, version)
 	if args.Type != "" {
 		url += "?virt-type=" + virtType
 	} else {
@@ -126,6 +138,16 @@ func Bake(args common.Command) {
 		}
 	}
 	DoBake(url, 120)
+}
+
+// BetaBake the ami - e.g. use the version of ditto in beta.
+func BetaBake(args common.Command) {
+    Bake(args, betaBakeUrl)
+}
+
+// Bake the ami
+func LiveBake(args common.Command) {
+    Bake(args, bakeUrl)
 }
 
 type Ami struct {
