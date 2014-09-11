@@ -18,7 +18,7 @@ func Init() {
 		common.Component{"info", Info,
 			"{app} Return information about the application", "APPS"},
 		common.Component{"add-onix-prop", AddProperty,
-			"{app} -N property name -V json value", "APPS"},
+			"{app} {name} {value} Adds an onix property (json)", "APPS:PROPNAMES"},
 		common.Component{"get-onix-prop", GetPropertyFromArgs,
 			"{app} {property-name} get the property for the application", "APPS"},
 		common.Component{"status", Status,
@@ -44,6 +44,10 @@ func GetApps() []string {
 		panic(err)
 	}
 	return apps
+}
+
+func GetCommonPropertyNames() []string {
+	return []string{"bakeType", "customBakeCommands", "jobsPath", "releasePath", "srcRepo", "servicePathPoke", "statusPath", "testPath"}
 }
 
 // List the apps known about by onix
@@ -88,15 +92,17 @@ func ToJsonValue(in string) (string, error) {
 }
 
 func AddProperty(args common.Command) {
-	if args.SecondPos == "" {
+	app := args.SecondPos
+	if app == "" {
 		console.Fail("Must supply application name as a second positional argument")
 	}
-	if args.Name == "" {
-		console.Fail("Must supply property name using -N")
+	name := args.ThirdPos
+	if name == "" {
+		console.Fail("Must supply the property name as the third positional argument")
 	}
-	value := args.Value
+	value := args.FourthPos
 	if value == "" {
-		console.Fail("Must supply value using -V in json format. Remember to quote!")
+		console.Fail("Must supply the property value as the fourth positional argument")
 	}
 
 	valueString, err := ToJsonValue(value)
@@ -108,7 +114,7 @@ func AddProperty(args common.Command) {
 		}
 	}
 
-	fmt.Println(common.PutString(onixUrl("/applications/"+args.SecondPos+"/"+args.Name),
+	fmt.Println(common.PutString(onixUrl("/applications/"+app+"/"+name),
 		valueString))
 }
 

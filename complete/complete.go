@@ -39,6 +39,11 @@ func generateEnvs() {
 	stringsToFile("/envs", onix.GetEnvironments("notfound"))
 }
 
+func generatePropertyNames() {
+    fmt.Println("Generating common property names")
+    stringsToFile("/propnames", onix.GetCommonPropertyNames())
+}
+
 // generate the app list from onix
 func generateApps() {
 	fmt.Println("Generating app file")
@@ -106,6 +111,9 @@ function get_complete {
         "DITTOS")
             COMPREPLY=($(compgen -W "$(cat $kpath/dittos)" -- $cur))
             ;;
+        "PROPNAMES")
+            COMPREPLY=($(compgen -W "$(cat $kpath/propnames)" -- $cur))
+            ;;
         "_")
             COMPREPLY=()
             ;;
@@ -167,6 +175,7 @@ source $HOME/.klink.d/klink_autocomplete.bash
 func GenComplete(_ common.Command) {
 	generateEnvs()
 	generateApps()
+    generatePropertyNames()
 	generateRooms()
 	generateDittoHelpers()
 	generateCommands()
