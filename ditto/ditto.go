@@ -142,12 +142,12 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 
 // BetaBake the ami - e.g. use the version of ditto in beta.
 func BetaBake(args common.Command) {
-    Bake(args, betaBakeUrl)
+	Bake(args, betaBakeUrl)
 }
 
 // Bake the ami
 func LiveBake(args common.Command) {
-    Bake(args, bakeUrl)
+	Bake(args, bakeUrl)
 }
 
 type Ami struct {

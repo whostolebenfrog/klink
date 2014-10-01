@@ -40,8 +40,8 @@ func generateEnvs() {
 }
 
 func generatePropertyNames() {
-    fmt.Println("Generating common property names")
-    stringsToFile("/propnames", onix.GetCommonPropertyNames())
+	fmt.Println("Generating common property names")
+	stringsToFile("/propnames", onix.GetCommonPropertyNames())
 }
 
 // generate the app list from onix
@@ -175,7 +175,7 @@ source $HOME/.klink.d/klink_autocomplete.bash
 func GenComplete(_ common.Command) {
 	generateEnvs()
 	generateApps()
-    generatePropertyNames()
+	generatePropertyNames()
 	generateRooms()
 	generateDittoHelpers()
 	generateCommands()
