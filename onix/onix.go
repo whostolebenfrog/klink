@@ -128,7 +128,7 @@ func EnsureProp(jq *jsonq.JsonQuery, app string, name string) string {
 				app,
 				name,
 			)
-			console.Fail(fmt.Sprintf("klink add-onix-prop %s -N %s -V '[\"my\", \"array\"]'\n",
+			console.Fail(fmt.Sprintf("klink add-onix-prop %s %s 'value'\n",
 				app, name))
 		}
 		// this is the only way to get a string from an arbitary type in go...
