@@ -126,13 +126,15 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 			app))
 	}
 
-	latestVersion, timestamp := jenkins.GetLatestStableBuildVersion(jenkins.JobPath(app, "releasePath"))
-	if latestVersion != "" {
-		console.Confirmer(
-			console.Green,
-			fmt.Sprintf("Version %s built on %s will be baked. Are you sure you wish to continue?", latestVersion, timestamp))
+	if version == "" {
+		latestVersion, dateDescription := jenkins.GetLatestStableBuildVersion(jenkins.JobPath(app, "releasePath"))
+		if latestVersion != "" {
+			console.Confirmer(
+				console.Green,
+				fmt.Sprintf("Version %s built on %s will be baked. Are you sure you wish to continue?", latestVersion, dateDescription))
 
-		version = latestVersion
+			version = latestVersion
+		}
 	}
 
 	if version == "" {
