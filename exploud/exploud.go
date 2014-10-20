@@ -198,10 +198,15 @@ func Exploud(args common.Command) {
 	latestAmi := ditto.LatestAmiFor(app)
 
 	if ami == "" {
-		confirmDeployLatest(latestAmi)
+		console.Confirmer(
+			console.Green,
+			fmt.Sprintf("The latest ami %s (version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
+
 		ami = latestAmi.ImageId
 	} else if latestAmi.ImageId != ami {
-		confirmNonLatestBake(latestAmi)
+		console.Confirmer(
+			console.Red,
+			fmt.Sprintf("The latest ami for this application is %s (version %s). Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
 	}
 
 	deployUrl := fmt.Sprintf(exploudUrl("/applications/%s/%s/deploy"), app, env)
@@ -250,52 +255,6 @@ func Resume(args common.Command) {
 	fmt.Printf("Attempting to resume deployment of %s in %s\n", app, env)
 
 	common.PostJson(resumeUrl, "")
-}
-
-// TODO - filthy code duplication. AL DUTTON YOU'RE ON MY LIST
-// TODO - doc strings
-func confirmNonLatestBake(ami ditto.Ami) {
-	console.Red()
-	fmt.Println(fmt.Sprintf("The latest ami for this application is %s (version %s). Are you sure you wish to continue?", ami.ImageId, ami.Version))
-	console.Reset()
-
-	var response string
-
-	fmt.Scan(&response)
-
-	switch response {
-	case "yes", "Yes", "YES", "y", "Y":
-		break
-	case "no", "No", "NO", "n", "N":
-		console.Red()
-		console.Fail("Deployment aborted.")
-		console.Reset()
-	default:
-		fmt.Println("Type better.")
-		confirmNonLatestBake(ami)
-	}
-}
-
-func confirmDeployLatest(latestAmi ditto.Ami) {
-	console.Green()
-	fmt.Println(fmt.Sprintf("The latest ami %s (version %s) will be deployed. Are you sure you wish to continue?", latestAmi.ImageId, latestAmi.Version))
-	console.Reset()
-
-	var response string
-
-	fmt.Scan(&response)
-
-	switch response {
-	case "yes", "Yes", "YES", "y", "Y":
-		break
-	case "no", "No", "NO", "n", "N":
-		console.Red()
-		console.Fail("Deployment aborted.")
-		console.Reset()
-	default:
-		fmt.Println("Type better.")
-		confirmDeployLatest(latestAmi)
-	}
 }
 
 // Undo the steps from a borked deployment
