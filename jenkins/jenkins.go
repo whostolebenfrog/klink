@@ -31,6 +31,8 @@ func Build(args common.Command) {
 	}
 
 	path := JobPath(app, "releasePath") + "build"
+	fmt.Println("URL: " + path)
+
 	CreateBuild(path)
 }
 
@@ -82,9 +84,33 @@ func JobPath(app string, property string) string {
 	if !strings.HasSuffix(jobPath, "/") {
 		jobPath += "/"
 	}
-	fmt.Println("URL: " + jobPath)
 
 	return jobPath
+}
+
+func GetLatestStableBuildVersion(path string) (string, string) {
+	path += "api/json"
+	builds := common.GetAsJsonq(path)
+	buildUrl, err := builds.String("lastStableBuild", "url")
+
+	if err != nil {
+		fmt.Println("Unable to parse Jenkins response.")
+		panic(err)
+	}
+
+	latestStableBuild := common.GetAsJsonq(buildUrl + "/api/json")
+	timestamp, err1 := latestStableBuild.Int("timestamp")
+	description, err2 := latestStableBuild.String("description")
+
+	if err1 != nil || err2 != nil {
+		return "", ""
+	} else {
+		return description, timestampDescription(timestamp)
+	}
+}
+
+func timestampDescription(timestamp int) string {
+	return time.Unix(0, int64(timestamp)*int64(time.Millisecond)).Format("Mon, Jan 2 15:04:05")
 }
 
 // Post a build and return the jobs location in the queue

@@ -10,6 +10,7 @@ import (
 
 	common "nokia.com/klink/common"
 	console "nokia.com/klink/console"
+	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 )
 
@@ -119,13 +120,23 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 	if app == "" {
 		console.Fail("Application must be supplied as the second argument")
 	}
-	if version == "" {
-		console.Fail("Version must be supplied as the third argument or using --version")
-	}
 
 	if !onix.AppExists(app) {
 		console.Fail(fmt.Sprintf("Application '%s' does not exist. It's your word against onix!",
 			app))
+	}
+
+	latestVersion, timestamp := jenkins.GetLatestStableBuildVersion(jenkins.JobPath(app, "releasePath"))
+	if latestVersion != "" {
+		console.Confirmer(
+			console.Green,
+			fmt.Sprintf("Version %s built on %s will be baked. Are you sure you wish to continue?", latestVersion, timestamp))
+
+		version = latestVersion
+	}
+
+	if version == "" {
+		console.Fail("Version must be supplied as the third argument or using --version")
 	}
 
 	url := bUrl(app, version)
