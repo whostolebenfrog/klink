@@ -134,11 +134,9 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 				fmt.Sprintf("Version %s built on %s will be baked. Are you sure you wish to continue?", latestVersion, dateDescription))
 
 			version = latestVersion
+		} else {
+			console.Fail("Version must be supplied as the third argument or using --version")
 		}
-	}
-
-	if version == "" {
-		console.Fail("Version must be supplied as the third argument or using --version")
 	}
 
 	url := bUrl(app, version)
