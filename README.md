@@ -1,6 +1,7 @@
 # KLINK
-
 Klink is the frontend to our cloud tooling. It makes calls to the various orchestrating applications that allow you to use bake images and deploy applications into aws.
+
+[Release Notes](releases.md)
 
 ## Installation
 
