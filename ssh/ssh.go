@@ -44,7 +44,9 @@ func chooseSSH(boxes []interface{}) string {
 
     choice, err := strconv.ParseInt(console.GetPrompt("Pick an instance to log in to:"), 10, 8)
     if boxes[choice] == nil || err != nil {
+        console.Red()
         console.Fail("You failed at this simple task. Have you considered a career in management?")
+        console.Reset()
     }
     ip, _ := jsonq.NewQuery(boxes[choice]).String("private-ip")
 
