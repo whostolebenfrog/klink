@@ -27,3 +27,12 @@ func Confirmer(colourer ColourFunc, message string) {
 		Confirmer(colourer, message)
 	}
 }
+
+// Prompts the user with the message and returns the input
+func GetPrompt(message string) string {
+    fmt.Println(message)
+
+    var response string
+    fmt.Scan(&response)
+    return response
+}
