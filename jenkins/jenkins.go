@@ -30,7 +30,9 @@ func Build(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to build...")
 	}
 
-	path := JobPath(app, "releasePath") + "build"
+	path := jobPath(app, "releasePath") + "build"
+	fmt.Println("URL: " + path)
+
 	CreateBuild(path)
 }
 
@@ -51,7 +53,7 @@ func Test(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to test...")
 	}
 
-	path := JobPath(app, "testPath")
+	path := jobPath(app, "testPath")
 	if isBuildWithParams(path) {
 		path += "buildWithParameters"
 	} else {
@@ -77,14 +79,38 @@ func CreateBuild(path string) {
 }
 
 // Returns the release path for the supplied app
-func JobPath(app string, property string) string {
-	jobPath := onix.GetProperty(app, property)
-	if !strings.HasSuffix(jobPath, "/") {
-		jobPath += "/"
+func jobPath(app string, property string) string {
+	path := onix.GetProperty(app, property)
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
 	}
-	fmt.Println("URL: " + jobPath)
 
-	return jobPath
+	return path
+}
+
+func GetLatestStableBuildVersion(app string) (string, string) {
+	path := jobPath(app, "releasePath") + "api/json"
+	builds := common.GetAsJsonq(path)
+	buildUrl, err := builds.String("lastStableBuild", "url")
+
+	if err != nil {
+		fmt.Println("Unable to parse Jenkins response.")
+		panic(err)
+	}
+
+	latestStableBuild := common.GetAsJsonq(buildUrl + "/api/json")
+	timestamp, err1 := latestStableBuild.Int("timestamp")
+	description, err2 := latestStableBuild.String("description")
+
+	if err1 != nil || err2 != nil {
+		return "", ""
+	} else {
+		return description, timestampDescription(timestamp)
+	}
+}
+
+func timestampDescription(timestamp int) string {
+	return time.Unix(0, int64(timestamp)*int64(time.Millisecond)).Format("Mon, Jan 2 15:04:05")
 }
 
 // Post a build and return the jobs location in the queue
@@ -167,7 +193,7 @@ func Jobs(args common.Command) {
 		console.Fail("You didn't supply an app.")
 	}
 
-	url := JobPath(app, "jobsPath") + "api/json?depth=2"
+	url := jobPath(app, "jobsPath") + "api/json?depth=2"
 	jq := common.GetAsJsonq(url)
 	jobs, err := jq.ArrayOfObjects("jobs")
 
