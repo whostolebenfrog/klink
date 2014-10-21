@@ -30,7 +30,7 @@ func Build(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to build...")
 	}
 
-	path := JobPath(app, "releasePath") + "build"
+	path := jobPath(app, "releasePath") + "build"
 	fmt.Println("URL: " + path)
 
 	CreateBuild(path)
@@ -53,7 +53,7 @@ func Test(args common.Command) {
 		console.Fail("Yeah, you're gonna have to tell me what to test...")
 	}
 
-	path := JobPath(app, "testPath")
+	path := jobPath(app, "testPath")
 	if isBuildWithParams(path) {
 		path += "buildWithParameters"
 	} else {
@@ -79,17 +79,17 @@ func CreateBuild(path string) {
 }
 
 // Returns the release path for the supplied app
-func JobPath(app string, property string) string {
-	jobPath := onix.GetProperty(app, property)
-	if !strings.HasSuffix(jobPath, "/") {
-		jobPath += "/"
+func jobPath(app string, property string) string {
+	path := onix.GetProperty(app, property)
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
 	}
 
-	return jobPath
+	return path
 }
 
-func GetLatestStableBuildVersion(path string) (string, string) {
-	path += "api/json"
+func GetLatestStableBuildVersion(app string) (string, string) {
+	path := jobPath(app, "releasePath") + "api/json"
 	builds := common.GetAsJsonq(path)
 	buildUrl, err := builds.String("lastStableBuild", "url")
 
@@ -193,7 +193,7 @@ func Jobs(args common.Command) {
 		console.Fail("You didn't supply an app.")
 	}
 
-	url := JobPath(app, "jobsPath") + "api/json?depth=2"
+	url := jobPath(app, "jobsPath") + "api/json?depth=2"
 	jq := common.GetAsJsonq(url)
 	jobs, err := jq.ArrayOfObjects("jobs")
 

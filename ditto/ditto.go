@@ -127,7 +127,7 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 	}
 
 	if version == "" {
-		latestVersion, dateDescription := jenkins.GetLatestStableBuildVersion(jenkins.JobPath(app, "releasePath"))
+		latestVersion, dateDescription := jenkins.GetLatestStableBuildVersion(app)
 		if latestVersion != "" {
 			console.Confirmer(
 				console.Green,
