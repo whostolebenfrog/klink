@@ -25,6 +25,11 @@ func chooseSSH(boxes []interface{}) string {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
 
+    // if we only have a single box then just connect
+    if boxes[1] == nil && boxes[0] != nil {
+        ip, _ := jsonq.NewQuery(boxes[0]).String("private-ip")
+        return ip
+    }
 	for i, jsonBox := range boxes {
 		if jsonBox == nil {
 			break
@@ -68,7 +73,7 @@ func SSH(args common.Command) {
 		env = "poke"
 	}
 
-	boxesArray := make([]interface{}, 20)
+	boxesArray := make([]interface{}, 1000)
 	exploud.JsonBoxes(app, env, boxesArray)
 
     if id == "" {
