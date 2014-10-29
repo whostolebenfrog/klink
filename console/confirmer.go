@@ -30,9 +30,9 @@ func Confirmer(colourer ColourFunc, message string) {
 
 // Prompts the user with the message and returns the input
 func GetPrompt(message string) string {
-    fmt.Println(message)
+	fmt.Println(message)
 
-    var response string
-    fmt.Scan(&response)
-    return response
+	var response string
+	fmt.Scan(&response)
+	return response
 }

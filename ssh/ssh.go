@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-    "strconv"
-    "strings"
+	"strconv"
+	"strings"
 	"text/tabwriter"
 
 	jsonq "github.com/jmoiron/jsonq"
@@ -25,37 +25,37 @@ func chooseSSH(boxes []interface{}) string {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
 
-    // if we only have a single box then just connect
-    if boxes[1] == nil && boxes[0] != nil {
-        ip, _ := jsonq.NewQuery(boxes[0]).String("private-ip")
-        return ip
-    }
+	// if we only have a single box then just connect
+	if boxes[1] == nil && boxes[0] != nil {
+		ip, _ := jsonq.NewQuery(boxes[0]).String("private-ip")
+		return ip
+	}
 	for i, jsonBox := range boxes {
 		if jsonBox == nil {
 			break
 		}
 
 		jqBox := jsonq.NewQuery(jsonBox)
-        name, _ := jqBox.String("name")
-        instanceId, _ := jqBox.String("instance-id")
-        imageId, _ := jqBox.String("image-id")
-        privateIp, _ := jqBox.String("private-ip")
-        numelId, _ := jqBox.String("numel-id")
-        opts := []string{name, instanceId, imageId, numelId, privateIp, strconv.Itoa(i)}
-        outStr := strings.Join(opts, "\t") + "\n"
+		name, _ := jqBox.String("name")
+		instanceId, _ := jqBox.String("instance-id")
+		imageId, _ := jqBox.String("image-id")
+		privateIp, _ := jqBox.String("private-ip")
+		numelId, _ := jqBox.String("numel-id")
+		opts := []string{name, instanceId, imageId, numelId, privateIp, strconv.Itoa(i)}
+		outStr := strings.Join(opts, "\t") + "\n"
 		fmt.Fprint(w, outStr)
 	}
 	w.Flush()
 
-    choice, err := strconv.ParseInt(console.GetPrompt("Pick an instance to log in to:"), 10, 8)
-    if boxes[choice] == nil || err != nil {
-        console.Red()
-        console.Fail("You failed at this simple task. Have you considered a career in management?")
-        console.Reset()
-    }
-    ip, _ := jsonq.NewQuery(boxes[choice]).String("private-ip")
+	choice, err := strconv.ParseInt(console.GetPrompt("Pick an instance to log in to:"), 10, 8)
+	if boxes[choice] == nil || err != nil {
+		console.Red()
+		console.Fail("You failed at this simple task. Have you considered a career in management?")
+		console.Reset()
+	}
+	ip, _ := jsonq.NewQuery(boxes[choice]).String("private-ip")
 
-    return ip
+	return ip
 }
 
 func SSH(args common.Command) {
@@ -76,34 +76,34 @@ func SSH(args common.Command) {
 	boxesArray := make([]interface{}, 1000)
 	exploud.JsonBoxes(app, env, boxesArray)
 
-    if id == "" {
-        ip := chooseSSH(boxesArray)
+	if id == "" {
+		ip := chooseSSH(boxesArray)
 		fmt.Println(fmt.Sprintf("About to connect to %s", ip))
-        doSomeSSH(ip, verbose != "")
-    } else {
-        var ip string
-        var numelId string
+		doSomeSSH(ip, verbose != "")
+	} else {
+		var ip string
+		var numelId string
 
-        for _, jsonBox := range boxesArray {
-            if jsonBox == nil {
-                break
-            }
-            jqBox := jsonq.NewQuery(jsonBox)
-            numelId, _ = jqBox.String("numel-id")
-            if id == numelId || id == "" {
-                ip, _ = jqBox.String("private-ip")
-                break
-            }
-        }
+		for _, jsonBox := range boxesArray {
+			if jsonBox == nil {
+				break
+			}
+			jqBox := jsonq.NewQuery(jsonBox)
+			numelId, _ = jqBox.String("numel-id")
+			if id == numelId || id == "" {
+				ip, _ = jqBox.String("private-ip")
+				break
+			}
+		}
 
-        if ip == "" {
-            fmt.Println("Unable to find a matching server, found (ignore the nils):")
-            console.Fail(fmt.Sprintf("%s", boxesArray))
-        } else {
-            fmt.Println(fmt.Sprintf("About to connect to %s with ip %s", numelId, ip))
-            doSomeSSH(ip, verbose != "")
-        }
-    }
+		if ip == "" {
+			fmt.Println("Unable to find a matching server, found (ignore the nils):")
+			console.Fail(fmt.Sprintf("%s", boxesArray))
+		} else {
+			fmt.Println(fmt.Sprintf("About to connect to %s with ip %s", numelId, ip))
+			doSomeSSH(ip, verbose != "")
+		}
+	}
 
 }
 
