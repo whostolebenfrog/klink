@@ -34,7 +34,7 @@ type App struct {
 }
 
 func onixUrl(end string) string {
-	return "http://onix.brislabs.com:8080/1.x" + end
+	return "http://onix.brislabs.com" + end
 }
 
 // Return the list of apps that are known about by onix
