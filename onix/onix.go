@@ -47,7 +47,7 @@ func GetApps() []string {
 }
 
 func GetCommonPropertyNames() []string {
-	return []string{"bakeType", "customBakeCommands", "jobsPath", "releasePath", "srcRepo", "servicePathPoke", "statusPath", "testPath"}
+	return []string{"bakeType", "baker", "customBakeCommands", "jobsPath", "releasePath", "srcRepo", "servicePathPoke", "statusPath", "testPath"}
 }
 
 // List the apps known about by onix

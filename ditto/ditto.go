@@ -158,6 +158,13 @@ func BetaBake(args common.Command) {
 
 // Bake the ami
 func LiveBake(args common.Command) {
+	app := args.SecondPos
+	if app != "" {
+		baker := onix.GetOptionalProperty(app, "baker")
+		if baker == "beta" {
+			Bake(args, betaBakeUrl)
+		}
+	}
 	Bake(args, bakeUrl)
 }
 
