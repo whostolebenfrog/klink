@@ -164,8 +164,9 @@ func LiveBake(args common.Command) {
 		if baker == "beta" {
 			Bake(args, betaBakeUrl)
 		}
+	} else {
+		Bake(args, bakeUrl)
 	}
-	Bake(args, bakeUrl)
 }
 
 type Ami struct {
