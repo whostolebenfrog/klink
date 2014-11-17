@@ -39,7 +39,7 @@ func Init() {
 		common.Component{"rollback", Rollback,
 			"{app} {env} rolls the application back to the last successful deploy", "APPS:ENVS"},
 		common.Component{"create-app", CreateApp,
-			"{app} -E {email} -o {owner} -d {description} Creates a new application", "APPS:ENVS"},
+			"{app} -E {email} Creates a new application", "APPS:ENVS"},
 		common.Component{"boxes", Boxes,
 			"{app} {env} -f format [text|json] -S status [stopped|running|terminated]", "APPS:ENVS"})
 }
@@ -104,9 +104,7 @@ type DeployRequest struct {
 }
 
 type CreateAppRequest struct {
-	Description string `json:"description"`
-	Email       string `json:"email"`
-	Owner       string `json:"owner"`
+	Email string `json:"email"`
 }
 
 type DeploymentReference struct {
@@ -402,19 +400,17 @@ func CreateApp(args common.Command) {
 		console.Fail("Must supply an application name as second positional argument")
 	}
 
-	if args.Description == "" || args.Email == "" || args.Owner == "" {
-		console.Fail("Don't be lazy! You must supply owner, email and description values")
+	if args.Email == "" {
+		console.Fail("Don't be lazy! You must supply a value for email")
 	}
 
 	fmt.Printf(
-		"Calling exploud to create application %s with description:\n%s, email: %s, owner: %s",
+		"Calling exploud to create application %s with email: %s",
 		args.SecondPos,
-		args.Description,
 		args.Email,
-		args.Owner,
 	)
 
-	createBody := CreateAppRequest{args.Description, args.Email, args.Owner}
+	createBody := CreateAppRequest{args.Email}
 
 	response := common.PutJson(exploudUrl("/applications/"+args.SecondPos), createBody)
 
