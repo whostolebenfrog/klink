@@ -28,7 +28,7 @@ func PrintHelpAndExit() {
 	console.Reset()
 	fmt.Print("\n[New and updated] ")
 	console.Red()
-	fmt.Print("bake retries, test, jobs\n")
+	fmt.Print("apply-infra, show-infra, bake retries, test, jobs\n")
 	console.FReset()
 
 	// [commands]

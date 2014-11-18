@@ -16,6 +16,7 @@ import (
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 	props "nokia.com/klink/props"
+	shuppet "nokia.com/klink/shuppet"
 	ssh "nokia.com/klink/ssh"
 	update "nokia.com/klink/update"
 )
@@ -64,6 +65,7 @@ func init() {
 	git.Init()
 	jenkins.Init()
 	onix.Init()
+	shuppet.Init()
 	ssh.Init()
 	update.Init()
 }
