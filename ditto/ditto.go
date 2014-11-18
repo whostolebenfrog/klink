@@ -163,10 +163,10 @@ func LiveBake(args common.Command) {
 		baker := onix.GetOptionalProperty(app, "baker")
 		if baker == "beta" {
 			Bake(args, betaBakeUrl)
-            return
+			return
 		}
 	}
-    Bake(args, bakeUrl)
+	Bake(args, bakeUrl)
 }
 
 type Ami struct {
