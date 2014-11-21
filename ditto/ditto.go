@@ -32,7 +32,9 @@ func Init() {
 		common.Component{"latest-bake", LatestBake,
 			"{app} Outputs the latest baked version of the specified application", "APPS"},
 		common.Component{"delete-ami", DeleteAmi,
-			"{app} {ami} Removes the supplied ami, makes it undeployable.", "APPS"})
+			"{app} {ami} Removes the supplied ami, makes it undeployable.", "APPS"},
+		common.Component{"delete-image", DeleteAmi,
+			"{app} {image} Removes the supplied image, makes it undeployable.", "APPS"})
 }
 
 func dittoUrl(end string) string {
