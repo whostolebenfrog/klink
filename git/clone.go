@@ -14,7 +14,7 @@ func Init() {
 		common.Component{"clone-tyr", CloneTyranitar,
 			"{app} {env - optional} clone the tyranitar properties for an app into pwd", "APPS"},
 		common.Component{"clone-shuppet", CloneShuppet,
-			"{app} {env - optional} clone the shuppet properties for an app into pwd", "APPS:ENVS"},
+			"{app} {env - optional} clone the shuppet properties for an app into pwd", "APPS|ENVS"},
 		common.Component{"clone", CloneService,
 			"{app} clone the application into pwd", "APPS"},
 		common.Component{"gist", Gist,

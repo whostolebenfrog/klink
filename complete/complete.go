@@ -73,10 +73,12 @@ func generateCommandArgs() {
 	fmt.Println("Generating command args file")
 
 	var acs []string
+    acs = append(acs, "COMMANDFORMATS=( ")
 	for _, component := range common.Components {
-		acs = append(acs, fmt.Sprintf("command_ac_formats[\"%s\"]=\"%s\"",
+		acs = append(acs, fmt.Sprintf("\"%s:%s\"",
 			component.Command, component.AutoComplete))
 	}
+    acs = append(acs, " )")
 	stringsToFile("/command_ac_formats", acs)
 }
 
@@ -88,14 +90,17 @@ func generateScript() {
 
 kpath="$HOME/.klink.d"
 
-
-if [ $(uname -s) == "Darwin" ]
-then
-    declare -a command_ac_formats
-else
-    declare -A command_ac_formats
-fi
 source $kpath/command_ac_formats
+
+function mget {
+    for animal in "${COMMANDFORMATS[@]}" ; do
+        KEY="${animal%%:*}"
+        VALUE="${animal##*:}"
+        if [ $KEY = $1 ]; then
+            MVAL=$VALUE
+        fi
+    done
+}
 
 function get_complete {
     case $1 in
@@ -133,8 +138,9 @@ _klink()
 			;;
 		*)
             local top=${COMP_WORDS[1]}
-            local command_string=${command_ac_formats[$top]}
-            local command_list=(${command_string//:/ })
+            mget $top
+            local command_string=$MVAL
+            local command_list=(${command_string//|/ })
             get_complete ${command_list[$COMP_CWORD-2]}
 			;;
 	esac

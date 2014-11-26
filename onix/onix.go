@@ -18,7 +18,7 @@ func Init() {
 		common.Component{"info", Info,
 			"{app} Return information about the application", "APPS"},
 		common.Component{"add-onix-prop", AddProperty,
-			"{app} {name} {value} Adds an onix property (json)", "APPS:PROPNAMES"},
+			"{app} {name} {value} Adds an onix property (json)", "APPS|PROPNAMES"},
 		common.Component{"get-onix-prop", GetPropertyFromArgs,
 			"{app} {property-name} get the property for the application", "APPS"},
 		common.Component{"status", Status,

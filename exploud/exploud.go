@@ -23,25 +23,25 @@ const latestVersionString = "latest"
 func Init() {
 	common.Register(
 		common.Component{"deploy", Exploud,
-			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)", "APPS:ENVS"},
+			"{app} {env} [{ami}] Deploy the AMI {ami} for {app} to {env}. (If no ami is specified, the latest is assumed.)", "APPS|ENVS"},
 		common.Component{"watch", Watch,
 			"{id} Resume watching the deployment with the supplied id", ""},
 		common.Component{"undo", Undo,
-			"{app} {env} Undo the steps of a broken deployment", "APPS:ENVS"},
+			"{app} {env} Undo the steps of a broken deployment", "APPS|ENVS"},
 		common.Component{"deployments", Deployments,
-			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed", "APPS:ENVS"},
+			"[{app} {env}] Display a list of ongoing deployments or recent deployments if an app is passed", "APPS|ENVS"},
 		common.Component{"pause", Pause,
-			"{app} {env} attempts to pause a running deployment of {app} in {env}", "APPS:ENVS"},
+			"{app} {env} attempts to pause a running deployment of {app} in {env}", "APPS|ENVS"},
 		common.Component{"cancel-pause", CancelPause,
-			"{app} {env} cancels any existing pause for {app} in {env}", "APPS:ENVS"},
+			"{app} {env} cancels any existing pause for {app} in {env}", "APPS|ENVS"},
 		common.Component{"resume", Resume,
-			"{app} {env} attempts to resume a paused deployment of {app} in {env}", "APPS:ENVS"},
+			"{app} {env} attempts to resume a paused deployment of {app} in {env}", "APPS|ENVS"},
 		common.Component{"rollback", Rollback,
-			"{app} {env} rolls the application back to the last successful deploy", "APPS:ENVS"},
+			"{app} {env} rolls the application back to the last successful deploy", "APPS|ENVS"},
 		common.Component{"create-app", CreateApp,
-			"{app} -E {email} Creates a new application", "APPS:ENVS"},
+			"{app} -E {email} Creates a new application", "APPS|ENVS"},
 		common.Component{"boxes", Boxes,
-			"{app} {env} -f format [text|json] -S status [stopped|running|terminated]", "APPS:ENVS"})
+			"{app} {env} -f format [text|json] -S status [stopped|running|terminated]", "APPS|ENVS"})
 }
 
 // Returns explouds url with the supplied string appended

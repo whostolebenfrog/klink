@@ -10,9 +10,9 @@ import (
 func Init() {
 	common.Register(
 		common.Component{"show-infra", ShowInfra,
-			"{app} {env} Shows infrastructure configuration for {app} in {env}", "APPS:ENVS"},
+			"{app} {env} Shows infrastructure configuration for {app} in {env}", "APPS|ENVS"},
 		common.Component{"apply-infra", ApplyInfra,
-			"{app} {env} Apply infrastructure configuration for {app} in {env}", "APPS:ENVS"})
+			"{app} {env} Apply infrastructure configuration for {app} in {env}", "APPS|ENVS"})
 }
 
 func shuppetUrl(end string) string {
