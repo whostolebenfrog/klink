@@ -39,11 +39,16 @@ func Build(args common.Command) {
 // A unparameterised build has no actions, return true if the build
 // is parameterised
 func isBuildWithParams(path string) bool {
-	pds, err := common.GetAsJsonq(path+"/api/json").Array("actions", "0", "parameterDefinitions")
+	actions, err := common.GetAsJsonq(path+"/api/json").Array("actions")
 	if err != nil {
 		return false
 	}
-	return pds != nil
+	for _, action := range actions {
+		if (action.(map[string]interface{})["parameterDefinitions"] != nil) {
+			return true
+		}
+	}
+	return false
 }
 
 // Build a test job for the supplied application and poll the reponse
