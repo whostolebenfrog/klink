@@ -142,14 +142,23 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 	}
 
 	url := bUrl(app, version)
+
 	if args.Type != "" {
 		url += "?virt-type=" + virtType
 	} else {
 		bakeType := onix.GetOptionalProperty(app, "bakeType")
 		if bakeType != "" {
 			url += "?virt-type=" + bakeType
-		}
+		} else {
+			url += "?virt-type=para"
+        }
 	}
+
+    if (args.Environment != "") {
+        url += "&embargo=" + args.Environment
+    }
+    fmt.Println(url)
+
 	DoBake(url, 120)
 }
 
