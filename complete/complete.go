@@ -73,12 +73,12 @@ func generateCommandArgs() {
 	fmt.Println("Generating command args file")
 
 	var acs []string
-    acs = append(acs, "COMMANDFORMATS=( ")
+	acs = append(acs, "COMMANDFORMATS=( ")
 	for _, component := range common.Components {
 		acs = append(acs, fmt.Sprintf("\"%s:%s\"",
 			component.Command, component.AutoComplete))
 	}
-    acs = append(acs, " )")
+	acs = append(acs, " )")
 	stringsToFile("/command_ac_formats", acs)
 }
 

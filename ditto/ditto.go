@@ -151,13 +151,13 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 			url += "?virt-type=" + bakeType
 		} else {
 			url += "?virt-type=para"
-        }
+		}
 	}
 
-    if (args.Environment != "") {
-        url += "&embargo=" + args.Environment
-    }
-    fmt.Println(url)
+	if args.Environment != "" {
+		url += "&embargo=" + args.Environment
+	}
+	fmt.Println(url)
 
 	DoBake(url, 120)
 }
