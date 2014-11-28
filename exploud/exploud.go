@@ -46,7 +46,7 @@ func Init() {
 
 // Returns explouds url with the supplied string appended
 func exploudUrl(end string) string {
-	return "http://exploud.brislabs.com/1.x" + end
+	return "http://exploud.brislabs.com" + end
 }
 
 // Returns a jsonq object with information about the boxes running

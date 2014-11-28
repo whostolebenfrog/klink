@@ -30,7 +30,7 @@ func ShowInfra(args common.Command) {
 	}
 	env := args.ThirdPos
 
-	infraUrl := fmt.Sprintf(shuppetUrl("/1.x/envs/%s/apps/%s"), env, app)
+	infraUrl := fmt.Sprintf(shuppetUrl("/envs/%s/apps/%s"), env, app)
 	console.MaybeJQS(common.GetString(infraUrl))
 }
 
@@ -45,6 +45,6 @@ func ApplyInfra(args common.Command) {
 	}
 	env := args.ThirdPos
 
-	infraUrl := fmt.Sprintf(shuppetUrl("/1.x/envs/%s/apps/%s/apply"), env, app)
+	infraUrl := fmt.Sprintf(shuppetUrl("/envs/%s/apps/%s/apply"), env, app)
 	console.MaybeJQS(common.GetString(infraUrl))
 }
