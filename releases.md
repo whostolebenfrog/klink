@@ -1,6 +1,11 @@
 # Release Notes
 Most recent releases are at the top.
 
+## Version 0.174
+ * Klink ssh now offers a list of servers to pick from
+ * klink betabake, bakes against an alternative version of ditto
+ * Mac OSX support in autocomplete
+
 ## Version 0.163
  * klink ssh <app> <env> now allows you to pick which box to ssh onto rather than just assuming numel 01
 
