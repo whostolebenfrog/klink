@@ -181,9 +181,9 @@ func LiveBake(args common.Command) {
 }
 
 type Ami struct {
-	Name    string
-	ImageId string
-	Version string
+    Name    string `json:"name"`
+    ImageId string `json:"image-id"`
+    Version string `json:"version"`
 }
 
 // FindAmis using the application name for the second positional command line arg
