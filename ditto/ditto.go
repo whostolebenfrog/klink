@@ -21,8 +21,6 @@ func Init() {
 			"Various helpers; lock, unlock, clean, build public and ent base amis", "DITTOS"},
 		common.Component{"bake", LiveBake,
 			"{app} {version} [-t {hvm,para}] Bakes an AMI for {app} with version {version}", "APPS"},
-		common.Component{"betabake", BetaBake,
-			"{app} {version} [-t {hvm,para}] Bakes an Amazon Linux AMI for {app} with version {version}", "APPS"},
 		common.Component{"allow-prod", AllowProd,
 			"{app} Allows the prod aws account access to the supplied application", "APPS"},
 		common.Component{"amis", FindAmis,
@@ -45,16 +43,8 @@ func dittoUrl(end string) string {
 	return base + "/1.x" + end
 }
 
-func betaDittoUrl(end string) string {
-	return "http://internal-betaditto-2028158683.eu-west-1.elb.amazonaws.com:8080/1.x" + end
-}
-
 func bakeUrl(app string, version string) string {
 	return fmt.Sprintf(dittoUrl("/bake/%s/%s"), app, version)
-}
-
-func betaBakeUrl(app string, version string) string {
-	return fmt.Sprintf(betaDittoUrl("/bake/%s/%s"), app, version)
 }
 
 func AllowProd(args common.Command) {
@@ -162,21 +152,8 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 	DoBake(url, 120)
 }
 
-// BetaBake the ami - e.g. use the version of ditto in beta.
-func BetaBake(args common.Command) {
-	Bake(args, betaBakeUrl)
-}
-
 // Bake the ami
 func LiveBake(args common.Command) {
-	app := args.SecondPos
-	if app != "" {
-		baker := onix.GetOptionalProperty(app, "baker")
-		if baker == "beta" {
-			Bake(args, betaBakeUrl)
-			return
-		}
-	}
 	Bake(args, bakeUrl)
 }
 
