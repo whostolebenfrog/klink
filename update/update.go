@@ -2,7 +2,6 @@ package update
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -177,15 +176,13 @@ func deferCopy(nextVersionUrl string, path string) {
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
 	cmd := exec.Command("sh", "updateklink.sh")
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
 
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
-	io.Copy(os.Stdout, stdout)
 
 	os.Exit(0)
 }
