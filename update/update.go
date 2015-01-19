@@ -169,9 +169,17 @@ func deferCopy(nextVersionUrl string, path string) {
 	script := "sleep 1"
 	script += "\nmv " + path + ".update " + path
 	if len(os.Args) > 0 && os.Args[0] != "update" {
-		script += "\n" + path + " " + strings.Join(os.Args[1:], " ")
+        script += "\n" + path + " "
+        for i := range os.Args[1:] {
+            argy := os.Args[i + 1]
+            if strings.Contains(argy, " ") {
+                script += "\"" + argy + "\" "
+            } else {
+                script += argy + " "
+            }
+        }
 	}
-    //script += "\nrm -f updateklink.sh"
+    script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 
