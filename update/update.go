@@ -168,7 +168,7 @@ func deferCopyForWindows(nextVersionUrl string, path string) {
 func deferCopy(nextVersionUrl string, path string) {
 	script := "sleep 1"
 	script += "\nmv " + path + ".update " + path
-	if len(os.Args) > 0 && os.Args[1] != "update" {
+	if len(os.Args) > 1 && os.Args[1] != "update" {
         script += "\n" + path + " "
         for i := range os.Args[1:] {
             argy := os.Args[i + 1]
