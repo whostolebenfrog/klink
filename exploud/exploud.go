@@ -41,7 +41,7 @@ func Init() {
 		common.Component{"create-app", CreateApp,
 			"{app} -E {email} Creates a new application", "APPS|ENVS"},
 		common.Component{"boxes", Boxes,
-			"{app} {env} -f format [text|json] -S status [stopped|running|terminated]", "APPS|ENVS"})
+			"{app} {env} {filter} -f format [text|json] -S status [stopped|running|terminated]", "APPS|ENVS"})
 }
 
 // Returns explouds url with the supplied string appended
@@ -56,6 +56,17 @@ func JsonBoxes(app string, env string, i []interface{}) {
 	common.GetJson(describeUrl, &i)
 }
 
+func PrintBoxesFilteredResult(filter string, boxes []map[string]interface {}) {
+	for _, box := range boxes {
+		box := jsonq.NewQuery(box)
+        res, err := box.String(filter)
+        if err != nil {
+            panic(err)
+        }
+        fmt.Println(res)
+	}
+}
+
 // Return information about the servers running in the supplied environment
 func Boxes(args common.Command) {
 	if args.SecondPos == "" {
@@ -67,16 +78,43 @@ func Boxes(args common.Command) {
 	}
 	env := args.ThirdPos
 
+    filter := args.FourthPos
+
 	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
+
 	if args.Status != "" {
 		describeUrl += "?state=" + args.Status
 	}
 
-	fmt.Println(common.GetString(describeUrl, func(req *http.Request) {
-		if args.Format == "" || args.Format == "text" {
+    resultString := common.GetString(describeUrl, func(req *http.Request) {
+		if filter == "" && (args.Format == "" || args.Format == "text") {
 			req.Header.Add("accept", "text/plain")
 		}
-	}))
+	})
+
+    if filter != "" {
+        // I might be going mad but it seems like jsonq can't accept json in the format
+        // where the top level element is an array. This is a workaround, although it's
+        // also shit. If it makes you feel better I feel worse writing this than you
+        // do reading it
+        xx := "{\"a\" : " + resultString + "}"
+
+        data := map[string]interface{}{}
+        dec := json.NewDecoder(strings.NewReader(xx))
+        dec.Decode(&data)
+        query := jsonq.NewQuery(data)
+
+        boxes, err := query.ArrayOfObjects("a")
+        if err != nil {
+            fmt.Println("Got a bad response fetching boxes")
+            panic(err)
+        }
+        PrintBoxesFilteredResult(filter, boxes)
+        return
+    } else {
+        fmt.Println(resultString)
+    }
+
 }
 
 // AppExists returns true if the application exists according to exploud
