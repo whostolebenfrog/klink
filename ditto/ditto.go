@@ -32,7 +32,9 @@ func Init() {
 		common.Component{"delete-ami", DeleteAmi,
 			"{app} {ami} Removes the supplied ami, makes it undeployable.", "APPS"},
 		common.Component{"delete-image", DeleteAmi,
-			"{app} {image} Removes the supplied image, makes it undeployable.", "APPS"})
+			"{app} {image} Removes the supplied image, makes it undeployable.", "APPS"},
+        common.Component{"list-amis", ListAmis,
+            "Lists the latest base, parent and public amis", ""})
 }
 
 func dittoUrl(end string) string {
@@ -40,7 +42,7 @@ func dittoUrl(end string) string {
 	if base == "" {
 		base = "http://ditto.brislabs.com:8080"
 	}
-	return base + "/1.x" + end
+	return base + end
 }
 
 func bakeUrl(app string, version string) string {
@@ -280,4 +282,8 @@ func DeleteAmi(args common.Command) {
 	console.Green()
 	fmt.Println("That appears to have worked, the ami will disappear in a few minutes")
 	console.Reset()
+}
+
+func ListAmis(_ common.Command) {
+    console.MaybeJQS(common.GetString(dittoUrl("/amis")))
 }
