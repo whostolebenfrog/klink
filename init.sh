@@ -69,7 +69,7 @@ echo -n "Checking go is on your path: "
 
 command -v go >/dev/null 2>&1 || {
     red "Fail\n\n"
-    red "Can't find go on your path. Install go 1.2 then get back to me!\n";
+    red "Can't find go on your path. Install go >= 1.2 then get back to me!\n";
     exit 1;
 }
 
