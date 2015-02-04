@@ -12,6 +12,7 @@ import (
 
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	onix "nokia.com/klink/onix"
@@ -46,7 +47,7 @@ func Init() {
 
 // Returns explouds url with the supplied string appended
 func exploudUrl(end string) string {
-	return "http://exploud.brislabs.com" + end
+	return conf.MaestroUrl + end
 }
 
 // Returns a jsonq object with information about the boxes running

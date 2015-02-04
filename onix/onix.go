@@ -7,6 +7,7 @@ import (
 
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -34,7 +35,7 @@ type App struct {
 }
 
 func onixUrl(end string) string {
-	return "http://onix.brislabs.com" + end
+	return conf.ListerUrl + end
 }
 
 // Return the list of apps that are known about by onix

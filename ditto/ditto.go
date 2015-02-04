@@ -9,13 +9,13 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
 )
 
 func Init() {
-	// TODO  --- helpers file! the first one
 	common.Register(
 		common.Component{"ditto", Helpers,
 			"Various helpers; lock, unlock, clean, build public and ent base amis", "DITTOS"},
@@ -40,7 +40,7 @@ func Init() {
 func dittoUrl(end string) string {
 	base := os.Getenv("DITTO_URL")
 	if base == "" {
-		base = "http://ditto.brislabs.com:8080"
+		base = conf.BakerUrl
 	}
 	return base + end
 }

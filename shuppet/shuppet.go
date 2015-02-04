@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 )
 
@@ -16,7 +17,7 @@ func Init() {
 }
 
 func shuppetUrl(end string) string {
-	return "http://shuppet.brislabs.com" + end
+	return conf.PedanticUrl + end
 }
 
 // Returns all information stored in Shuppet about the supplied application and environment

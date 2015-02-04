@@ -1,13 +1,14 @@
 package console
 
 import (
+    conf "nokia.com/klink/conf"
 	"fmt"
 	"net/http"
 	"net/url"
 )
 
 func doSpeak(room string, message string) int {
-	resp, _ := http.PostForm("http://btmgsrvhubot001.brislabs.com/hubot/say",
+	resp, _ := http.PostForm(conf.HubotUrl,
 		url.Values{"room": {room}, "message": {message}})
 	return resp.StatusCode
 }

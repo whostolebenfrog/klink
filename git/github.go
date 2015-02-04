@@ -6,6 +6,7 @@ import (
 	"os"
 
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 )
 
@@ -16,7 +17,7 @@ type GistJson struct {
 }
 
 func githubTeamsUrl(end string) string {
-	return "http://benkins.brislabs.com/teams" + end
+	return conf.GithubTeamsUrl + end
 }
 
 // send stdin to a github gist

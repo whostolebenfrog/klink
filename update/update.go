@@ -15,6 +15,7 @@ import (
 
 	common "nokia.com/klink/common"
 	complete "nokia.com/klink/complete"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -34,7 +35,7 @@ func Init() {
 }
 
 func benkinsUrl(end string) string {
-	return "http://benkins.brislabs.com/klink/" + end
+	return conf.DeployUrl + end
 }
 
 // Prints the current version, os and architecture
@@ -49,7 +50,7 @@ func LatestVersion() int {
 	i, err := strconv.Atoi(strings.Replace(latestFromServer, "\n", "", 1))
 	if err != nil {
 		fmt.Println(err)
-		console.Fail("Unable to get latest version. Check http://benkins.brislabs.com/klink/")
+		console.Fail("Unable to get latest version. Check " + conf.DeployUrl)
 	}
 	return i
 }
@@ -60,7 +61,7 @@ func errorWithHelper(nextVersionUrl string) {
 	fmt.Println("\nThere appears to be a later version but an error has occured whilst updating")
 	fmt.Println("You should may be able to download it manually from: ", nextVersionUrl)
 	fmt.Println("\nYou could also try again or check benkins manually for updates")
-	console.Fail("http://benkins.brislabs.com/klink/")
+	console.Fail(conf.DeployUrl)
 }
 
 // Update if there is a later version available, takes the path that this

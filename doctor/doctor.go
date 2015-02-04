@@ -8,6 +8,7 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
+    conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -48,7 +49,7 @@ func BrislabsReachable() {
 	fmt.Println("Checking to see if aws resources in Brislabs are reachable...")
 
 	httpClient := common.NewTimeoutClient(2*time.Second, 2*time.Second)
-	req, err := http.NewRequest("HEAD", "http://ditto.brislabs.com:8080/1.x/status", nil)
+	req, err := http.NewRequest("HEAD", conf.BakerUrl + "/status", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +92,7 @@ func doctorOut() {
 func unableToFixConnection() {
 	console.Red()
 	fmt.Println("\nUnable to fix your connection issues. Try curling:")
-	fmt.Println("http://ditto.brislabs.com:8080/1.x/status")
+	fmt.Println(conf.BakerUrl + "/status")
 	fmt.Println("This can't go through a proxy. If it's trying - that's your problem.")
 	fmt.Println("Usually the fix is putting export no_proxy=$no_proxy,brislabs.com")
 	fmt.Println("into your .bashrc and either sourcing it or starting a new shell.")
