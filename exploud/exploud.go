@@ -12,7 +12,7 @@ import (
 
 	jsonq "github.com/jmoiron/jsonq"
 	common "nokia.com/klink/common"
-    conf "nokia.com/klink/conf"
+	conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	ditto "nokia.com/klink/ditto"
 	onix "nokia.com/klink/onix"
@@ -57,14 +57,14 @@ func JsonBoxes(app string, env string, i []interface{}) {
 	common.GetJson(describeUrl, &i)
 }
 
-func PrintBoxesFilteredResult(filter string, boxes []map[string]interface {}) {
+func PrintBoxesFilteredResult(filter string, boxes []map[string]interface{}) {
 	for _, box := range boxes {
 		box := jsonq.NewQuery(box)
-        res, err := box.String(filter)
-        if err != nil {
-            panic(err)
-        }
-        fmt.Println(res)
+		res, err := box.String(filter)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(res)
 	}
 }
 
@@ -79,7 +79,7 @@ func Boxes(args common.Command) {
 	}
 	env := args.ThirdPos
 
-    filter := args.FourthPos
+	filter := args.FourthPos
 
 	describeUrl := exploudUrl("/describe-instances/" + app + "/" + env)
 
@@ -87,34 +87,34 @@ func Boxes(args common.Command) {
 		describeUrl += "?state=" + args.Status
 	}
 
-    resultString := common.GetString(describeUrl, func(req *http.Request) {
+	resultString := common.GetString(describeUrl, func(req *http.Request) {
 		if filter == "" && (args.Format == "" || args.Format == "text") {
 			req.Header.Add("accept", "text/plain")
 		}
 	})
 
-    if filter != "" {
-        // I might be going mad but it seems like jsonq can't accept json in the format
-        // where the top level element is an array. This is a workaround, although it's
-        // also shit. If it makes you feel better I feel worse writing this than you
-        // do reading it
-        xx := "{\"a\" : " + resultString + "}"
+	if filter != "" {
+		// I might be going mad but it seems like jsonq can't accept json in the format
+		// where the top level element is an array. This is a workaround, although it's
+		// also shit. If it makes you feel better I feel worse writing this than you
+		// do reading it
+		xx := "{\"a\" : " + resultString + "}"
 
-        data := map[string]interface{}{}
-        dec := json.NewDecoder(strings.NewReader(xx))
-        dec.Decode(&data)
-        query := jsonq.NewQuery(data)
+		data := map[string]interface{}{}
+		dec := json.NewDecoder(strings.NewReader(xx))
+		dec.Decode(&data)
+		query := jsonq.NewQuery(data)
 
-        boxes, err := query.ArrayOfObjects("a")
-        if err != nil {
-            fmt.Println("Got a bad response fetching boxes")
-            panic(err)
-        }
-        PrintBoxesFilteredResult(filter, boxes)
-        return
-    } else {
-        fmt.Println(resultString)
-    }
+		boxes, err := query.ArrayOfObjects("a")
+		if err != nil {
+			fmt.Println("Got a bad response fetching boxes")
+			panic(err)
+		}
+		PrintBoxesFilteredResult(filter, boxes)
+		return
+	} else {
+		fmt.Println(resultString)
+	}
 
 }
 

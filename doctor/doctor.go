@@ -8,7 +8,7 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
-    conf "nokia.com/klink/conf"
+	conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -49,7 +49,7 @@ func BrislabsReachable() {
 	fmt.Println("Checking to see if aws resources in Brislabs are reachable...")
 
 	httpClient := common.NewTimeoutClient(2*time.Second, 2*time.Second)
-	req, err := http.NewRequest("HEAD", conf.BakerUrl + "/status", nil)
+	req, err := http.NewRequest("HEAD", conf.BakerUrl+"/status", nil)
 	if err != nil {
 		panic(err)
 	}

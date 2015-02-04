@@ -9,7 +9,7 @@ import (
 	"time"
 
 	common "nokia.com/klink/common"
-    conf "nokia.com/klink/conf"
+	conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	jenkins "nokia.com/klink/jenkins"
 	onix "nokia.com/klink/onix"
@@ -33,8 +33,8 @@ func Init() {
 			"{app} {ami} Removes the supplied ami, makes it undeployable.", "APPS"},
 		common.Component{"delete-image", DeleteAmi,
 			"{app} {image} Removes the supplied image, makes it undeployable.", "APPS"},
-        common.Component{"list-amis", ListAmis,
-            "Lists the latest base, parent and public amis", ""})
+		common.Component{"list-amis", ListAmis,
+			"Lists the latest base, parent and public amis", ""})
 }
 
 func dittoUrl(end string) string {
@@ -160,9 +160,9 @@ func LiveBake(args common.Command) {
 }
 
 type Ami struct {
-    Name    string `json:"name"`
-    ImageId string `json:"image-id"`
-    Version string `json:"version"`
+	Name    string `json:"name"`
+	ImageId string `json:"image-id"`
+	Version string `json:"version"`
 }
 
 // FindAmis using the application name for the second positional command line arg
@@ -285,5 +285,5 @@ func DeleteAmi(args common.Command) {
 }
 
 func ListAmis(_ common.Command) {
-    console.MaybeJQS(common.GetString(dittoUrl("/amis")))
+	console.MaybeJQS(common.GetString(dittoUrl("/amis")))
 }

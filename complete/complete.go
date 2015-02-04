@@ -154,17 +154,17 @@ complete -F _klink klink`
 // ensure that a command to source the autocomplete script is written to bash
 func addSourceToBash() {
 	if !props.HasAutoCompleteRun() {
-        homeFile := ""
-        homeFile = common.UserHomeDir() + "/.bashrc"
-        if common.Exists(homeFile) == false {
-            homeFile = common.UserHomeDir() + "/.bash_profile"
-            if !(common.Exists(homeFile)) {
-                return
-            }
-        }
+		homeFile := ""
+		homeFile = common.UserHomeDir() + "/.bashrc"
+		if common.Exists(homeFile) == false {
+			homeFile = common.UserHomeDir() + "/.bash_profile"
+			if !(common.Exists(homeFile)) {
+				return
+			}
+		}
 
 		console.Green()
-        fmt.Println("Adding the source command to: " + homeFile)
+		fmt.Println("Adding the source command to: " + homeFile)
 		console.Reset()
 
 		f, err := os.OpenFile(homeFile, os.O_APPEND|os.O_WRONLY, 0644)

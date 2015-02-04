@@ -1,10 +1,10 @@
 package console
 
 import (
-    conf "nokia.com/klink/conf"
 	"fmt"
 	"net/http"
 	"net/url"
+	conf "nokia.com/klink/conf"
 )
 
 func doSpeak(room string, message string) int {

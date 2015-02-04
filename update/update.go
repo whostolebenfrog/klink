@@ -15,7 +15,7 @@ import (
 
 	common "nokia.com/klink/common"
 	complete "nokia.com/klink/complete"
-    conf "nokia.com/klink/conf"
+	conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 	props "nokia.com/klink/props"
 )
@@ -170,17 +170,17 @@ func deferCopy(nextVersionUrl string, path string) {
 	script := "sleep 1"
 	script += "\nmv " + path + ".update " + path
 	if len(os.Args) > 1 && os.Args[1] != "update" {
-        script += "\n" + path + " "
-        for i := range os.Args[1:] {
-            argy := os.Args[i + 1]
-            if strings.Contains(argy, " ") {
-                script += "\"" + argy + "\" "
-            } else {
-                script += argy + " "
-            }
-        }
+		script += "\n" + path + " "
+		for i := range os.Args[1:] {
+			argy := os.Args[i+1]
+			if strings.Contains(argy, " ") {
+				script += "\"" + argy + "\" "
+			} else {
+				script += argy + " "
+			}
+		}
 	}
-    script += "\nrm -f updateklink.sh"
+	script += "\nrm -f updateklink.sh"
 	scriptBytes := []byte(script)
 	ioutil.WriteFile("updateklink.sh", scriptBytes, 0755)
 

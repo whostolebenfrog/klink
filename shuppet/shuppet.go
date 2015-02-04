@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	common "nokia.com/klink/common"
-    conf "nokia.com/klink/conf"
+	conf "nokia.com/klink/conf"
 	console "nokia.com/klink/console"
 )
 
