@@ -3,7 +3,7 @@ package console
 import (
 	"fmt"
 
-	common "nokia.com/klink/common"
+	common "mixrad.io/klink/common"
 )
 
 // Sets color and weight back to defaults

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	onix "nokia.com/klink/onix"
+	common "mixrad.io/klink/common"
+	console "mixrad.io/klink/console"
+	onix "mixrad.io/klink/onix"
 )
 
 func Init() {

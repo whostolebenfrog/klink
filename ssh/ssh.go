@@ -9,11 +9,11 @@ import (
 	"text/tabwriter"
 
 	jsonq "github.com/jmoiron/jsonq"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	exploud "nokia.com/klink/exploud"
-	onix "nokia.com/klink/onix"
-	props "nokia.com/klink/props"
+	common "mixrad.io/klink/common"
+	console "mixrad.io/klink/console"
+	exploud "mixrad.io/klink/exploud"
+	onix "mixrad.io/klink/onix"
+	props "mixrad.io/klink/props"
 )
 
 func Init() {

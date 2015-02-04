@@ -8,11 +8,11 @@ import (
 	"regexp"
 	"time"
 
-	common "nokia.com/klink/common"
-	conf "nokia.com/klink/conf"
-	console "nokia.com/klink/console"
-	jenkins "nokia.com/klink/jenkins"
-	onix "nokia.com/klink/onix"
+	common "mixrad.io/klink/common"
+	conf "mixrad.io/klink/conf"
+	console "mixrad.io/klink/console"
+	jenkins "mixrad.io/klink/jenkins"
+	onix "mixrad.io/klink/onix"
 )
 
 func Init() {

@@ -2,9 +2,9 @@ package console
 
 import (
 	"fmt"
+	conf "mixrad.io/klink/conf"
 	"net/http"
 	"net/url"
-	conf "nokia.com/klink/conf"
 )
 
 func doSpeak(room string, message string) int {

@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
+	common "mixrad.io/klink/common"
+	console "mixrad.io/klink/console"
 )
 
 func Init() {

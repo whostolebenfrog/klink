@@ -3,9 +3,9 @@ package shuppet
 import (
 	"fmt"
 
-	common "nokia.com/klink/common"
-	conf "nokia.com/klink/conf"
-	console "nokia.com/klink/console"
+	common "mixrad.io/klink/common"
+	conf "mixrad.io/klink/conf"
+	console "mixrad.io/klink/console"
 )
 
 func Init() {

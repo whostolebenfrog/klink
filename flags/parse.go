@@ -2,7 +2,7 @@ package flags
 
 import (
 	optarg "github.com/jteeuwen/go-pkg-optarg"
-	common "nokia.com/klink/common"
+	common "mixrad.io/klink/common"
 )
 
 func LoadFlags() common.Command {

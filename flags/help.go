@@ -9,9 +9,9 @@ import (
 	"text/tabwriter"
 
 	optarg "github.com/jteeuwen/go-pkg-optarg"
-	common "nokia.com/klink/common"
-	console "nokia.com/klink/console"
-	update "nokia.com/klink/update"
+	common "mixrad.io/klink/common"
+	console "mixrad.io/klink/console"
+	update "mixrad.io/klink/update"
 )
 
 func WrapString(desc string) []string {

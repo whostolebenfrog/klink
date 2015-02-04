@@ -11,12 +11,12 @@ import (
 	"time"
 
 	jsonq "github.com/jmoiron/jsonq"
-	common "nokia.com/klink/common"
-	conf "nokia.com/klink/conf"
-	console "nokia.com/klink/console"
-	ditto "nokia.com/klink/ditto"
-	onix "nokia.com/klink/onix"
-	props "nokia.com/klink/props"
+	common "mixrad.io/klink/common"
+	conf "mixrad.io/klink/conf"
+	console "mixrad.io/klink/console"
+	ditto "mixrad.io/klink/ditto"
+	onix "mixrad.io/klink/onix"
+	props "mixrad.io/klink/props"
 )
 
 const latestVersionString = "latest"

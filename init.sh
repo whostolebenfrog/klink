@@ -104,13 +104,13 @@ fi
 
 echo -n "Checking project is in the correct place: "
 
-klinkpath="$GOPATH/src/nokia.com/klink"
+klinkpath="$GOPATH/src/mixrad.io/klink"
 current=`pwd`
 
 if [ $klinkpath != $current ]; then
     red "Fail\n\n"
     red "Your project must be checked out into the src folder, inside your \$GOPATH.\n"
-    red "Due to go's package management it must be: \$GOPATH/src/nokia.com/klink\n"
+    red "Due to go's package management it must be: \$GOPATH/src/mixrad.io/klink\n"
     red "Found: $current\n"
     red "Expected: $klinkpath\n"
     exit 1

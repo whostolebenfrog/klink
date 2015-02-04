@@ -1,6 +1,5 @@
 nakia -> mixradio
 remove build script from source control (keep in our branch)
-create a build script that sets environment from config
 rename namespaces to be new names
 README
 format!

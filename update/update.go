@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	common "nokia.com/klink/common"
-	complete "nokia.com/klink/complete"
-	conf "nokia.com/klink/conf"
-	console "nokia.com/klink/console"
-	props "nokia.com/klink/props"
+	common "mixrad.io/klink/common"
+	complete "mixrad.io/klink/complete"
+	conf "mixrad.io/klink/conf"
+	console "mixrad.io/klink/console"
+	props "mixrad.io/klink/props"
 )
 
 func Init() {
