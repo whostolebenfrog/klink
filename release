@@ -1,0 +1,46 @@
+#!/bin/bash
+# Builds then releases latest version
+
+VERSION=`cat version`
+NEXT_VERSION=$(($VERSION + 1))
+
+echo Releasing next version: $NEXT_VERSION
+
+# Set the new version in the go source so that the code has access to it.
+# Ghetto properties files going on here! 
+
+sed -i "s/^const Version.*$/const Version = $NEXT_VERSION/" update/version.go
+echo $NEXT_VERSION > version
+
+# Clear the build output directory and build project for all environments
+rm builds/*
+./build-all
+
+BUILDS=builds/*
+
+for build in $BUILDS
+do
+    # if this is wrong I don't want to know what right is.
+    if [ $(whoami) == "jenkins" ]; then
+        cp $build /opt/klink/
+    else
+        scp $build benkins.brislabs.com:/opt/klink/
+    fi
+done
+
+# Update the version file on the remote server to provide the latest version
+
+if [ $(whoami) == "jenkins" ]; then
+    cp version /opt/klink
+else
+    scp version benkins.brislabs.com:/opt/klink/
+fi
+
+# Update git
+
+git add -A
+git commit -m "Bumped version number for release: $NEXT_VERSION"
+git push origin master
+
+git tag -a v$NEXT_VERSION -m "Version $NEXT_VERSION"
+git push --tags origin master
