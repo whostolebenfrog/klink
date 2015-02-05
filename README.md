@@ -3,27 +3,15 @@ Klink is the frontend to our cloud tooling. It makes calls to the various orches
 
 [Release Notes](releases.md)
 
-## Installation
+## What can Klink do?
 
-Navigate to `benkins.brislabs.com/klink` and download the latest version for your architecture. e.g.
+For a list of commands run `klink` with no arguments.
 
-    wget "benkins.brislabs.com/klink/klink-84-linux-amd64"
+## Using Klink
 
-Move this file to somewhere on your `$PATH` that doesn't require root privileges to write. Rename to klink and make executable. e.g.
+To use klink you will first need to have the various other mr-<name> cloud services as klink works by controlling these services. Secondly you will need to alter the conf/conf.go to set the URLs to reflect how you have the various services set up.
 
-    mv klink-84-linux-amd64 $HOME/bin/klink
-    cd !$
-    chmod +x klink
-
-Double check that you don't have appgate connected to live (blocks you from being able to talk to applications in aws brislabs) then run klink
-
-    klink
-    
-Klink will prompt you for your username and run `klink doctor` to ensure that you have network access.
-
-##Updating
-
-Klink will automatically update itself when it detects a new version.
+At this point you can run klink directly with go run, or compile a static version.
 
 ## Developing Klink
 
