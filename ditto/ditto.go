@@ -142,7 +142,7 @@ func Bake(args common.Command, bUrl bakeUrlFn) {
 		if bakeType != "" {
 			url += "?virt-type=" + bakeType
 		} else {
-			url += "?virt-type=para"
+			url += "?virt-type=hvm"
 		}
 	}
 
