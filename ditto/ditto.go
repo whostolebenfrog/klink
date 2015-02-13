@@ -174,7 +174,7 @@ func FindAmis(args common.Command) {
 		console.Fail("Application must be supplied as second positional argument")
 	}
 
-	amis := make([]Ami, 10)
+	amis := make([]Ami, 20)
 	common.GetJson(dittoUrl(fmt.Sprintf("/amis/%s", application)), &amis)
 
 	for key := range amis {
